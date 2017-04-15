@@ -8,7 +8,7 @@ import scala.concurrent.Future
 
 trait AuthenticationStrategy {
 
-  def fetchUser(token: String): Future[UserData]
+  def fetchUser(token: String): Future[Option[UserData]]
 }
 
 class AuthenticationStrategiesRegistry @Inject()(spotifyAuthentication: SpotifyAuthentication) {

@@ -8,4 +8,7 @@
 #        items:
 #          $ref: '#/definitions/com.amplify.api.models.Venue'
 GET     /    com.amplify.api.controllers.VenueManagementController.list
-POST    /    com.amplify.api.controllers.VenueManagementController.signUp(authProvider, authToken)
+
+POST    /    com.amplify.api.controllers.VenueManagementController.signUp
+
+GET     /:authProvider/:authToken    com.amplify.api.controllers.VenueManagementController.login(authProvider, authToken)

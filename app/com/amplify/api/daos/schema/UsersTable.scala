@@ -22,5 +22,5 @@ trait UsersTable extends BaseTable {
     def * = (id, name, email, authIdentifier, authProviderType) <> (UserDb.tupled, UserDb.unapply)
   }
 
-  val usersTable = TableQuery[Users]
+  lazy val usersTable = TableQuery[Users]
 }

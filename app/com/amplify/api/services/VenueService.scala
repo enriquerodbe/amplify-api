@@ -16,4 +16,6 @@ trait VenueService {
       authProviderType: AuthProviderType): Future[Unit]
 
   def listAll: Future[Seq[Venue]]
+
+  def get(userData: UserData, authProviderType: AuthProviderType): Future[Venue]
 }

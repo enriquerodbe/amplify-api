@@ -21,5 +21,5 @@ trait VenuesTable extends BaseTable with UsersTable {
     def * = (id, name, userId) <> (VenueDb.tupled, VenueDb.unapply)
   }
 
-  val venuesTable = TableQuery[Venues]
+  lazy val venuesTable = TableQuery[Venues]
 }
