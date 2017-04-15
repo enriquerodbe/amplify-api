@@ -5,9 +5,12 @@ version := "1.0-SNAPSHOT"
 scalaVersion := "2.11.8"
 
 lazy val dependencies = Seq(
+  "com.typesafe.play" %% "play-ws" % "2.5.4",
   "com.typesafe.play" %% "play-slick" % "2.1.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "2.1.0",
   "com.h2database" % "h2" % "1.4.194",
+  "com.github.tototoshi" %% "play-json-naming" % "1.1.0",
+  "com.iheart" %% "play-swagger" % "0.5.4",
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "it,test")
 
 lazy val root = (project in file("."))
@@ -15,7 +18,10 @@ lazy val root = (project in file("."))
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(scalaSource in IntegrationTest := baseDirectory.value / "it")
-  .enablePlugins(PlayScala)
+  .enablePlugins(PlayScala, SwaggerPlugin)
+
+// Swagger configuration
+swaggerDomainNameSpaces := Seq("com.amplify.api.models")
 
 // Scalastyle configuration
 lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")

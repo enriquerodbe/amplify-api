@@ -1,0 +1,11 @@
+###
+#  summary: List venues
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        type: array
+#        items:
+#          $ref: '#/definitions/com.amplify.api.models.Venue'
+GET     /    com.amplify.api.controllers.VenueManagementController.list
+POST    /    com.amplify.api.controllers.VenueManagementController.signUp(authProvider, authToken)
