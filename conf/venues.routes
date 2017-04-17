@@ -10,5 +10,3 @@
 GET     /    com.amplify.api.controllers.VenueManagementController.list
 
 POST    /    com.amplify.api.controllers.VenueManagementController.signUp
-
-GET     /:authProvider/:authToken    com.amplify.api.controllers.VenueManagementController.login(authProvider, authToken)

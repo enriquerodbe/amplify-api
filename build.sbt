@@ -10,6 +10,7 @@ lazy val dependencies = Seq(
   "com.typesafe.play" %% "play-slick-evolutions" % "2.1.0",
   "com.h2database" % "h2" % "1.4.194",
   "com.github.tototoshi" %% "play-json-naming" % "1.1.0",
+  "be.objectify" %% "deadbolt-scala" % "2.5.1",
   "com.iheart" %% "play-swagger" % "0.5.4",
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "it,test")
 

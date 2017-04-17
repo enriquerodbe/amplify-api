@@ -1,6 +1,5 @@
-package com.amplify.api.controllers
+package com.amplify.api.exceptions
 
-import com.amplify.api.exceptions.{BadRequestException, InternalException}
 import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.http.DefaultHttpErrorHandler

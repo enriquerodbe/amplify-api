@@ -17,7 +17,9 @@ object AppExceptionCode extends Enumeration {
   val
     UnsupportedAuthProvider,
     UserAuthTokenNotFound,
-    VenueNotFound,
-    SpotifyError
+    UserNotFound,
+    SpotifyError,
+    MissingAuthProviderHeader,
+    MissingAuthTokenHeader
   = Value
 }

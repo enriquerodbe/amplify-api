@@ -1,7 +1,7 @@
 package com.amplify.api.services.external
 
 import com.amplify.api.configuration.EnvConfig
-import com.amplify.api.exceptions.{AppExceptionCode, InternalException}
+import com.amplify.api.exceptions.SpotifyException
 import com.github.tototoshi.play.json.JsonNaming
 import javax.inject.Inject
 import play.api.libs.json.{JsError, JsSuccess, Json}
@@ -44,6 +44,3 @@ class SpotifyAuthentication @Inject()(
 }
 
 case class SpotifyAuthResponse(id: String, displayName: String, email: String)
-
-case class SpotifyException(message: String)
-  extends InternalException(AppExceptionCode.SpotifyError, message)

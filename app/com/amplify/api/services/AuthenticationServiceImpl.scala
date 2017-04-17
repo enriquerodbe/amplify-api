@@ -1,7 +1,7 @@
 package com.amplify.api.services
 
 import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
-import com.amplify.api.exceptions.{AppExceptionCode, BadRequestException}
+import com.amplify.api.exceptions.UserAuthTokenNotFound
 import com.amplify.api.services.external.{AuthenticationStrategiesRegistry, UserData}
 import com.amplify.api.utils.FutureUtils.OptionT
 import javax.inject.Inject
@@ -22,8 +22,3 @@ class AuthenticationServiceImpl @Inject()(
     yield result
   }
 }
-
-case class UserAuthTokenNotFound(authToken: String)
-  extends BadRequestException(
-    AppExceptionCode.UserAuthTokenNotFound,
-    s"User authentication token not found: $authToken")
