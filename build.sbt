@@ -12,6 +12,7 @@ lazy val dependencies = Seq(
   "com.github.tototoshi" %% "play-json-naming" % "1.1.0",
   "be.objectify" %% "deadbolt-scala" % "2.5.1",
   "com.iheart" %% "play-swagger" % "0.5.4",
+  "org.webjars" % "swagger-ui" % "2.2.0",
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "it,test")
 
 lazy val root = (project in file("."))
@@ -22,7 +23,7 @@ lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SwaggerPlugin)
 
 // Swagger configuration
-swaggerDomainNameSpaces := Seq("com.amplify.api.models")
+swaggerDomainNameSpaces := Seq("com.amplify.api.controllers.dtos")
 
 // Scalastyle configuration
 lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")

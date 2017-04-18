@@ -1,12 +1,24 @@
 ###
-#  summary: List venues
+#  summary: Register new venue into the system
 #  responses:
-#    200:
+#    201:
 #      description: success
-#      schema:
-#        type: array
-#        items:
-#          $ref: '#/definitions/com.amplify.api.models.Venue'
-GET     /    com.amplify.api.controllers.VenueManagementController.list
-
+#  parameters:
+#  - name: auth-provider
+#    description: Name of the OAuth authorization server.
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: auth-token
+#    description: Access token issued by the authorization server.
+#    in: header
+#    required: true
+#    type: string
+#  - name: venue
+#    in: body
+#    required: true
+#    schema:
+#      $ref: '#/definitions/com.amplify.api.controllers.dtos.VenueManagement.SignUp'
+###
 POST    /    com.amplify.api.controllers.VenueManagementController.signUp

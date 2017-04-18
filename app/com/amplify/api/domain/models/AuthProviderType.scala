@@ -8,6 +8,8 @@ object AuthProviderType extends Enumeration {
 
   val Spotify = Value(1, "spotify")
 
+  val defaultAuthProvider = Spotify
+
   def find(name: String): Option[AuthProviderType] = {
     AuthProviderType.values.find(_.toString.equalsIgnoreCase(name))
   }

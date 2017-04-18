@@ -33,6 +33,6 @@ class AmplifyDeadboltHandler(
   }
 
   override def onAuthFailure[A](request: AuthenticatedRequest[A]): Future[Result] = {
-    Future.successful(Unauthorized)
+    Future.successful(Forbidden)
   }
 }
