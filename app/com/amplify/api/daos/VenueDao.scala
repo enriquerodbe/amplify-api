@@ -10,6 +10,4 @@ import slick.dbio.DBIO
 trait VenueDao {
 
   def create(user: UserDb, name: Name[Venue]): DBIO[VenueDb]
-
-  def retrieveAll: DBIO[Seq[VenueDb]]
 }

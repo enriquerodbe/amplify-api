@@ -16,6 +16,4 @@ class VenueDaoImpl @Inject()(
     (venuesTable returning venuesTable.map(_.id) into ((obj, id) ⇒ obj.copy(id = id))) +=
       VenueDb(name = name, userId = user.id)
   }
-
-  override def retrieveAll: DBIO[Seq[VenueDb]] = venuesTable.result
 }

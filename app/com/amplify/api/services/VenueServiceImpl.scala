@@ -5,7 +5,6 @@ import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
 import com.amplify.api.domain.models.Venue
 import com.amplify.api.domain.models.primitives.Name
 import com.amplify.api.services.converters.UserConverter.userDataToUserDb
-import com.amplify.api.services.converters.VenueConverter.venueDbToVenue
 import com.amplify.api.services.external.UserData
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,6 +30,4 @@ class VenueServiceImpl @Inject()(
 
     db.runTransactionally(action)
   }
-
-  override def listAll: Future[Seq[Venue]] = db.run(venueDao.retrieveAll.map(_.map(venueDbToVenue)))
 }

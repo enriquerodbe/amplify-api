@@ -14,6 +14,4 @@ trait VenueService {
       name: Name[Venue],
       userData: UserData,
       authProviderType: AuthProviderType): Future[Unit]
-
-  def listAll: Future[Seq[Venue]]
 }
