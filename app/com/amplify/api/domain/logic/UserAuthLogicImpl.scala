@@ -1,6 +1,6 @@
 package com.amplify.api.domain.logic
 
-import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
+import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
 import com.amplify.api.domain.models.User
 import com.amplify.api.services.{AuthenticationService, UserService}
 import javax.inject.Inject
@@ -11,7 +11,7 @@ class UserAuthLogicImpl @Inject()(
     userService: UserService)(
     implicit ec: ExecutionContext) extends UserAuthLogic {
 
-  override def login(authProviderType: AuthProviderType, authToken: String): Future[User] = {
+  override def login(authProviderType: ContentProviderType, authToken: String): Future[User] = {
     for {
       userData ← authService.fetchUser(authProviderType, authToken)
       user ← userService.get(userData, authProviderType)

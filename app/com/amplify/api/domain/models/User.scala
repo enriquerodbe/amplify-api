@@ -2,4 +2,7 @@ package com.amplify.api.domain.models
 
 import com.amplify.api.domain.models.primitives.{Email, Name}
 
-case class User(name: Name[User], email: Email, venue: Option[Venue])
+case class User(
+    name: Name[User],
+    email: Email,
+    identifier: ContentProviderIdentifier[User])

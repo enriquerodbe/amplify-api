@@ -1,10 +1,5 @@
 package com.amplify.api.domain.models
 
-import com.amplify.api.domain.models.primitives.Identifier
+import com.amplify.api.domain.models.primitives.Name
 
-case class Playlist(source: PlaylistSource, identifier: Identifier[Playlist])
-
-sealed trait PlaylistSource {
-
-  case object SpotifyUri extends PlaylistSource
-}
+case class Playlist(name: Name[Playlist], identifier: ContentProviderIdentifier[Playlist])

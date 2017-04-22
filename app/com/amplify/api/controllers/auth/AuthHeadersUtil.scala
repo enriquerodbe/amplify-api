@@ -1,7 +1,7 @@
 package com.amplify.api.controllers.auth
 
-import com.amplify.api.domain.models.AuthProviderType
-import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
+import com.amplify.api.domain.models.ContentProviderType
+import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
 import com.amplify.api.exceptions.{MissingAuthTokenHeader, UnsupportedAuthProvider}
 import com.amplify.api.utils.FutureUtils.OptionT
 import javax.inject.Inject
@@ -13,9 +13,9 @@ class AuthHeadersUtil @Inject()(implicit ec: ExecutionContext) {
   def getAuthData(request: Request[_]): Future[AuthData] = {
     val authProvider = request.headers.get("auth-provider") match {
       case Some(providerName) ⇒
-        AuthProviderType.find(providerName) ?! UnsupportedAuthProvider(providerName)
+        ContentProviderType.find(providerName) ?! UnsupportedAuthProvider(providerName)
       case _ ⇒
-        Future.successful(AuthProviderType.defaultAuthProvider)
+        Future.successful(ContentProviderType.default)
     }
 
     for {
@@ -26,4 +26,4 @@ class AuthHeadersUtil @Inject()(implicit ec: ExecutionContext) {
   }
 }
 
-case class AuthData(authProviderType: AuthProviderType, authToken: String)
+case class AuthData(authProviderType: ContentProviderType, authToken: String)

@@ -1,8 +1,8 @@
 package com.amplify.api.services
 
-import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
-import com.amplify.api.domain.models.Venue
+import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
 import com.amplify.api.domain.models.primitives.Name
+import com.amplify.api.domain.models.{Playlist, User, Venue}
 import com.amplify.api.services.external.UserData
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
@@ -13,5 +13,7 @@ trait VenueService {
   def create(
       name: Name[Venue],
       userData: UserData,
-      authProviderType: AuthProviderType): Future[Unit]
+      authProviderType: ContentProviderType): Future[Unit]
+
+  def retrievePlaylists(authToken: String)(implicit user: User): Future[Seq[Playlist]]
 }

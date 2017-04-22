@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 import scala.language.reflectiveCalls
 
 // scalastyle:off public.methods.have.type
-class VenueManagementController @Inject()(
+class VenueAuthController @Inject()(
     venueAuthLogic: VenueAuthLogic,
     authHeadersUtil: AuthHeadersUtil,
     actionBuilder: ActionBuilders)(

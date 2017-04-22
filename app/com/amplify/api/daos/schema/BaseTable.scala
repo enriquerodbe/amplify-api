@@ -1,7 +1,7 @@
 package com.amplify.api.daos.schema
 
-import com.amplify.api.domain.models.AuthProviderType
-import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
+import com.amplify.api.domain.models.ContentProviderType
+import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
 import com.amplify.api.domain.models.primitives.{Email, Identifier, Name}
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -21,5 +21,5 @@ trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
     MappedColumnType.base[Identifier[T], String](_.value, Identifier.apply)
 
   implicit val authProviderTypeType =
-    MappedColumnType.base[AuthProviderType, Int](_.id, AuthProviderType.apply)
+    MappedColumnType.base[ContentProviderType, Int](_.id, ContentProviderType.apply)
 }
