@@ -33,7 +33,7 @@ class VenueServiceImpl @Inject()(
     db.runTransactionally(action)
   }
 
-  override def retrievePlaylists(authToken: String)(implicit user: User): Future[Seq[Playlist]] = {
+  override def retrievePlaylists(user: User, authToken: String): Future[Seq[Playlist]] = {
     val strategy = registry.getStrategy(user.identifier.contentProvider)
     val eventualPlaylists = strategy.fetchPlaylists(authToken)
     eventualPlaylists.map(_.map(playlistDataToPlaylist))

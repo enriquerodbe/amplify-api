@@ -7,5 +7,5 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[VenueCrudLogicImpl])
 trait VenueCrudLogic {
 
-  def retrievePlaylists(authToken: String)(implicit user: User): Future[Seq[Playlist]]
+  def retrievePlaylists(user: User, authToken: String): Future[Seq[Playlist]]
 }

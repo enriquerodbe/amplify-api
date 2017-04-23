@@ -15,5 +15,5 @@ trait VenueService {
       userData: UserData,
       authProviderType: ContentProviderType): Future[Unit]
 
-  def retrievePlaylists(authToken: String)(implicit user: User): Future[Seq[Playlist]]
+  def retrievePlaylists(user: User, authToken: String): Future[Seq[Playlist]]
 }

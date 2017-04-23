@@ -7,7 +7,7 @@ import scala.concurrent.Future
 
 class VenueCrudLogicImpl @Inject()(venueService: VenueService) extends VenueCrudLogic {
 
-  override def retrievePlaylists(authToken: String)(implicit user: User): Future[Seq[Playlist]] = {
-    venueService.retrievePlaylists(authToken)
+  override def retrievePlaylists(user:User, authToken: String): Future[Seq[Playlist]] = {
+    venueService.retrievePlaylists(user, authToken)
   }
 }
