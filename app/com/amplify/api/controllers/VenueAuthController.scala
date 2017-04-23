@@ -5,7 +5,7 @@ import com.amplify.api.controllers.auth.AuthHeadersUtil
 import com.amplify.api.controllers.dtos.VenueManagement.SignUp
 import com.amplify.api.domain.logic.VenueAuthLogic
 import javax.inject.Inject
-import play.api.mvc.Controller
+import play.api.mvc.{Action, Controller}
 import scala.concurrent.ExecutionContext
 import scala.language.reflectiveCalls
 
@@ -16,13 +16,11 @@ class VenueAuthController @Inject()(
     actionBuilder: ActionBuilders)(
     implicit ec: ExecutionContext) extends Controller {
 
-  def signUp = {
-    actionBuilder.SubjectNotPresentAction().defaultHandler()(parse.json[SignUp]) { request ⇒
-      for {
-        authData ← authHeadersUtil.getAuthData(request)
-        _ ← venueAuthLogic.signUp(authData.authProviderType, authData.authToken, request.body.name)
-      }
-      yield Created
+  def signUp = Action.async(parse.json[SignUp]) { request ⇒
+    for {
+      authData ← authHeadersUtil.getAuthData(request)
+      _ ← venueAuthLogic.signUp(authData.authProviderType, authData.authToken, request.body.name)
     }
+    yield Created
   }
 }
