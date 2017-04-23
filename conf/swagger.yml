@@ -8,4 +8,3 @@
     - application/json
   produces:
     - application/json
-  host: localhost:9000

@@ -4,12 +4,10 @@ GET   /docs/swagger-ui/*file        controllers.Assets.at(path:String="/public/l
 ### NoDocs ###
 GET   /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
 
+### NoDocs ###
 GET    /    controllers.Default.todo
 
-###
-# summary: swagger definition
-# description: for swagger UI to consume
-###
+### NoDocs ###
 GET    /assets/swagger.json    com.amplify.api.controllers.SwaggerController.specs
 
 -> /venues  venues.Routes
