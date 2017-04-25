@@ -1,11 +1,11 @@
 package com.amplify.api.exceptions
 
-trait AuthException
+sealed trait AuthException
 
-case class UserAuthTokenNotFound(authToken: String)
+case object UserAuthTokenNotFound
   extends BadRequestException(
     AppExceptionCode.UserAuthTokenNotFound,
-    s"User authentication token not found: $authToken")
+    s"User authentication token not found")
     with AuthException
 
 case class UnsupportedAuthProvider(authProviderName: String)

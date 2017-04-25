@@ -28,7 +28,7 @@ class AmplifyDeadboltHandler(
       yield Some(AuthUser(user, authData.authToken))
 
     eventualSubject recover {
-      case _: UserAuthTokenNotFound | _: UserNotFound ⇒ None
+      case UserAuthTokenNotFound | _: UserNotFound ⇒ None
     }
   }
 

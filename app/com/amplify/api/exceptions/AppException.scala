@@ -20,6 +20,7 @@ object AppExceptionCode extends Enumeration {
     UserNotFound,
     SpotifyError,
     MissingAuthProviderHeader,
-    MissingAuthTokenHeader
+    MissingAuthTokenHeader,
+    UnexpectedExternalServiceResponse
   = Value
 }

@@ -19,6 +19,7 @@ class VenueAuthLogicImpl @Inject()(
     for {
       userData ← authService.fetchUser(authProviderType, authToken)
       creationResult ← venueService.create(name, userData, authProviderType)
-    } yield creationResult
+    }
+    yield creationResult
   }
 }
