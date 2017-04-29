@@ -1,11 +1,14 @@
 package com.amplify.api.exceptions
 
+import com.amplify.api.controllers.converters.JsonConverters._
+import com.amplify.api.controllers.dtos.ErrorResponse
 import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.http.DefaultHttpErrorHandler
+import play.api.libs.json.Json
 import play.api.mvc.{RequestHeader, Result, Results}
 import play.api.routing.Router
-import play.api.{Configuration, Environment, OptionalSourceMapper}
+import play.api.{Configuration, Environment, OptionalSourceMapper, UsefulException}
 import scala.concurrent.Future
 
 @Singleton
@@ -16,11 +19,29 @@ class ErrorHandler @Inject()(
     router: Provider[Router])
   extends DefaultHttpErrorHandler(env, config, sourceMapper, router) with Results {
 
-  override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
-    exception match {
-      case ex: BadRequestException ⇒ Future.successful(BadRequest(ex.getMessage))
-      case ex: InternalException ⇒ Future.successful(InternalServerError(ex.getMessage))
-      case _ ⇒ super.onServerError(request, exception)
-    }
+  override def onProdServerError(
+      request: RequestHeader,
+      exception: UsefulException): Future[Result] = {
+    onServerError(request, exception.cause, s"[${exception.id}] ${exception.title}")
+  }
+
+  override protected def onDevServerError(
+      request: RequestHeader,
+      exception: UsefulException): Future[Result] = {
+    val unexpectedMessage = s"[${exception.id}] ${exception.title}: ${exception.description}"
+    onServerError(request, exception.cause, unexpectedMessage)
+  }
+
+  private def onServerError(
+      request: RequestHeader,
+      exception: Throwable,
+      unexpectedMessage: String) = exception match {
+    case ex: BadRequestException ⇒
+      Future.successful(BadRequest(Json.toJson(ErrorResponse(ex.code, ex.message))))
+    case ex: InternalException ⇒
+      Future.successful(InternalServerError(Json.toJson(ErrorResponse(ex.code, ex.message))))
+    case _ ⇒
+      val body = Json.toJson(ErrorResponse(AppExceptionCode.Unexpected, unexpectedMessage))
+      Future.successful(InternalServerError(body))
   }
 }

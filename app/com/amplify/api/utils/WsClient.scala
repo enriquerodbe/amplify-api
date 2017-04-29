@@ -84,5 +84,5 @@ trait WsClient {
   }
 }
 
-case class InvalidJsonException(message: String)
+case class InvalidJsonException(override val message: String)
   extends InternalException(AppExceptionCode.UnexpectedExternalServiceResponse, message)
