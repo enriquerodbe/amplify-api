@@ -2,14 +2,14 @@ package com.amplify.api.domain.models.primitives
 
 import scala.language.implicitConversions
 
-case class Identifier[T](value: String) extends AnyVal {
+case class Identifier(value: String) extends AnyVal {
 
   override def toString: String = value
 }
 
 object Identifier {
 
-  implicit def identifierToLong[T](identifier: Identifier[T]): String = identifier.value
+  implicit def identifierToLong(identifier: Identifier): String = identifier.value
 
-  implicit def longToIdentifier[T](value: String): Identifier[T] = Identifier[T](value)
+  implicit def longToIdentifier(value: String): Identifier = Identifier(value)
 }

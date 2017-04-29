@@ -14,14 +14,14 @@ trait UsersTable extends BaseTable {
   // scalastyle:off method.name
   class Users(tag: Tag) extends Table[UserDb](tag, "users") {
     def id = column[Id[User]]("id", O.PrimaryKey, O.AutoInc)
-    def name = column[Name[User]]("name")
+    def name = column[Name]("name")
     def email = column[Email]("email")
     def authProviderType = column[ContentProviderType]("auth_provider")
-    def authIdentifier = column[Identifier[User]]("auth_identifier")
+    def authIdentifier = column[Identifier]("auth_identifier")
 
     def contentProviderIdentifier =
       (authProviderType, authIdentifier) <>
-        ((ContentProviderIdentifier.apply[User] _).tupled, ContentProviderIdentifier.unapply[User])
+        ((ContentProviderIdentifier.apply _).tupled, ContentProviderIdentifier.unapply)
 
     def * = (id, name, email, contentProviderIdentifier) <> (UserDb.tupled, UserDb.unapply)
   }

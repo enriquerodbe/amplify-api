@@ -19,7 +19,7 @@
 #    in: body
 #    required: true
 #    schema:
-#      $ref: '#/definitions/com.amplify.api.controllers.dtos.VenueManagement.SignUp'
+#      $ref: '#/definitions/com.amplify.api.controllers.dtos.VenueAuth.SignUpReq'
 ###
 POST    /    com.amplify.api.controllers.VenueAuthController.signUp
 

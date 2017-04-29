@@ -3,9 +3,11 @@ package com.amplify.api.controllers.auth
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler}
 import com.amplify.api.domain.logic.UserAuthLogic
-import com.amplify.api.exceptions.{UserAuthTokenNotFound, UserNotFound}
+import com.amplify.api.domain.models.{AuthToken, AuthenticatedUserReq}
+import com.amplify.api.exceptions.UserNotFound
 import play.api.mvc.{Request, Result, Results}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class AmplifyDeadboltHandler(
     userAuthLogic: UserAuthLogic,
@@ -20,15 +22,20 @@ class AmplifyDeadboltHandler(
       request: Request[A]): Future[Option[DynamicResourceHandler]] = Future.successful(None)
 
   override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] = {
-    val eventualSubject =
-      for {
-        authData ← authHeadersUtil.getAuthData(request)
-        user ← userAuthLogic.login(authData.authProviderType, authData.authToken)
+    val eventualMaybeSubject =
+      authHeadersUtil.getAuthToken(request) match {
+        case Success(authToken) ⇒ loginUser(authToken)
+        case Failure(_) ⇒ Future.successful(None)
       }
-      yield Some(AuthUser(user, authData.authToken))
 
-    eventualSubject recover {
-      case UserAuthTokenNotFound | _: UserNotFound ⇒ None
+    eventualMaybeSubject.recover {
+      case _: UserNotFound ⇒ None
+    }
+  }
+
+  private def loginUser(authToken: AuthToken) = {
+    userAuthLogic.login(authToken).map { user ⇒
+      Some(AmplifyApiSubject(AuthenticatedUserReq(user, authToken.token)))
     }
   }
 

@@ -1,9 +1,8 @@
 package com.amplify.api.services
 
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
-import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
 import com.amplify.api.domain.models.primitives.Name
-import com.amplify.api.domain.models.{Playlist, User, Venue}
+import com.amplify.api.domain.models.{AuthenticatedUserReq, Playlist}
 import com.amplify.api.services.converters.PlaylistConverter.playlistDataToPlaylist
 import com.amplify.api.services.converters.UserConverter.userDataToUserDb
 import com.amplify.api.services.external.{ContentProviderRegistry, UserData}
@@ -18,10 +17,9 @@ class VenueServiceImpl @Inject()(
     implicit ec: ExecutionContext) extends VenueService {
 
   override def create(
-      name: Name[Venue],
       userData: UserData,
-      authProviderType: ContentProviderType): Future[Unit] = {
-    val userDb = userDataToUserDb(userData, authProviderType)
+      name: Name): Future[Unit] = {
+    val userDb = userDataToUserDb(userData)
 
     val action =
       for {
@@ -33,9 +31,9 @@ class VenueServiceImpl @Inject()(
     db.runTransactionally(action)
   }
 
-  override def retrievePlaylists(user: User, authToken: String): Future[Seq[Playlist]] = {
-    val strategy = registry.getStrategy(user.identifier.contentProvider)
-    val eventualPlaylists = strategy.fetchPlaylists(authToken)
+  override def retrievePlaylists(userReq: AuthenticatedUserReq): Future[Seq[Playlist]] = {
+    val strategy = registry.getStrategy(userReq.user.identifier.contentProvider)
+    val eventualPlaylists = strategy.fetchPlaylists(userReq.authToken)
     eventualPlaylists.map(_.map(playlistDataToPlaylist))
   }
 }

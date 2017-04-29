@@ -13,7 +13,7 @@ trait VenuesTable extends BaseTable with UsersTable {
   // scalastyle:off method.name
   class Venues(tag: Tag) extends Table[VenueDb](tag, "venues") {
     def id = column[Id[Venue]]("id", O.PrimaryKey, O.AutoInc)
-    def name = column[Name[Venue]]("name")
+    def name = column[Name]("name")
     def userId = column[Id[User]]("user_id")
 
     def user = foreignKey("user_fk", userId, usersTable)(_.id)

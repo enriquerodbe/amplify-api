@@ -8,24 +8,24 @@ import play.api.libs.functional.syntax._
 
 object JsonConverters {
 
-  implicit def nameReads[T]: Reads[Name[T]] = Reads {
+  implicit val nameReads: Reads[Name] = Reads {
     case JsString(value) ⇒ JsSuccess(value)
     case other ⇒ JsError(s"Name must be a string but found: $other")
   }
 
-  implicit def nameWrites[T]: Writes[Name[T]] = Writes(JsString(_))
+  implicit val nameWrites: Writes[Name] = Writes(JsString(_))
 
-  implicit def nameFormat[T]: Format[Name[T]] = Format(nameReads, nameWrites)
+  implicit val nameFormat: Format[Name] = Format(nameReads, nameWrites)
 
-  implicit def identifierReads[T]: Reads[Identifier[T]] = Reads {
+  implicit val identifierReads: Reads[Identifier] = Reads {
     case JsString(value) ⇒ JsSuccess(value)
     case other ⇒ JsError(s"Identifier must be a string but found: $other")
   }
 
-  implicit def identifierWrites[T]: Writes[Identifier[T]] = Writes(JsString(_))
+  implicit val identifierWrites: Writes[Identifier] = Writes(JsString(_))
 
-  implicit def identifierFormat[T]: Format[Identifier[T]] = {
-    Format(identifierReads[T], identifierWrites[T])
+  implicit val identifierFormat: Format[Identifier] = {
+    Format(identifierReads, identifierWrites)
   }
 
   implicit val contentProviderReads: Reads[ContentProviderType] = Reads {
@@ -44,15 +44,15 @@ object JsonConverters {
     Format(contentProviderReads, contentProviderWrites)
   }
 
-  implicit def contentProviderIdentifierFormat[T]: Format[ContentProviderIdentifier[T]] = {
+  implicit def contentProviderIdentifierFormat: Format[ContentProviderIdentifier] = {
     ((__ \ "content_provider").format[ContentProviderType] ~
-      (__ \ "identifier").format[Identifier[T]]
-      )(ContentProviderIdentifier.apply[T], unlift(ContentProviderIdentifier.unapply))
+      (__ \ "identifier").format[Identifier]
+      )(ContentProviderIdentifier.apply, unlift(ContentProviderIdentifier.unapply))
   }
 
   implicit val playlistFormat: Format[Playlist] = {
-    ((__ \ "name").format[Name[Playlist]] ~
-      (__ \ "identifier").format[ContentProviderIdentifier[Playlist]]
+    ((__ \ "name").format[Name] ~
+      (__ \ "identifier").format[ContentProviderIdentifier]
       )(Playlist.apply, unlift(Playlist.unapply))
   }
 }

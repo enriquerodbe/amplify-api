@@ -1,7 +1,7 @@
 package com.amplify.api.services.external.spotify
 
 import com.amplify.api.configuration.EnvConfig
-import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProviderType, Playlist, User}
+import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProviderType}
 import com.amplify.api.exceptions.{UnexpectedResponseException, UserAuthTokenNotFound}
 import com.amplify.api.services.external._
 import com.amplify.api.services.external.spotify.Dtos.{Playlists, User ⇒ SpotifyUser}
@@ -21,14 +21,14 @@ class SpotifyContentProvider @Inject()(
 
   override def fetchUser(implicit token: String): Future[UserData] = {
     spotifyGet[SpotifyUser]("/me").map { spotifyUser ⇒
-      val identifier = ContentProviderIdentifier[User](ContentProviderType.Spotify, spotifyUser.id)
+      val identifier = ContentProviderIdentifier(ContentProviderType.Spotify, spotifyUser.id)
       UserData(identifier, spotifyUser.displayName, spotifyUser.email)
     }
   }
 
   override def fetchPlaylists(implicit token: String): Future[Seq[PlaylistData]] = {
     spotifyGet[Playlists]("/me/playlists").map(_.items.map { item ⇒
-      val identifier = ContentProviderIdentifier[Playlist](ContentProviderType.Spotify, item.id)
+      val identifier = ContentProviderIdentifier(ContentProviderType.Spotify, item.id)
       PlaylistData(identifier, item.name)
     })
   }

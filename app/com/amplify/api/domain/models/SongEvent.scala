@@ -13,7 +13,7 @@ case object SongStartedPlaying extends SongEventType
 case object SongSkipped extends SongEventType
 case object SongFinishedPlaying extends SongEventType
 
-case class Song(source: SongSource, identifier: Identifier[Song])
+case class Song(source: SongSource, identifier: Identifier)
 
 sealed trait SongSource {
 

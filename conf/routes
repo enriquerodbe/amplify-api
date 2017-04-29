@@ -11,3 +11,5 @@ GET    /    controllers.Default.todo
 GET    /assets/swagger.json    com.amplify.api.controllers.SwaggerController.specs
 
 -> /venues  venues.Routes
+
+-> /users  users.Routes

@@ -1,7 +1,6 @@
 package com.amplify.api.domain.logic
 
-import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
-import com.amplify.api.domain.models.Venue
+import com.amplify.api.domain.models.AuthToken
 import com.amplify.api.domain.models.primitives.Name
 import com.amplify.api.services.{AuthenticationService, VenueService}
 import javax.inject.Inject
@@ -13,12 +12,11 @@ class VenueAuthLogicImpl @Inject()(
     implicit ec: ExecutionContext) extends VenueAuthLogic {
 
   override def signUp(
-      authProviderType: ContentProviderType,
-      authToken: String,
-      name: Name[Venue]): Future[Unit] = {
+      authToken: AuthToken,
+      name: Name): Future[Unit] = {
     for {
-      userData ← authService.fetchUser(authProviderType, authToken)
-      creationResult ← venueService.create(name, userData, authProviderType)
+      userData ← authService.fetchUser(authToken)
+      creationResult ← venueService.create(userData, name)
     }
     yield creationResult
   }

@@ -11,14 +11,14 @@ trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
 
-  implicit def nameType[T] =
-    MappedColumnType.base[Name[T], String](_.value, Name.apply)
+  implicit val nameType =
+    MappedColumnType.base[Name, String](_.value, Name.apply)
 
   implicit val emailType =
     MappedColumnType.base[Email, String](_.value, Email.apply)
 
-  implicit def identifierType[T] =
-    MappedColumnType.base[Identifier[T], String](_.value, Identifier.apply)
+  implicit val identifierType =
+    MappedColumnType.base[Identifier, String](_.value, Identifier.apply)
 
   implicit val authProviderTypeType =
     MappedColumnType.base[ContentProviderType, Int](_.id, ContentProviderType.apply)

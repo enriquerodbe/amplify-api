@@ -6,6 +6,6 @@ import com.amplify.api.domain.models.{ContentProviderIdentifier, User}
 
 case class UserDb(
     id: Id[User] = -1L,
-    name: Name[User],
+    name: Name,
     email: Email,
-    authIdentifier: ContentProviderIdentifier[User])
+    authIdentifier: ContentProviderIdentifier)
