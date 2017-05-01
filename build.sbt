@@ -13,7 +13,8 @@ lazy val dependencies = Seq(
   "be.objectify" %% "deadbolt-scala" % "2.5.1",
   "com.iheart" %% "play-swagger" % "0.5.4",
   "org.webjars" % "swagger-ui" % "2.2.0",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "it,test")
+  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "it,test",
+  "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % "it,test")
 
 lazy val root = (project in file("."))
   .settings(libraryDependencies ++= dependencies)
@@ -22,14 +23,17 @@ lazy val root = (project in file("."))
   .settings(scalaSource in IntegrationTest := baseDirectory.value / "it")
   .enablePlugins(PlayScala, SwaggerPlugin)
 
-// Swagger
-swaggerDomainNameSpaces := Seq("com.amplify.api.controllers.dtos")
+fork in IntegrationTest := true
+javaOptions in IntegrationTest += "-Dconfig.file=it/conf/application.test.conf"
 
 // Scoverage
 // This makes heroku deploy fail
 //coverageEnabled := true
 //coverageMinimum := 80
 //coverageFailOnMinimum := true
+
+// Swagger
+swaggerDomainNameSpaces := Seq("com.amplify.api.controllers.dtos")
 
 // Scalastyle
 lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")

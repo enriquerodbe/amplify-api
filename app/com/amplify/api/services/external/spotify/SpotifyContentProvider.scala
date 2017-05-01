@@ -16,10 +16,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SpotifyContentProvider @Inject()(
     val ws: WSClient,
-    envConfig: EnvConfig)(
+    val envConfig: EnvConfig)(
     implicit val ec: ExecutionContext) extends ContentProviderStrategy with SpotifyBaseClient {
-
-  val baseUrl = envConfig.getString("spotify.web_api.url")
 
   override def fetchUser(implicit token: AuthToken): Future[UserData] = {
     spotifyGet[SpotifyUser]("/me").map(userToUserData)

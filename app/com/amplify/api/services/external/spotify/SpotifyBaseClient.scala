@@ -1,5 +1,6 @@
 package com.amplify.api.services.external.spotify
 
+import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models.AuthToken
 import com.amplify.api.services.external.spotify.Dtos.Page
 import com.amplify.api.services.external.spotify.JsonConverters._
@@ -10,6 +11,10 @@ import play.mvc.Http.HeaderNames.AUTHORIZATION
 import scala.concurrent.Future
 
 trait SpotifyBaseClient extends WsClient {
+
+  def envConfig: EnvConfig
+
+  override val baseUrl = envConfig.spotifyUrl
 
   def spotifyGet[T](
       path: String,
