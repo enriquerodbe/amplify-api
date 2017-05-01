@@ -17,8 +17,7 @@ class VenueCrudController @Inject()(
     implicit ec: ExecutionContext) extends Controller with AuthenticatedRequests {
 
   def fetchPlaylists(offset: Int, limit: Int) = authenticated() { request ⇒
-    val subject = request.subject
-    val eventualPlaylists = venueCrudLogic.retrievePlaylists(subject.userReq)
+    val eventualPlaylists = venueCrudLogic.retrievePlaylists(request.subject.userReq)
     eventualPlaylists.map(playlists ⇒ Ok(Json.toJson(playlists)))
   }
 }

@@ -22,10 +22,15 @@ lazy val root = (project in file("."))
   .settings(scalaSource in IntegrationTest := baseDirectory.value / "it")
   .enablePlugins(PlayScala, SwaggerPlugin)
 
-// Swagger configuration
+// Swagger
 swaggerDomainNameSpaces := Seq("com.amplify.api.controllers.dtos")
 
-// Scalastyle configuration
+// Scoverage
+coverageEnabled := true
+coverageMinimum := 80
+coverageFailOnMinimum := true
+
+// Scalastyle
 lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")
 compileScalastyle := org.scalastyle.sbt.ScalastylePlugin.scalastyle.in(Compile).toTask("").value
 (compile in Compile) := (compile in Compile).dependsOn(compileScalastyle).value
