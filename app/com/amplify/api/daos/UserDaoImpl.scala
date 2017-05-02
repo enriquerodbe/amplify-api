@@ -1,6 +1,6 @@
 package com.amplify.api.daos
 
-import com.amplify.api.daos.models.{UserDb, VenueDb}
+import com.amplify.api.daos.models.UserDb
 import com.amplify.api.daos.schema.{UsersTable, VenuesTable}
 import com.amplify.api.domain.models.ContentProviderIdentifier
 import javax.inject.Inject
@@ -16,10 +16,8 @@ class UserDaoImpl @Inject()(
   }
 
   override def retrieve(
-      identifier: ContentProviderIdentifier): DBIO[Option[(UserDb, Option[VenueDb])]] = {
-    val all = usersTable joinLeft venuesTable on (_.id === _.userId)
-
-    val query = all.filter { case (user, _) ⇒
+      identifier: ContentProviderIdentifier): DBIO[Option[UserDb]] = {
+    val query = usersTable.filter { user ⇒
       user.authIdentifier === identifier.identifier &&
         user.authProviderType === identifier.contentProvider
     }

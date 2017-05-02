@@ -1,7 +1,7 @@
 package com.amplify.api.controllers
 
 import be.objectify.deadbolt.scala.ActionBuilders
-import com.amplify.api.controllers.converters.JsonConverters._
+import com.amplify.api.controllers.dtos.PrimitivesJsonConverters._
 import com.amplify.api.domain.logic.VenueCrudLogic
 import com.amplify.api.utils.AuthenticatedRequests
 import javax.inject.Inject

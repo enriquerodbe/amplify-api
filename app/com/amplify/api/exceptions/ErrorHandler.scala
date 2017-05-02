@@ -1,6 +1,6 @@
 package com.amplify.api.exceptions
 
-import com.amplify.api.controllers.converters.JsonConverters._
+import com.amplify.api.controllers.dtos.PrimitivesJsonConverters._
 import com.amplify.api.controllers.dtos.ErrorResponse
 import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
@@ -22,17 +22,17 @@ class ErrorHandler @Inject()(
   override def onProdServerError(
       request: RequestHeader,
       exception: UsefulException): Future[Result] = {
-    onServerError(request, exception.cause, s"[${exception.id}] ${exception.title}")
+    onError(request, exception.cause, s"[${exception.id}] ${exception.title}")
   }
 
   override protected def onDevServerError(
       request: RequestHeader,
       exception: UsefulException): Future[Result] = {
     val unexpectedMessage = s"[${exception.id}] ${exception.title}: ${exception.description}"
-    onServerError(request, exception.cause, unexpectedMessage)
+    onError(request, exception.cause, unexpectedMessage)
   }
 
-  private def onServerError(
+  private def onError(
       request: RequestHeader,
       exception: Throwable,
       unexpectedMessage: String) = exception match {

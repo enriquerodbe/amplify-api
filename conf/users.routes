@@ -1,19 +1,39 @@
 ###
 #  summary: Register new user into the system
 #  responses:
-#    201:
+#    200:
 #      description: success
 #  parameters:
 #  - name: auth-provider
-#    description: Name of the OAuth authorization server.
+#    description: Name of the OAuth authorization server
 #    in: header
 #    required: false
 #    type: string
 #    default: spotify
 #  - name: auth-token
-#    description: Access token issued by the authorization server.
+#    description: Access token issued by the authorization server
 #    in: header
 #    required: true
 #    type: string
 ###
 POST    /    com.amplify.api.controllers.UserAuthController.signUp
+
+###
+#  summary: Get the profile of the authenticated user
+#  responses:
+#    200:
+#      description: success
+#  parameters:
+#  - name: auth-provider
+#    description: Name of the OAuth authorization server
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: auth-token
+#    description: Access token issued by the authorization server
+#    in: header
+#    required: true
+#    type: string
+###
+GET    /me    com.amplify.api.controllers.UserCrudController.fetchUser()

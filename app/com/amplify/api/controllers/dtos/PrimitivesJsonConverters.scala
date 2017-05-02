@@ -1,14 +1,13 @@
-package com.amplify.api.controllers.converters
+package com.amplify.api.controllers.dtos
 
-import com.amplify.api.controllers.dtos.ErrorResponse
-import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProviderType, Playlist}
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
 import com.amplify.api.domain.models.primitives.{Identifier, Name}
+import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProviderType, Playlist}
 import com.amplify.api.exceptions.AppExceptionCode.AppExceptionCode
-import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
-object JsonConverters {
+object PrimitivesJsonConverters {
 
   implicit val appExceptionCodeWrites: Writes[AppExceptionCode] = Writes(c ⇒ JsNumber(c.id))
 
