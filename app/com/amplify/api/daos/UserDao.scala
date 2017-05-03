@@ -8,7 +8,7 @@ import slick.dbio.DBIO
 @ImplementedBy(classOf[UserDaoImpl])
 trait UserDao {
 
-  def create(user: UserDb): DBIO[UserDb]
-
   def retrieve(identifier: ContentProviderIdentifier): DBIO[Option[UserDb]]
+
+  def retrieveOrCreate(userDb: UserDb): DBIO[UserDb]
 }

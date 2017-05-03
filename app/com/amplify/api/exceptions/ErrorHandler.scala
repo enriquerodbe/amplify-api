@@ -36,6 +36,8 @@ class ErrorHandler @Inject()(
       request: RequestHeader,
       exception: Throwable,
       unexpectedMessage: String) = exception match {
+    case ex: ForbiddenException ⇒
+      Future.successful(Forbidden(Json.toJson(ErrorResponse(ex.code, ex.message))))
     case ex: BadRequestException ⇒
       Future.successful(BadRequest(Json.toJson(ErrorResponse(ex.code, ex.message))))
     case ex: InternalException ⇒

@@ -15,4 +15,8 @@ class VenueDaoImpl @Inject()(
     (venuesTable returning venuesTable.map(_.id) into ((obj, id) ⇒ obj.copy(id = id))) +=
       VenueDb(name = name, userId = user.id)
   }
+
+  override def retrieve(user: UserDb): DBIO[Option[VenueDb]] = {
+    venuesTable.filter(_.userId === user.id).take(1).result.headOption
+  }
 }

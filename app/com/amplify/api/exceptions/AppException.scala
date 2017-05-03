@@ -13,6 +13,11 @@ abstract class BadRequestException(
     override val message: String)
   extends AppException(code, message)
 
+abstract class ForbiddenException(
+    override val code: AppExceptionCode,
+    override val message: String)
+  extends BadRequestException(code, message)
+
 object AppExceptionCode extends Enumeration {
 
   type AppExceptionCode = Value
@@ -25,6 +30,7 @@ object AppExceptionCode extends Enumeration {
     SpotifyError,
     MissingAuthProviderHeader,
     MissingAuthTokenHeader,
-    UnexpectedExternalServiceResponse
+    UnexpectedExternalServiceResponse,
+    UserAlreadyHasVenue
   = Value
 }

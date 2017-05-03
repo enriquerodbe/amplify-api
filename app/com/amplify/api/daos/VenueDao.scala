@@ -9,4 +9,6 @@ import slick.dbio.DBIO
 trait VenueDao {
 
   def create(user: UserDb, name: Name): DBIO[VenueDb]
+
+  def retrieve(user: UserDb): DBIO[Option[VenueDb]]
 }
