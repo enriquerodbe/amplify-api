@@ -4,6 +4,7 @@ import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProviderType}
 import com.amplify.api.exceptions.{UnexpectedResponseException, UserAuthTokenNotFound}
 import com.amplify.api.services.external._
+import com.amplify.api.services.external.models.{PlaylistData, UserData}
 import com.amplify.api.services.external.spotify.Dtos.{Playlists, User ⇒ SpotifyUser}
 import com.amplify.api.services.external.spotify.JsonConverters._
 import javax.inject.Inject

@@ -1,8 +1,8 @@
 package com.amplify.api.services.external
 
+import com.amplify.api.domain.models.ContentProviderType
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
-import com.amplify.api.domain.models.primitives.{Email, Name}
-import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProviderType}
+import com.amplify.api.services.external.models.{PlaylistData, UserData}
 import com.amplify.api.services.external.spotify.SpotifyContentProvider
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -21,7 +21,3 @@ class ContentProviderRegistry @Inject()(spotifyContentProvider: SpotifyContentPr
     case ContentProviderType.Spotify ⇒ spotifyContentProvider
   }
 }
-
-case class UserData(identifier: ContentProviderIdentifier, name: Name, email: Email)
-
-case class PlaylistData(identifier: ContentProviderIdentifier, name: Name)

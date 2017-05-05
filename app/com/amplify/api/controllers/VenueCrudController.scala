@@ -1,7 +1,7 @@
 package com.amplify.api.controllers
 
 import be.objectify.deadbolt.scala.ActionBuilders
-import com.amplify.api.controllers.dtos.PrimitivesJsonConverters._
+import com.amplify.api.controllers.dtos.Venue.playlistToPlaylistResponse
 import com.amplify.api.domain.logic.VenueCrudLogic
 import com.amplify.api.utils.AuthenticatedRequests
 import javax.inject.Inject
@@ -18,6 +18,6 @@ class VenueCrudController @Inject()(
 
   def fetchPlaylists(offset: Int, limit: Int) = authenticated() { request ⇒
     val eventualPlaylists = venueCrudLogic.retrievePlaylists(request.subject.userReq)
-    eventualPlaylists.map(playlists ⇒ Ok(Json.toJson(playlists)))
+    eventualPlaylists.map(playlists ⇒ Ok(Json.toJson(playlists.map(playlistToPlaylistResponse))))
   }
 }

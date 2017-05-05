@@ -2,8 +2,8 @@ package com.amplify.api.daos.schema
 
 import com.amplify.api.daos.models.VenueDb
 import com.amplify.api.daos.primitives.Id
-import com.amplify.api.domain.models.{User, Venue}
 import com.amplify.api.domain.models.primitives.Name
+import com.amplify.api.domain.models.{User, Venue}
 
 trait VenuesTable extends BaseTable with UsersTable {
 

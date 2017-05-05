@@ -6,9 +6,9 @@ import play.api.libs.json.Json
 
 object JsonConverters {
 
-  implicit val userFormat = JsonNaming.snakecase(Json.format[User])
+  implicit val userReads = JsonNaming.snakecase(Json.reads[User])
 
-  implicit val playlistItemFormat = JsonNaming.snakecase(Json.format[PlaylistItem])
+  implicit val playlistItemReads = JsonNaming.snakecase(Json.reads[PlaylistItem])
 
-  implicit val playlistsFormat = JsonNaming.snakecase(Json.format[Playlists])
+  implicit val playlistsReads = JsonNaming.snakecase(Json.reads[Playlists])
 }

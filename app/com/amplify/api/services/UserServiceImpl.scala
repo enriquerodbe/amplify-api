@@ -4,7 +4,7 @@ import com.amplify.api.daos.{DbioRunner, UserDao}
 import com.amplify.api.domain.models.{AuthenticatedUser, ContentProviderIdentifier}
 import com.amplify.api.exceptions.UserNotFound
 import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
-import com.amplify.api.services.external.UserData
+import com.amplify.api.services.external.models.UserData
 import com.amplify.api.utils.FutureUtils.FutureT
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

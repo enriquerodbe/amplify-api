@@ -13,8 +13,7 @@ class UserDaoImpl @Inject()(
 
   import profile.api._
 
-  override def retrieve(
-      identifier: ContentProviderIdentifier): DBIO[Option[UserDb]] = {
+  override def retrieve(identifier: ContentProviderIdentifier): DBIO[Option[UserDb]] = {
     val query = usersTable.filter { user ⇒
       user.authIdentifier === identifier.identifier &&
         user.authProviderType === identifier.contentProvider

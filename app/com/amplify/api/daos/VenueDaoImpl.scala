@@ -1,8 +1,9 @@
 package com.amplify.api.daos
 
-import com.amplify.api.daos.models.{UserDb, VenueDb}
+import com.amplify.api.daos.models.VenueDb
+import com.amplify.api.daos.primitives.Id
 import com.amplify.api.daos.schema.VenuesTable
-import com.amplify.api.domain.models.primitives.Name
+import com.amplify.api.domain.models.User
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 
@@ -11,12 +12,11 @@ class VenueDaoImpl @Inject()(
 
   import profile.api._
 
-  override def create(user: UserDb, name: Name): DBIO[VenueDb] = {
-    (venuesTable returning venuesTable.map(_.id) into ((obj, id) ⇒ obj.copy(id = id))) +=
-      VenueDb(name = name, userId = user.id)
+  override def create(venueDb: VenueDb): DBIO[VenueDb] = {
+    (venuesTable returning venuesTable.map(_.id) into ((obj, id) ⇒ obj.copy(id = id))) += venueDb
   }
 
-  override def retrieve(user: UserDb): DBIO[Option[VenueDb]] = {
-    venuesTable.filter(_.userId === user.id).take(1).result.headOption
+  override def retrieve(userId: Id[User]): DBIO[Option[VenueDb]] = {
+    venuesTable.filter(_.userId === userId).take(1).result.headOption
   }
 }

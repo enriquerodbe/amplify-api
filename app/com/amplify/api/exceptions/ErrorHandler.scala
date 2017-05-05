@@ -1,6 +1,5 @@
 package com.amplify.api.exceptions
 
-import com.amplify.api.controllers.dtos.PrimitivesJsonConverters._
 import com.amplify.api.controllers.dtos.ErrorResponse
 import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}

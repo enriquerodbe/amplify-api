@@ -1,14 +1,15 @@
 package com.amplify.api.daos
 
-import com.amplify.api.daos.models.{UserDb, VenueDb}
-import com.amplify.api.domain.models.primitives.Name
+import com.amplify.api.daos.models.VenueDb
+import com.amplify.api.daos.primitives.Id
+import com.amplify.api.domain.models.User
 import com.google.inject.ImplementedBy
 import slick.dbio.DBIO
 
 @ImplementedBy(classOf[VenueDaoImpl])
 trait VenueDao {
 
-  def create(user: UserDb, name: Name): DBIO[VenueDb]
+  def create(venueDb: VenueDb): DBIO[VenueDb]
 
-  def retrieve(user: UserDb): DBIO[Option[VenueDb]]
+  def retrieve(userId: Id[User]): DBIO[Option[VenueDb]]
 }

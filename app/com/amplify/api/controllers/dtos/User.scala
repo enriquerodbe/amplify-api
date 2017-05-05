@@ -1,17 +1,13 @@
 package com.amplify.api.controllers.dtos
 
-import com.amplify.api.controllers.dtos.PrimitivesJsonConverters._
-import com.amplify.api.domain.models.{AuthenticatedUser, ContentProviderIdentifier}
+import com.amplify.api.domain.models.AuthenticatedUser
 import play.api.libs.json.{Json, Writes}
 
 object User {
 
-  case class UserResponse(name: String, email: String, identifier: ContentProviderIdentifier)
+  case class UserResponse(name: String, email: String, identifier: String)
   def authenticatedUserToUserResponse(authUser: AuthenticatedUser): UserResponse = {
-    UserResponse(
-      name = authUser.name,
-      email = authUser.email,
-      identifier = authUser.identifier)
+    UserResponse(authUser.name, authUser.email, authUser.identifier)
   }
   implicit val userResponseWrites: Writes[UserResponse] = Json.writes[UserResponse]
 }

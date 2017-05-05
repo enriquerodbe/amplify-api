@@ -1,12 +1,11 @@
 package com.amplify.api.domain.logic
 
-import com.amplify.api.domain.models.{AuthToken, Venue}
-import com.amplify.api.domain.models.primitives.Name
+import com.amplify.api.domain.models.{AuthToken, AuthenticatedVenue, VenueReq}
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
 
 @ImplementedBy(classOf[VenueAuthLogicImpl])
 trait VenueAuthLogic {
 
-  def signUp(authToken: AuthToken, name: Name): Future[Venue]
+  def signUp(authToken: AuthToken, venueReq: VenueReq): Future[AuthenticatedVenue]
 }
