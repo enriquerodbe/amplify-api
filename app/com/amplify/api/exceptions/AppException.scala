@@ -31,6 +31,8 @@ object AppExceptionCode extends Enumeration {
     MissingAuthProviderHeader,
     MissingAuthTokenHeader,
     UnexpectedExternalServiceResponse,
-    UserAlreadyHasVenue
+    UserAlreadyHasVenue,
+    InvalidProviderIdentifier,
+    VenueNotFound
   = Value
 }

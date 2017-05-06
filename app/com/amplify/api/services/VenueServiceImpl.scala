@@ -1,7 +1,7 @@
 package com.amplify.api.services
 
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
-import com.amplify.api.domain.models.{AuthenticatedUserReq, AuthenticatedVenue, Playlist, VenueReq}
+import com.amplify.api.domain.models._
 import com.amplify.api.exceptions.UserAlreadyHasVenue
 import com.amplify.api.services.converters.PlaylistConverter.playlistDataToPlaylist
 import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
@@ -40,9 +40,22 @@ class VenueServiceImpl @Inject()(
     yield (user, maybeVenue)
   }
 
-  override def retrievePlaylists(userReq: AuthenticatedUserReq): Future[Seq[Playlist]] = {
-    val strategy = registry.getStrategy(userReq.user.identifier.contentProvider)
-    val eventualPlaylists = strategy.fetchPlaylists(userReq.authToken)
+  override def retrievePlaylists(user: AuthenticatedUserReq): Future[Seq[Playlist]] = {
+    val strategy = registry.getStrategy(user.user.identifier.contentProvider)
+    val eventualPlaylists = strategy.fetchPlaylists(user.authToken)
     eventualPlaylists.map(_.map(playlistDataToPlaylist))
+  }
+
+  override def setCurrentPlaylist(
+      user: AuthenticatedUserReq,
+      playlistIdentifier: ContentProviderIdentifier): Future[Unit] = {
+    val action =
+      for {
+        venue ← venueDao.retrieve(user.user.identifier)
+        result ← venueDao.updateCurrentPlaylist(venue.id, playlistIdentifier)
+      }
+      yield result
+
+    db.run(action)
   }
 }

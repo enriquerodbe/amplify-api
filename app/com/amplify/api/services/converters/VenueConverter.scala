@@ -11,6 +11,6 @@ object VenueConverter {
   }
 
   def venueReqToVenueDb(venueReq: VenueReq, userId: Id[User]): VenueDb = {
-    VenueDb(name = venueReq.name, userId = userId)
+    VenueDb(name = venueReq.name, userId = userId, currentPlaylist = None)
   }
 }

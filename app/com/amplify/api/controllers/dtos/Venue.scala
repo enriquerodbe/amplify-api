@@ -21,4 +21,7 @@ object Venue {
     PlaylistResponse(playlist.name, playlist.identifier)
   }
   implicit val playlistResponseWrites: Writes[PlaylistResponse] = Json.writes[PlaylistResponse]
+
+  case class PlaylistRequest(identifier: String)
+  implicit val playlistRequestReads: Reads[PlaylistRequest] = Json.reads[PlaylistRequest]
 }

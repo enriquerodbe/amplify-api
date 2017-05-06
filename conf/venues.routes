@@ -42,3 +42,28 @@ POST    /    com.amplify.api.controllers.VenueAuthController.signUp
 #    type: string
 ###
 GET    /me/playlists    com.amplify.api.controllers.VenueCrudController.fetchPlaylists(offset: Int ?= 0, limit: Int ?= 100)
+
+###
+#  summary: Set the current playlist of allowed songs for the authenticated venue
+#  responses:
+#    204:
+#      description: success
+#  parameters:
+#  - name: auth-provider
+#    description: Name of the OAuth authorization server
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: auth-token
+#    description: Access token issued by the authorization server
+#    in: header
+#    required: true
+#    type: string
+#  - name: playlist
+#    in: body
+#    required: true
+#    schema:
+#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.PlaylistRequest'
+###
+PUT    /me/playlists/current    com.amplify.api.controllers.VenueCrudController.setCurrentPlaylist

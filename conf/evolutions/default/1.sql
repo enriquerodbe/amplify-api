@@ -11,6 +11,8 @@ CREATE TABLE "venues" (
   "id" BIGINT IDENTITY NOT NULL,
   "name" VARCHAR(255) NOT NULL,
   "user_id" BIGINT NOT NULL,
+  "current_playlist_provider" VARCHAR(255),
+  "current_playlist_identifier" VARCHAR(255),
   UNIQUE KEY "unique_user_id" ("user_id"));
 
 # --- !Downs
