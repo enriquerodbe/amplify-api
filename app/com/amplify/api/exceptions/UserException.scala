@@ -5,6 +5,6 @@ import com.amplify.api.domain.models.ContentProviderIdentifier
 trait UserException
 
 case class UserNotFound(identifier: ContentProviderIdentifier)
-  extends ForbiddenException(AppExceptionCode.UserNotFound,
+  extends UnauthorizedException(AppExceptionCode.UserNotFound,
     s"User with identifier $identifier not found")
     with UserException

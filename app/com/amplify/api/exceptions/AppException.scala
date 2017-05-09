@@ -13,7 +13,7 @@ abstract class BadRequestException(
     override val message: String)
   extends AppException(code, message)
 
-abstract class ForbiddenException(
+abstract class UnauthorizedException(
     override val code: AppExceptionCode,
     override val message: String)
   extends BadRequestException(code, message)
@@ -26,6 +26,7 @@ object AppExceptionCode extends Enumeration {
     Unexpected,
     UnsupportedAuthProvider,
     UserAuthTokenNotFound,
+    WrongAuthorizationHeader,
     UserNotFound,
     SpotifyError,
     MissingAuthProviderHeader,

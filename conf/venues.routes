@@ -4,13 +4,13 @@
 #    200:
 #      description: success
 #  parameters:
-#  - name: auth-provider
+#  - name: Auth-provider
 #    description: Name of the OAuth authorization server
 #    in: header
 #    required: false
 #    type: string
 #    default: spotify
-#  - name: auth-token
+#  - name: Authorization
 #    description: Access token issued by the authorization server
 #    in: header
 #    required: true
@@ -29,13 +29,13 @@ POST    /    com.amplify.api.controllers.VenueAuthController.signUp
 #    200:
 #      description: success
 #  parameters:
-#  - name: auth-provider
+#  - name: Auth-provider
 #    description: Name of the OAuth authorization server
 #    in: header
 #    required: false
 #    type: string
 #    default: spotify
-#  - name: auth-token
+#  - name: Authorization
 #    description: Access token issued by the authorization server
 #    in: header
 #    required: true
@@ -49,13 +49,13 @@ GET    /me/playlists    com.amplify.api.controllers.VenueCrudController.fetchPla
 #    204:
 #      description: success
 #  parameters:
-#  - name: auth-provider
+#  - name: Auth-provider
 #    description: Name of the OAuth authorization server
 #    in: header
 #    required: false
 #    type: string
 #    default: spotify
-#  - name: auth-token
+#  - name: Authorization
 #    description: Access token issued by the authorization server
 #    in: header
 #    required: true

@@ -8,6 +8,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{RequestHeader, Result, Results}
 import play.api.routing.Router
 import play.api.{Configuration, Environment, OptionalSourceMapper, UsefulException}
+import play.mvc.Http
 import scala.concurrent.Future
 
 @Singleton
@@ -35,8 +36,9 @@ class ErrorHandler @Inject()(
       request: RequestHeader,
       exception: Throwable,
       unexpectedMessage: String) = exception match {
-    case ex: ForbiddenException ⇒
-      Future.successful(Forbidden(Json.toJson(ErrorResponse(ex.code, ex.message))))
+    case ex: UnauthorizedException ⇒
+      val response = Unauthorized(Json.toJson(ErrorResponse(ex.code, ex.message)))
+      Future.successful(response.withHeaders(Http.HeaderNames.WWW_AUTHENTICATE → "Bearer"))
     case ex: BadRequestException ⇒
       Future.successful(BadRequest(Json.toJson(ErrorResponse(ex.code, ex.message))))
     case ex: InternalException ⇒

@@ -4,13 +4,13 @@
 #    200:
 #      description: success
 #  parameters:
-#  - name: auth-provider
+#  - name: Auth-provider
 #    description: Name of the OAuth authorization server
 #    in: header
 #    required: false
 #    type: string
 #    default: spotify
-#  - name: auth-token
+#  - name: Authorization
 #    description: Access token issued by the authorization server
 #    in: header
 #    required: true
@@ -30,7 +30,7 @@ POST    /    com.amplify.api.controllers.UserAuthController.signUp
 #    required: false
 #    type: string
 #    default: spotify
-#  - name: auth-token
+#  - name: Authorization
 #    description: Access token issued by the authorization server
 #    in: header
 #    required: true
