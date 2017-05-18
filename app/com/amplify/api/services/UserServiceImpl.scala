@@ -1,22 +1,32 @@
 package com.amplify.api.services
 
-import com.amplify.api.daos.{DbioRunner, UserDao}
-import com.amplify.api.domain.models.{AuthenticatedUser, ContentProviderIdentifier}
+import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
+import com.amplify.api.domain.models.{AuthenticatedUser, ContentProviderIdentifier, UnauthenticatedVenue, Venue}
 import com.amplify.api.exceptions.UserNotFound
 import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
+import com.amplify.api.services.converters.VenueConverter.venueDbToVenue
 import com.amplify.api.services.external.models.UserData
-import com.amplify.api.utils.FutureUtils.FutureT
+import com.amplify.api.utils.FutureUtils.DbioT
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserServiceImpl @Inject()(
     db: DbioRunner,
-    userDao: UserDao)(
+    userDao: UserDao,
+    venueDao: VenueDao)(
     implicit ec: ExecutionContext) extends UserService {
 
-  override def get(identifier: ContentProviderIdentifier): Future[AuthenticatedUser] = {
-    val user = db.run(userDao.retrieve(identifier)) ?! UserNotFound(identifier)
-    user.map(userDbToAuthenticatedUser)
+  override def get(
+      identifier: ContentProviderIdentifier
+  ): Future[(AuthenticatedUser, Option[UnauthenticatedVenue])] = {
+    val action =
+      for {
+        user ← userDao.retrieve(identifier) ?! UserNotFound(identifier)
+        venue ← venueDao.retrieve(user.id)
+      }
+      yield userDbToAuthenticatedUser(user) → venue.map(venueDbToVenue)
+
+    db.run(action)
   }
 
   override def getOrCreate(userData: UserData): Future[AuthenticatedUser] = {

@@ -14,6 +14,6 @@ object UserConverter {
   }
 
   def userDbToAuthenticatedUser(userDb: UserDb): AuthenticatedUser = {
-    AuthenticatedUser(userDb.name, userDb.email, userDb.authIdentifier)
+    AuthenticatedUser(userDb.id, userDb.name, userDb.email, userDb.authIdentifier)
   }
 }

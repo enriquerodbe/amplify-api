@@ -10,9 +10,9 @@ trait VenueService {
 
   def getOrCreate(userData: UserData, venueReq: VenueReq): Future[AuthenticatedVenue]
 
-  def retrievePlaylists(user: AuthenticatedUserReq): Future[Seq[Playlist]]
+  def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[Playlist]]
 
-  def setCurrentPlaylist(
-      user: AuthenticatedUserReq,
-      playlistIdentifier: ContentProviderIdentifier): Future[Unit]
+  def retrievePlaylistTracks(
+      venue: AuthenticatedVenueReq,
+      playlistIdentifier: ContentProviderIdentifier): Future[Seq[Track]]
 }

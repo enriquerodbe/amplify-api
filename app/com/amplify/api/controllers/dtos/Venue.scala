@@ -1,7 +1,7 @@
 package com.amplify.api.controllers.dtos
 
 import com.amplify.api.controllers.dtos.User.{UserResponse, authenticatedUserToUserResponse}
-import com.amplify.api.domain.models.{Playlist, AuthenticatedVenue}
+import com.amplify.api.domain.models.AuthenticatedVenue
 import com.github.tototoshi.play.json.JsonNaming
 import play.api.libs.json.{Json, Reads, Writes}
 
@@ -14,14 +14,7 @@ object Venue {
   def venueToVenueResponse(venue: AuthenticatedVenue): VenueResponse = {
     VenueResponse(authenticatedUserToUserResponse(venue.user), venue.name)
   }
-  implicit val venueResponseWrites: Writes[VenueResponse] = Json.writes[VenueResponse]
-
-  case class PlaylistResponse(name: String, identifier: String)
-  def playlistToPlaylistResponse(playlist: Playlist): PlaylistResponse = {
-    PlaylistResponse(playlist.name, playlist.identifier)
+  implicit val venueResponseWrites: Writes[VenueResponse] = {
+    JsonNaming.snakecase(Json.writes[VenueResponse])
   }
-  implicit val playlistResponseWrites: Writes[PlaylistResponse] = Json.writes[PlaylistResponse]
-
-  case class PlaylistRequest(identifier: String)
-  implicit val playlistRequestReads: Reads[PlaylistRequest] = Json.reads[PlaylistRequest]
 }

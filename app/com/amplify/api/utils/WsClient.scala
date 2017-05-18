@@ -34,13 +34,21 @@ trait WsClient {
     apiCallForResponse[T]("POST", path, query, headers, Json.stringify(body))
   }
 
+  def apiPut(
+      path: String,
+      body: JsValue = Json.obj(),
+      query: Map[String, String] = Map.empty,
+      headers: Map[String, String] = Map.empty): Future[WSResponse] = {
+    apiCall("PUT", path, query, headers, Json.stringify(body))
+  }
+
   def apiDelete(path: String,
       query: Map[String, String] = Map.empty,
-      headers: Map[String, String] = Map.empty): Future[JsValue] = {
+      headers: Map[String, String] = Map.empty): Future[WSResponse] = {
     apiCall("DELETE", path, query, headers)
   }
 
-  protected def apiCall[T](
+  protected def apiCall(
       method: String,
       path: String,
       query: Map[String, String] = Map.empty,
@@ -66,11 +74,11 @@ trait WsClient {
       headers: Map[String, String] = Map.empty,
       body: String = "")(
       implicit reads: Reads[T]) = {
-    apiCall(method, path, query, headers, body).flatMap(validate[T])
+    apiCall(method, path, query, headers, body).flatMap(r ⇒ validate[T](r.json))
   }
 
-  protected def customHandleResponse(response: WSResponse): Future[JsValue] = {
-    Future.successful(response.json)
+  protected def customHandleResponse(response: WSResponse): Future[WSResponse] = {
+    Future.successful(response)
   }
 
   protected def validate[T](json: JsValue)(implicit reads: Reads[T]) = {

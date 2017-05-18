@@ -1,20 +1,36 @@
 package com.amplify.api.domain.logic
 
-import com.amplify.api.domain.models.{AuthenticatedUserReq, ContentProviderIdentifier, Playlist}
-import com.amplify.api.services.VenueService
+import com.amplify.api.domain.models.EventSource.SetCurrentPlaylist
+import com.amplify.api.domain.models.QueueEvent.{AddVenueTrack, RemoveVenueTracks}
+import com.amplify.api.domain.models._
+import com.amplify.api.services.{EventService, QueueService, VenueService}
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class VenueCrudLogicImpl @Inject()(venueService: VenueService) extends VenueCrudLogic {
+class VenueCrudLogicImpl @Inject()(
+    venueService: VenueService,
+    eventService: EventService,
+    queueService: QueueService)(
+    implicit ec: ExecutionContext) extends VenueCrudLogic {
 
-  override def retrievePlaylists(user: AuthenticatedUserReq): Future[Seq[Playlist]] = {
-    venueService.retrievePlaylists(user)
+  override def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[Playlist]] = {
+    venueService.retrievePlaylists(venue)
   }
 
   override def setCurrentPlaylist(
-      user: AuthenticatedUserReq,
+      venueReq: AuthenticatedVenueReq,
       playlistIdentifier: ContentProviderIdentifier): Future[Unit] = {
-    venueService.setCurrentPlaylist(user, playlistIdentifier)
-    // Retrieve playlist data and update the venue's queue
+    for {
+      playlist ← venueService.retrievePlaylistTracks(venueReq, playlistIdentifier)
+      eventSource = SetCurrentPlaylist(venueReq.venue, playlistIdentifier)
+      queueEvents = playlist.map(AddVenueTrack.apply)
+      _ ← eventService.create(eventSource, RemoveVenueTracks +: queueEvents: _*)
+      _ ← queueService.update(venueReq.venue.toUnauthenticated, queueEvents: _*)
+    }
+    yield ()
+  }
+
+  override def retrieveQueue(venue: AuthenticatedVenue): Future[Queue] = {
+    queueService.retrieve(venue)
   }
 }
