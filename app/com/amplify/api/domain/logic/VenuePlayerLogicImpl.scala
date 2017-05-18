@@ -16,8 +16,6 @@ class VenuePlayerLogicImpl @Inject()(
     for {
       _ ← eventService.create(StartPlaying(venue), QueueStartPlaying)
       queue ← queueService.update(venue.toUnauthenticated, QueueStartPlaying)
-    //scalastyle:off
-      _ = println(s"QUEUE: ${queue.items}")
       _ ← playerService.play(venue, queue)
     }
     yield ()

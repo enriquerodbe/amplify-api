@@ -45,8 +45,6 @@ class SpotifyContentProvider @Inject()(
       tracks: Seq[ModelTrack])(
       implicit token: AuthToken): Future[Unit] = {
     val uris = tracks.map(t ⇒ s"spotify:track:${t.contentProviderIdentifier.identifier}")
-    // scalastyle:off
-    println(s"POSTING: ${Json.stringify(Json.obj("uris" → uris))}")
     spotifyPut("/me/player/play", Json.obj("uris" → uris))(token.token).map(_ ⇒ ())
   }
 
