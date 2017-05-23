@@ -8,5 +8,5 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[AuthenticationServiceImpl])
 trait AuthenticationService {
 
-  def fetchUser(authToken: AuthToken): Future[UserData]
+  def fetchUser(implicit authToken: AuthToken): Future[UserData]
 }

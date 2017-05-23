@@ -10,7 +10,7 @@ class AuthenticationServiceImpl @Inject()(
     registry: ContentProviderRegistry)(
     implicit ec: ExecutionContext) extends AuthenticationService {
 
-  override def fetchUser(authToken: AuthToken): Future[UserData] = {
-    registry.getStrategy(authToken.contentProvider).fetchUser(authToken.token)
+  override def fetchUser(implicit authToken: AuthToken): Future[UserData] = {
+    registry.getStrategy(authToken.contentProvider).fetchUser(authToken)
   }
 }

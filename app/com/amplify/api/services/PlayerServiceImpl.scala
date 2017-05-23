@@ -13,6 +13,11 @@ class PlayerServiceImpl @Inject()(registry: ContentProviderRegistry) extends Pla
       implicit authToken: AuthToken): Future[Unit] = {
     val identifier = venue.user.identifier
     val strategy = registry.getStrategy(identifier.contentProvider)
-    strategy.play(identifier.identifier, queue.items.map(_.item))
+    strategy.play(queue.items.map(_.item))
+  }
+
+  override def pause(venue: AuthenticatedVenue)(implicit authToken: AuthToken): Future[Unit] = {
+    val strategy = registry.getStrategy(venue.user.identifier.contentProvider)
+    strategy.pause
   }
 }

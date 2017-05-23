@@ -30,9 +30,9 @@ class AmplifyDeadboltHandler(
   private def login(authToken: AuthToken) = userAuthLogic.login(authToken).map {
     case (user, Some(venue)) ⇒
       val authVenue = AuthenticatedVenue(venue.id, user, venue.name)
-      Some(AmplifyApiVenue(AuthenticatedVenueReq(authVenue, authToken.token)))
+      Some(AmplifyApiVenue(AuthenticatedVenueReq(authVenue, authToken)))
     case (user, _) ⇒
-      Some(AmplifyApiUser(AuthenticatedUserReq(user, authToken.token)))
+      Some(AmplifyApiUser(AuthenticatedUserReq(user, authToken)))
   }
 
   override def onAuthFailure[A](request: AuthenticatedRequest[A]): Future[Result] = {

@@ -15,7 +15,7 @@ case class AuthenticatedVenue(id: Id[Venue], user: AuthenticatedUser, name: Name
   def toUnauthenticated: UnauthenticatedVenue = UnauthenticatedVenue(id, name)
 }
 
-case class AuthenticatedVenueReq(venue: AuthenticatedVenue, authToken: String) extends Venue {
+case class AuthenticatedVenueReq(venue: AuthenticatedVenue, authToken: AuthToken) extends Venue {
 
   override def name: Name = venue.name
 

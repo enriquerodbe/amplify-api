@@ -8,4 +8,6 @@ import scala.concurrent.Future
 trait PlayerService {
 
   def play(venue: AuthenticatedVenue, queue: Queue)(implicit authToken: AuthToken): Future[Unit]
+
+  def pause(venue: AuthenticatedVenue)(implicit authToken: AuthToken): Future[Unit]
 }

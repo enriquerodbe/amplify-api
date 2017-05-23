@@ -2,6 +2,7 @@ package com.amplify.api.utils
 
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.{AmplifyApiUser, AmplifyApiVenue}
+import com.amplify.api.domain.models.AuthToken
 import play.api.mvc._
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
@@ -12,11 +13,17 @@ trait AuthenticatedRequests {
 
   case class AuthenticatedUserRequest[A](
       subject: AmplifyApiUser,
-      request: Request[A]) extends WrappedRequest[A](request)
+      request: Request[A]) extends WrappedRequest[A](request) {
+
+    def authToken: AuthToken = subject.userReq.authToken
+  }
 
   case class AuthenticatedVenueRequest[A](
       subject: AmplifyApiVenue,
-      request: Request[A]) extends WrappedRequest[A](request)
+      request: Request[A]) extends WrappedRequest[A](request) {
+
+    def authToken: AuthToken = subject.venueReq.authToken
+  }
 
   def authenticatedUser[A](
       parser: BodyParser[A] = BodyParsers.parse.anyContent)(

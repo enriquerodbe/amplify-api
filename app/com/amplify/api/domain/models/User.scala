@@ -16,7 +16,7 @@ case class AuthenticatedUser(
     email: Email,
     identifier: ContentProviderIdentifier) extends User
 
-case class AuthenticatedUserReq(user: AuthenticatedUser, authToken: String) extends User {
+case class AuthenticatedUserReq(user: AuthenticatedUser, authToken: AuthToken) extends User {
 
   override def name: Name = user.name
 

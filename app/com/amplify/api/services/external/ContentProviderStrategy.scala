@@ -10,16 +10,18 @@ import scala.concurrent.Future
 
 trait ContentProviderStrategy {
 
-  def fetchUser(implicit token: String): Future[UserData]
+  def fetchUser(implicit token: AuthToken): Future[UserData]
 
-  def fetchPlaylists(implicit token: String): Future[Seq[PlaylistData]]
+  def fetchPlaylists(implicit token: AuthToken): Future[Seq[PlaylistData]]
 
   def fetchPlaylistTracks(
       userIdentifier: Identifier,
       playlistIdentifier: Identifier)(
-      implicit token: String): Future[Seq[TrackData]]
+      implicit token: AuthToken): Future[Seq[TrackData]]
 
-  def play(userIdentifier: Identifier, tracks: Seq[Track])(implicit token: AuthToken): Future[Unit]
+  def play(tracks: Seq[Track])(implicit token: AuthToken): Future[Unit]
+
+  def pause(implicit token: AuthToken): Future[Unit]
 }
 
 class ContentProviderRegistry @Inject()(spotifyContentProvider: SpotifyContentProvider) {

@@ -7,7 +7,8 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[UserAuthLogicImpl])
 trait UserAuthLogic {
 
-  def signUp(authToken: AuthToken): Future[AuthenticatedUser]
+  def signUp(implicit authToken: AuthToken): Future[AuthenticatedUser]
 
-  def login(authToken: AuthToken): Future[(AuthenticatedUser, Option[UnauthenticatedVenue])]
+  def login(
+      implicit authToken: AuthToken): Future[(AuthenticatedUser, Option[UnauthenticatedVenue])]
 }

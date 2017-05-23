@@ -6,8 +6,7 @@ import com.amplify.api.domain.logic.VenuePlayerLogic
 import com.amplify.api.utils.AuthenticatedRequests
 import javax.inject.Inject
 import play.api.mvc.Controller
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext
 
 // scalastyle:off public.methods.have.type
 class VenuePlayerController @Inject()(
@@ -17,11 +16,10 @@ class VenuePlayerController @Inject()(
     implicit ec: ExecutionContext) extends Controller with AuthenticatedRequests {
 
   def play() = authenticatedVenue(parse.empty) { request ⇒
-    authHeadersUtil.getAuthToken(request) match {
-      case Success(authToken) ⇒
-        venuePlayerLogic.play(request.subject.venue)(authToken).map(_ ⇒ NoContent)
-      case Failure(exception) ⇒
-        Future.failed(exception)
-    }
+    venuePlayerLogic.play(request.subject.venue)(request.authToken).map(_ ⇒ NoContent)
+  }
+
+  def pause() = authenticatedVenue(parse.empty) { request ⇒
+    venuePlayerLogic.pause(request.subject.venue)(request.authToken).map(_ ⇒ NoContent)
   }
 }

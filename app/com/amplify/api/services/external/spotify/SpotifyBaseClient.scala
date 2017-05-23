@@ -1,5 +1,6 @@
 package com.amplify.api.services.external.spotify
 
+import com.amplify.api.domain.models.AuthToken
 import com.amplify.api.services.external.spotify.Dtos.Page
 import com.amplify.api.services.external.spotify.JsonConverters._
 import com.amplify.api.utils.WsClient
@@ -15,7 +16,7 @@ trait SpotifyBaseClient extends WsClient {
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty)(
       implicit reads: Reads[T],
-      token: String): Future[T] = {
+      token: AuthToken): Future[T] = {
     super.apiGet(path, query, withAuthHeader(headers, token))
   }
 
@@ -25,7 +26,7 @@ trait SpotifyBaseClient extends WsClient {
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty)(
       implicit reads: Reads[T],
-      token: String): Future[T] = {
+      token: AuthToken): Future[T] = {
     super.apiPost(path, body, query, withAuthHeader(headers, token))
   }
 
@@ -34,7 +35,7 @@ trait SpotifyBaseClient extends WsClient {
       body: JsValue = Json.obj(),
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty)(
-      implicit token: String): Future[WSResponse] = {
+      implicit token: AuthToken): Future[WSResponse] = {
     super.apiPut(path, body, query, withAuthHeader(headers, token))
   }
 
@@ -42,7 +43,7 @@ trait SpotifyBaseClient extends WsClient {
       path: String,
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty)(
-      implicit token: String): Future[WSResponse] = {
+      implicit token: AuthToken): Future[WSResponse] = {
     super.apiDelete(path, query, withAuthHeader(headers, token))
   }
 
@@ -51,7 +52,7 @@ trait SpotifyBaseClient extends WsClient {
       query: Map[String, String],
       acc: Seq[T],
       offset: Int)(
-      implicit token: String): Future[Seq[T]] = {
+      implicit token: AuthToken): Future[Seq[T]] = {
     fetchPage[T](path, query, offset).flatMap { page ⇒
       val items = acc ++ page.items
       page.next match {
@@ -65,11 +66,11 @@ trait SpotifyBaseClient extends WsClient {
       path: String,
       query: Map[String, String],
       offset: Int)(
-      implicit token: String): Future[Page[T]] = {
+      implicit token: AuthToken): Future[Page[T]] = {
     spotifyGet[Page[T]](path, query.updated("offset", offset.toString))
   }
 
-  private def withAuthHeader[T](headers: Map[String, String], token: String) = {
-    headers.updated(AUTHORIZATION, s"Bearer $token")
+  private def withAuthHeader[T](headers: Map[String, String], token: AuthToken) = {
+    headers.updated(AUTHORIZATION, s"Bearer ${token.token}")
   }
 }

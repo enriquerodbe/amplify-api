@@ -10,18 +10,18 @@ class UserAuthLogicImpl @Inject()(
     userService: UserService)(
     implicit ec: ExecutionContext) extends UserAuthLogic {
 
-  override def signUp(authToken: AuthToken): Future[AuthenticatedUser] = {
+  override def signUp(implicit authToken: AuthToken): Future[AuthenticatedUser] = {
     for {
-      userData ← authService.fetchUser(authToken)
+      userData ← authService.fetchUser
       user ← userService.getOrCreate(userData)
     }
     yield user
   }
 
   override def login(
-      authToken: AuthToken): Future[(AuthenticatedUser, Option[UnauthenticatedVenue])] = {
+      implicit authToken: AuthToken): Future[(AuthenticatedUser, Option[UnauthenticatedVenue])] = {
     for {
-      userData ← authService.fetchUser(authToken)
+      userData ← authService.fetchUser
       userAndVenue ← userService.get(userData.identifier)
     }
     yield userAndVenue

@@ -20,4 +20,12 @@ class VenuePlayerLogicImpl @Inject()(
     }
     yield ()
   }
+
+  override def pause(venue: AuthenticatedVenue)(implicit authToken: AuthToken): Future[Unit] = {
+    for {
+      _ ← eventService.create(StartPlaying(venue), QueueStartPlaying)
+      _ ← playerService.pause(venue)
+    }
+    yield ()
+  }
 }
