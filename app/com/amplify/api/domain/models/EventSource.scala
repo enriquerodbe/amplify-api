@@ -8,5 +8,7 @@ object EventSource {
       venue: AuthenticatedVenue,
       playlistIdentifier: ContentProviderIdentifier) extends EventSource
 
-  case class StartPlaying(venue: AuthenticatedVenue) extends EventSource
+  case class StartPlayback(venue: AuthenticatedVenue) extends EventSource
+
+  case class PausePlayback(venue: AuthenticatedVenue) extends EventSource
 }

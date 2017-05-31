@@ -16,9 +16,4 @@ object QueueEvent {
 
     override def process(queue: Queue): Queue = queue.addVenueTrack(track)
   }
-
-  case object StartPlaying extends QueueEvent {
-
-    override def process(queue: Queue): Queue = queue.startPlaying()
-  }
 }

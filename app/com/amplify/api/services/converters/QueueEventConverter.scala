@@ -1,7 +1,7 @@
 package com.amplify.api.services.converters
 
 import com.amplify.api.daos.models.{EventSourceDb, QueueEventDb}
-import com.amplify.api.domain.models.QueueEvent.{AddVenueTrack, RemoveVenueTracks, StartPlaying}
+import com.amplify.api.domain.models.QueueEvent.{AddVenueTrack, RemoveVenueTracks}
 import com.amplify.api.domain.models._
 import java.time.Instant
 
@@ -11,7 +11,6 @@ object QueueEventConverter {
     queueEvent match {
       case RemoveVenueTracks ⇒ removeVenueTracksQueueEventDb(eventSource)
       case AddVenueTrack(track) ⇒ addVenueTrackQueueEventDb(eventSource, track)
-      case StartPlaying ⇒ startPlayingQueueEventDb(eventSource)
     }
   }
 
@@ -29,15 +28,6 @@ object QueueEventConverter {
       eventSourceId = eventSource.id,
       eventType = QueueEventType.AddVenueTrack,
       contentIdentifier = Some(track.contentProviderIdentifier),
-      createdAt = Instant.now()
-    )
-  }
-
-  private def startPlayingQueueEventDb(eventSource: EventSourceDb): QueueEventDb = {
-    QueueEventDb(
-      eventSourceId = eventSource.id,
-      eventType = QueueEventType.StartPlaying,
-      contentIdentifier = None,
       createdAt = Instant.now()
     )
   }

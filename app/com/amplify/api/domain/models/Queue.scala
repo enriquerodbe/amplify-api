@@ -8,7 +8,7 @@ case class Queue(items: List[QueueItem] = Nil) {
 
   def removeVenueTracks(): Queue = Queue(removeVenueTracks(items))
 
-  def startPlaying(): Queue = Queue(items)
+  def startPlayback(): Queue = Queue(items)
 
   @tailrec
   private def removeVenueTracks(items: List[QueueItem]): List[QueueItem] = items match {

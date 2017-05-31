@@ -23,8 +23,8 @@ class VenueCrudLogicImpl @Inject()(
     for {
       playlist ← venueService.retrievePlaylistTracks(venueReq, playlistIdentifier)
       eventSource = SetCurrentPlaylist(venueReq.venue, playlistIdentifier)
-      queueEvents = playlist.map(AddVenueTrack.apply)
-      _ ← eventService.create(eventSource, RemoveVenueTracks +: queueEvents: _*)
+      queueEvents = playlist.map(AddVenueTrack.apply) :+ RemoveVenueTracks
+      _ ← eventService.create(eventSource, queueEvents: _*)
       _ ← queueService.update(venueReq.venue.toUnauthenticated, queueEvents: _*)
     }
     yield ()

@@ -6,7 +6,7 @@ import play.api.libs.json.{Json, Writes}
 
 object Track {
 
-  case class TrackResponse(name: String, contentProviderIdentifier: String)
+  case class TrackResponse(name: String, identifier: String)
   def trackToTrackResponse(track: ModelTrack): TrackResponse = {
     TrackResponse(track.name, track.contentProviderIdentifier)
   }

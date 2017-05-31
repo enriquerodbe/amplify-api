@@ -1,3 +1,3 @@
 package com.amplify.api.domain.models
 
-case class QueueItem(item: Track, itemType: QueueItemType)
+case class QueueItem(track: Track, itemType: QueueItemType)
