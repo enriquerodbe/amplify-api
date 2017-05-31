@@ -1,14 +1,52 @@
 package com.amplify.api.domain.models
 
-sealed trait EventSource
+import com.amplify.api.domain.models.EventSourceType.EventSourceType
+
+sealed trait EventSource {
+
+  def venue: AuthenticatedVenue
+
+  def eventType: EventSourceType
+
+  def contentIdentifier: Option[ContentProviderIdentifier]
+}
 
 object EventSource {
 
   case class SetCurrentPlaylist(
       venue: AuthenticatedVenue,
-      playlistIdentifier: ContentProviderIdentifier) extends EventSource
+      playlistIdentifier: ContentProviderIdentifier) extends EventSource {
 
-  case class StartPlayback(venue: AuthenticatedVenue) extends EventSource
+    override def eventType: EventSourceType = EventSourceType.SetCurrentPlaylist
 
-  case class PausePlayback(venue: AuthenticatedVenue) extends EventSource
+    override def contentIdentifier: Option[ContentProviderIdentifier] = Some(playlistIdentifier)
+  }
+
+  case class StartPlayback(venue: AuthenticatedVenue) extends EventSource {
+
+    override def eventType: EventSourceType = EventSourceType.StartPlayback
+
+    override def contentIdentifier: Option[ContentProviderIdentifier] = None
+  }
+
+  case class PausePlayback(venue: AuthenticatedVenue) extends EventSource {
+
+    override def eventType: EventSourceType = EventSourceType.PausePlayback
+
+    override def contentIdentifier: Option[ContentProviderIdentifier] = None
+  }
+
+  case class StartAmplifying(venue: AuthenticatedVenue) extends EventSource {
+
+    override def eventType: EventSourceType = EventSourceType.StartAmplifying
+
+    override def contentIdentifier: Option[ContentProviderIdentifier] = None
+  }
+
+  case class StopAmplifying(venue: AuthenticatedVenue) extends EventSource {
+
+    override def eventType: EventSourceType = EventSourceType.StopAmplifying
+
+    override def contentIdentifier: Option[ContentProviderIdentifier] = None
+  }
 }

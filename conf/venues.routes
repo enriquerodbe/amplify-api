@@ -128,3 +128,45 @@ PUT    /me/queue/player/play    com.amplify.api.controllers.VenuePlayerControlle
 #    type: string
 ###
 PUT    /me/queue/player/pause    com.amplify.api.controllers.VenuePlayerController.pause
+
+
+###
+#  summary: Start amplifying on the authenticated venue
+#  responses:
+#    204:
+#      description: success
+#  parameters:
+#  - name: Auth-provider
+#    description: Name of the OAuth authorization server
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: Authorization
+#    description: Access token issued by the authorization server
+#    in: header
+#    required: true
+#    type: string
+###
+PUT    /me/start    com.amplify.api.controllers.VenuePlayerController.startAmplifying
+
+
+###
+#  summary: Stop amplifying on the authenticated venue
+#  responses:
+#    204:
+#      description: success
+#  parameters:
+#  - name: Auth-provider
+#    description: Name of the OAuth authorization server
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: Authorization
+#    description: Access token issued by the authorization server
+#    in: header
+#    required: true
+#    type: string
+###
+PUT    /me/stop    com.amplify.api.controllers.VenuePlayerController.stopAmplifying

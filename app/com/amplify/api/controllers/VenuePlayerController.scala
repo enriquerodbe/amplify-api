@@ -16,10 +16,22 @@ class VenuePlayerController @Inject()(
     implicit ec: ExecutionContext) extends Controller with AuthenticatedRequests {
 
   def play() = authenticatedVenue(parse.empty) { request ⇒
-    venuePlayerLogic.play(request.subject.venue)(request.authToken).map(_ ⇒ NoContent)
+    implicit val authToken = request.authToken
+    venuePlayerLogic.play(request.subject.venue).map(_ ⇒ NoContent)
   }
 
   def pause() = authenticatedVenue(parse.empty) { request ⇒
-    venuePlayerLogic.pause(request.subject.venue)(request.authToken).map(_ ⇒ NoContent)
+    implicit val authToken = request.authToken
+    venuePlayerLogic.pause(request.subject.venue).map(_ ⇒ NoContent)
+  }
+
+  def startAmplifying() = authenticatedVenue(parse.empty) { request ⇒
+    implicit val authToken = request.authToken
+    venuePlayerLogic.startAmplifying(request.subject.venue).map(_ ⇒ NoContent)
+  }
+
+  def stopAmplifying() = authenticatedVenue(parse.empty) { request ⇒
+    implicit val authToken = request.authToken
+    venuePlayerLogic.stopAmplifying(request.subject.venue).map(_ ⇒ NoContent)
   }
 }

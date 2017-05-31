@@ -17,7 +17,7 @@ class UserAuthController @Inject()(
     actionBuilder: ActionBuilders)(
     implicit ec: ExecutionContext) extends Controller {
 
-  def signUp = Action.async(parse.empty) { implicit request ⇒
+  def signUp = Action.async(parse.empty) { request ⇒
     authHeadersUtil.getAuthToken(request) match {
       case Success(authToken) ⇒
         val eventualUser = userAuthLogic.signUp(authToken)

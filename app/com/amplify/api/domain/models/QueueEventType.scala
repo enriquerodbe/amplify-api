@@ -4,7 +4,10 @@ object QueueEventType extends Enumeration {
 
   type QueueEventType = Value
 
-  val RemoveVenueTracks = Value(1)
-  val AddVenueTrack = Value(2)
-  val StartPlaying = Value(3)
+  val
+    RemoveVenueTracks,
+    AddVenueTrack,
+    StartPlaying,
+    RemoveAllTracks
+  = Value
 }

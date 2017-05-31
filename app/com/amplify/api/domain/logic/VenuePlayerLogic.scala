@@ -10,4 +10,8 @@ trait VenuePlayerLogic {
   def play(venue: AuthenticatedVenue)(implicit authToken: AuthToken): Future[Unit]
 
   def pause(venue: AuthenticatedVenue)(implicit authToken: AuthToken): Future[Unit]
+
+  def startAmplifying(venue: AuthenticatedVenue)(implicit authToken: AuthToken): Future[Unit]
+
+  def stopAmplifying(venue: AuthenticatedVenue)(implicit authToken: AuthToken): Future[Unit]
 }

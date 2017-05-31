@@ -8,6 +8,8 @@ object EventSourceType extends Enumeration {
     SetCurrentPlaylist,
     AddTrack,
     StartPlayback,
-    PausePlayback
+    PausePlayback,
+    StartAmplifying,
+    StopAmplifying
   = Value
 }

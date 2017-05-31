@@ -1,6 +1,7 @@
 package com.amplify.api.domain.logic
 
-import com.amplify.api.domain.models.EventSource.{PausePlayback, StartPlayback}
+import com.amplify.api.domain.models.EventSource.{PausePlayback, StartAmplifying, StartPlayback, StopAmplifying}
+import com.amplify.api.domain.models.QueueEvent.RemoveAllTracks
 import com.amplify.api.domain.models.{AuthToken, AuthenticatedVenue}
 import com.amplify.api.services.{EventService, QueueService}
 import javax.inject.Inject
@@ -17,5 +18,21 @@ class VenuePlayerLogicImpl @Inject()(
 
   override def pause(venue: AuthenticatedVenue)(implicit authToken: AuthToken): Future[Unit] = {
     eventService.create(PausePlayback(venue))
+  }
+
+  override def startAmplifying(
+      venue: AuthenticatedVenue)(
+      implicit authToken: AuthToken): Future[Unit] = {
+    eventService.create(StartAmplifying(venue))
+  }
+
+  override def stopAmplifying(
+      venue: AuthenticatedVenue)(
+      implicit authToken: AuthToken): Future[Unit] = {
+    for {
+      _ ← eventService.create(StopAmplifying(venue), RemoveAllTracks)
+      _ ← queueService.update(venue.toUnauthenticated, RemoveAllTracks)
+    }
+    yield ()
   }
 }
