@@ -49,4 +49,11 @@ object EventSource {
 
     override def contentIdentifier: Option[ContentProviderIdentifier] = None
   }
+
+  case class TrackFinished(venue: AuthenticatedVenue) extends EventSource {
+
+    override def eventType: EventSourceType = EventSourceType.TrackFinished
+
+    override def contentIdentifier: Option[ContentProviderIdentifier] = None
+  }
 }

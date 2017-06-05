@@ -1,7 +1,7 @@
 package com.amplify.api.domain.logic
 
-import com.amplify.api.domain.models.EventSource.{PausePlayback, StartAmplifying, StartPlayback, StopAmplifying}
-import com.amplify.api.domain.models.QueueEvent.RemoveAllTracks
+import com.amplify.api.domain.models.EventSource._
+import com.amplify.api.domain.models.QueueEvent.{RemoveAllTracks, TrackFinished ⇒ QueueTrackFinished}
 import com.amplify.api.domain.models.{AuthToken, AuthenticatedVenue}
 import com.amplify.api.services.{EventService, QueueService}
 import javax.inject.Inject
@@ -32,6 +32,14 @@ class VenuePlayerLogicImpl @Inject()(
     for {
       _ ← eventService.create(StopAmplifying(venue), RemoveAllTracks)
       _ ← queueService.update(venue.toUnauthenticated, RemoveAllTracks)
+    }
+    yield ()
+  }
+
+  override def trackFinished(venue: AuthenticatedVenue): Future[Unit] = {
+    for {
+      _ ← eventService.create(TrackFinished(venue), QueueTrackFinished)
+      _ ← queueService.update(venue.toUnauthenticated, QueueTrackFinished)
     }
     yield ()
   }

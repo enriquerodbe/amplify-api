@@ -39,6 +39,15 @@ object QueueEvent {
 
     override def contentIdentifier: Option[ContentProviderIdentifier] = None
 
-    override def process(queue: Queue): Queue = Queue()
+    override def process(queue: Queue): Queue = queue.removeAllTracks()
+  }
+
+  case object TrackFinished extends QueueEvent {
+
+    override def eventType: QueueEventType = QueueEventType.TrackFinished
+
+    override def contentIdentifier: Option[ContentProviderIdentifier] = None
+
+    override def process(queue: Queue): Queue = queue.trackFinished()
   }
 }

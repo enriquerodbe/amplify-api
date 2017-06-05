@@ -14,4 +14,6 @@ trait VenuePlayerLogic {
   def startAmplifying(venue: AuthenticatedVenue)(implicit authToken: AuthToken): Future[Unit]
 
   def stopAmplifying(venue: AuthenticatedVenue)(implicit authToken: AuthToken): Future[Unit]
+
+  def trackFinished(venue: AuthenticatedVenue): Future[Unit]
 }

@@ -34,4 +34,9 @@ class VenuePlayerController @Inject()(
     implicit val authToken = request.authToken
     venuePlayerLogic.stopAmplifying(request.subject.venue).map(_ ⇒ NoContent)
   }
+
+  def trackFinished() = authenticatedVenue(parse.empty) { request ⇒
+    implicit val authToken = request.authToken
+    venuePlayerLogic.trackFinished(request.subject.venue).map(_ ⇒ NoContent)
+  }
 }
