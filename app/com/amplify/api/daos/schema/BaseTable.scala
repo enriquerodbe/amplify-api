@@ -4,7 +4,7 @@ import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProvider
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
 import com.amplify.api.domain.models.EventSourceType.EventSourceType
 import com.amplify.api.domain.models.QueueEventType.QueueEventType
-import com.amplify.api.domain.models.primitives.{Email, Identifier, Name}
+import com.amplify.api.domain.models.primitives.{Email, Identifier, Name, Uid}
 import java.sql.Timestamp
 import java.time.Instant
 import play.api.db.slick.HasDatabaseConfigProvider
@@ -25,6 +25,8 @@ trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
   implicit val identifierType =
     MappedColumnType.base[Identifier, String](_.value, Identifier.apply)
+
+  implicit val uidType = MappedColumnType.base[Uid, String](_.value, Uid.apply)
 
   implicit val authProviderTypeType =
     MappedColumnType.base[ContentProviderType, Int](_.id, ContentProviderType.apply)

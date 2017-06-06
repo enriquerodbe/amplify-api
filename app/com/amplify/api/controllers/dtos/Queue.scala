@@ -7,7 +7,7 @@ import play.api.libs.json.{Json, Writes}
 
 object Queue {
 
-  case class QueueResponse(items: Seq[TrackResponse])
+  case class QueueResponse(tracks: Seq[TrackResponse])
   def queueToQueueResponse(queue: ModelQueue): QueueResponse = {
     QueueResponse(queue.items.map(item ⇒ trackToTrackResponse(item.track)))
   }

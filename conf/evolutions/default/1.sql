@@ -12,8 +12,7 @@ CREATE TABLE "venues" (
   "id" BIGINT IDENTITY NOT NULL,
   "name" VARCHAR(255) NOT NULL,
   "user_id" BIGINT NOT NULL,
-  "current_playlist_provider" VARCHAR(255),
-  "current_playlist_identifier" VARCHAR(255),
+  "uid" CHAR(8) NOT NULL,
   UNIQUE KEY "unique_user_id" ("user_id"));
 
 CREATE TABLE "event_sources" (

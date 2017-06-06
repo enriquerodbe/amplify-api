@@ -1,8 +1,10 @@
 ###
-#  summary: Register new user into the system
+#  summary: Register new user
 #  responses:
 #    200:
 #      description: success
+#      schema:
+#        $ref: '#/definitions/com.amplify.api.controllers.dtos.User.UserResponse'
 #  parameters:
 #  - name: Auth-provider
 #    description: Name of the OAuth authorization server
@@ -23,6 +25,8 @@ POST    /    com.amplify.api.controllers.UserAuthController.signUp
 #  responses:
 #    200:
 #      description: success
+#      schema:
+#        $ref: '#/definitions/com.amplify.api.controllers.dtos.User.UserResponse'
 #  parameters:
 #  - name: auth-provider
 #    description: Name of the OAuth authorization server

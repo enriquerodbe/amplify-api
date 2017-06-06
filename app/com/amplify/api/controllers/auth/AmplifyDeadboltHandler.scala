@@ -29,7 +29,7 @@ class AmplifyDeadboltHandler(
 
   private def login(authToken: AuthToken) = userAuthLogic.login(authToken).map {
     case (user, Some(venue)) ⇒
-      val authVenue = AuthenticatedVenue(venue.id, user, venue.name)
+      val authVenue = AuthenticatedVenue(user, venue)
       Some(AmplifyApiVenue(AuthenticatedVenueReq(authVenue, authToken)))
     case (user, _) ⇒
       Some(AmplifyApiUser(AuthenticatedUserReq(user, authToken)))

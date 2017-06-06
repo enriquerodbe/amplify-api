@@ -14,4 +14,6 @@ trait VenueCrudLogic {
       playlistIdentifier: ContentProviderIdentifier): Future[Unit]
 
   def retrieveQueue(venue: AuthenticatedVenue): Future[Queue]
+
+  def retrieveAll(): Future[Seq[Venue]]
 }

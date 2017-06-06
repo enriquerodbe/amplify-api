@@ -22,4 +22,8 @@ class VenueDaoImpl @Inject()(
   override def retrieve(userId: Id[User]): DBIO[Option[VenueDb]] = {
     venuesTable.filter(_.userId === userId).result.headOption
   }
+
+  override def retrieveAllVenues(): DBIO[Seq[VenueDb]] = {
+    venuesTable.result
+  }
 }

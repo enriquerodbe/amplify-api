@@ -1,12 +1,13 @@
 package com.amplify.api.services
 
+import com.amplify.api.controllers.dtos.Venue.VenueRequest
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
 import com.amplify.api.domain.models._
 import com.amplify.api.exceptions.UserAlreadyHasVenue
 import com.amplify.api.services.converters.PlaylistConverter.playlistDataToPlaylist
 import com.amplify.api.services.converters.TrackConverter.trackDataToTrack
 import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
-import com.amplify.api.services.converters.VenueConverter.{venueDbToAuthenticatedVenue, venueReqToVenueDb}
+import com.amplify.api.services.converters.VenueConverter.{venueDbToAuthenticatedVenue, venueDbToVenue, venueReqToVenueDb}
 import com.amplify.api.services.external.ContentProviderRegistry
 import com.amplify.api.services.external.models.UserData
 import javax.inject.Inject
@@ -22,9 +23,9 @@ class VenueServiceImpl @Inject()(
 
   override def getOrCreate(
       userData: UserData,
-      venueReq: VenueReq): Future[AuthenticatedVenue] = {
+      venueReq: VenueRequest): Future[AuthenticatedVenue] = {
     val action = getUserWithVenue(userData).flatMap {
-      case (_, Some(venueDb)) ⇒ DBIO.failed(UserAlreadyHasVenue(VenueReq(venueDb.name)))
+      case (_, Some(venueDb)) ⇒ DBIO.failed(UserAlreadyHasVenue(venueDbToVenue(venueDb)))
       case (userDb, _) ⇒
         val venueDb = venueDao.create(venueReqToVenueDb(venueReq, userDb.id))
         venueDb.map(venueDbToAuthenticatedVenue(_, userDbToAuthenticatedUser(userDb)))
@@ -56,5 +57,9 @@ class VenueServiceImpl @Inject()(
       playlistIdentifier.identifier)(
       venue.authToken)
     eventualPlaylist.map(_.map(trackDataToTrack))
+  }
+
+  override def retrieveAllVenues(): Future[Seq[Venue]] = {
+    db.run(venueDao.retrieveAllVenues()).map(_.map(venueDbToVenue))
   }
 }

@@ -31,7 +31,7 @@ class VenuePlayerLogicImpl @Inject()(
       implicit authToken: AuthToken): Future[Unit] = {
     for {
       _ ← eventService.create(StopAmplifying(venue), RemoveAllTracks)
-      _ ← queueService.update(venue.toUnauthenticated, RemoveAllTracks)
+      _ ← queueService.update(venue.unauthenticated, RemoveAllTracks)
     }
     yield ()
   }
@@ -39,7 +39,7 @@ class VenuePlayerLogicImpl @Inject()(
   override def trackFinished(venue: AuthenticatedVenue): Future[Unit] = {
     for {
       _ ← eventService.create(TrackFinished(venue), QueueTrackFinished)
-      _ ← queueService.update(venue.toUnauthenticated, QueueTrackFinished)
+      _ ← queueService.update(venue.unauthenticated, QueueTrackFinished)
     }
     yield ()
   }

@@ -2,7 +2,7 @@ package com.amplify.api.utils
 
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.{AmplifyApiUser, AmplifyApiVenue}
-import com.amplify.api.domain.models.AuthToken
+import com.amplify.api.domain.models.{AuthToken, AuthenticatedUserReq}
 import play.api.mvc._
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
@@ -32,6 +32,9 @@ trait AuthenticatedRequests {
       request.subject match {
         case Some(authUser: AmplifyApiUser) ⇒
           block(AuthenticatedUserRequest[A](authUser, request))
+        case Some(authVenue: AmplifyApiVenue) ⇒
+          val userReq = AuthenticatedUserReq(authVenue.user, authVenue.venueReq.authToken)
+          block(AuthenticatedUserRequest[A](AmplifyApiUser(userReq), request))
         case other ⇒
           throw new IllegalStateException(s"Expected AuthUser, got: $other")
       }

@@ -1,8 +1,10 @@
 ###
-#  summary: Register new venue into the system
+#  summary: Register new venue
 #  responses:
 #    200:
 #      description: success
+#      schema:
+#        $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueResponse'
 #  parameters:
 #  - name: Auth-provider
 #    description: Name of the OAuth authorization server
@@ -19,7 +21,7 @@
 #    in: body
 #    required: true
 #    schema:
-#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.SignUpReq'
+#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueRequest'
 ###
 POST    /    com.amplify.api.controllers.VenueAuthController.signUp
 
@@ -28,6 +30,10 @@ POST    /    com.amplify.api.controllers.VenueAuthController.signUp
 #  responses:
 #    200:
 #      description: success
+#      schema:
+#        type: array
+#        items:
+#          $ref: '#/definitions/com.amplify.api.controllers.dtos.Playlist.PlaylistResponse'
 #  parameters:
 #  - name: Auth-provider
 #    description: Name of the OAuth authorization server
@@ -73,6 +79,8 @@ PUT    /me/playlists/current    com.amplify.api.controllers.VenueCrudController.
 #  responses:
 #    200:
 #      description: success
+#      schema:
+#        $ref: '#/definitions/com.amplify.api.controllers.dtos.Queue.QueueResponse'
 #  parameters:
 #  - name: Auth-provider
 #    description: Name of the OAuth authorization server
@@ -106,7 +114,7 @@ GET    /me/queue    com.amplify.api.controllers.VenueCrudController.getQueue
 #    required: true
 #    type: string
 ###
-PUT    /me/queue/player/play    com.amplify.api.controllers.VenuePlayerController.play
+PUT    /me/queue/play    com.amplify.api.controllers.VenuePlayerController.play
 
 
 ###
@@ -127,7 +135,7 @@ PUT    /me/queue/player/play    com.amplify.api.controllers.VenuePlayerControlle
 #    required: true
 #    type: string
 ###
-PUT    /me/queue/player/pause    com.amplify.api.controllers.VenuePlayerController.pause
+PUT    /me/queue/pause    com.amplify.api.controllers.VenuePlayerController.pause
 
 
 ###
@@ -188,4 +196,28 @@ PUT    /me/stop    com.amplify.api.controllers.VenuePlayerController.stopAmplify
 #    required: true
 #    type: string
 ###
-PUT    /me/track_finished    com.amplify.api.controllers.VenuePlayerController.trackFinished
+PUT    /me/queue/current/finished    com.amplify.api.controllers.VenuePlayerController.trackFinished
+
+###
+#  summary: Retrieve all registered venues
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        type: array
+#        items:
+#          $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueResponse'
+#  parameters:
+#  - name: Auth-provider
+#    description: Name of the OAuth authorization server
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: Authorization
+#    description: Access token issued by the authorization server
+#    in: header
+#    required: true
+#    type: string
+###
+GET    /    com.amplify.api.controllers.VenueCrudController.retrieveAll

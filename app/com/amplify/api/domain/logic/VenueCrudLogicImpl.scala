@@ -25,12 +25,16 @@ class VenueCrudLogicImpl @Inject()(
       eventSource = SetCurrentPlaylist(venueReq.venue, playlistIdentifier)
       queueEvents = playlist.map(AddVenueTrack.apply) :+ RemoveVenueTracks
       _ ← eventService.create(eventSource, queueEvents: _*)
-      _ ← queueService.update(venueReq.venue.toUnauthenticated, queueEvents: _*)
+      _ ← queueService.update(venueReq.venue.unauthenticated, queueEvents: _*)
     }
     yield ()
   }
 
   override def retrieveQueue(venue: AuthenticatedVenue): Future[Queue] = {
     queueService.retrieve(venue)
+  }
+
+  override def retrieveAll(): Future[Seq[Venue]] = {
+    venueService.retrieveAllVenues()
   }
 }

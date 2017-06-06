@@ -12,4 +12,6 @@ trait VenueDao {
   def create(venueDb: VenueDb): DBIO[VenueDb]
 
   def retrieve(userId: Id[User]): DBIO[Option[VenueDb]]
+
+  def retrieveAllVenues(): DBIO[Seq[VenueDb]]
 }
