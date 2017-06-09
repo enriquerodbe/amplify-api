@@ -1,7 +1,7 @@
 package com.amplify.api.services
 
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
-import com.amplify.api.domain.models.{AuthenticatedUser, ContentProviderIdentifier, UnauthenticatedVenue, Venue}
+import com.amplify.api.domain.models.{AuthenticatedUser, ContentProviderIdentifier, UnauthenticatedVenue}
 import com.amplify.api.exceptions.UserNotFound
 import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
 import com.amplify.api.services.converters.VenueConverter.venueDbToVenue
@@ -16,7 +16,7 @@ class UserServiceImpl @Inject()(
     venueDao: VenueDao)(
     implicit ec: ExecutionContext) extends UserService {
 
-  override def get(
+  override def retrieve(
       identifier: ContentProviderIdentifier
   ): Future[(AuthenticatedUser, Option[UnauthenticatedVenue])] = {
     val action =
@@ -29,7 +29,7 @@ class UserServiceImpl @Inject()(
     db.run(action)
   }
 
-  override def getOrCreate(userData: UserData): Future[AuthenticatedUser] = {
+  override def retrieveOrCreate(userData: UserData): Future[AuthenticatedUser] = {
     val userDb = userDataToUserDb(userData)
     val createdUser = db.runTransactionally(userDao.retrieveOrCreate(userDb))
     createdUser.map(userDbToAuthenticatedUser)

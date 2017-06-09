@@ -13,6 +13,15 @@ sealed trait QueueEvent {
 
 object QueueEvent {
 
+  case class SetCurrentPlaylist(identifier: ContentProviderIdentifier) extends QueueEvent {
+
+    override def eventType: QueueEventType = QueueEventType.SetCurrentPlaylist
+
+    override def contentIdentifier: Option[ContentProviderIdentifier] = Some(identifier)
+
+    override def process(queue: Queue): Queue = queue.setCurrentPlaylist(identifier)
+  }
+
   case object RemoveVenueTracks extends QueueEvent {
 
     override def eventType: QueueEventType = QueueEventType.RemoveVenueTracks

@@ -10,7 +10,7 @@ object EventSourceConverter {
     EventSourceDb(
       venueId = eventSource.venue.id,
       userId = None,
-      eventType = EventSourceType.SetCurrentPlaylist,
+      eventType = eventSource.eventType,
       contentIdentifier = eventSource.contentIdentifier,
       createdAt = Instant.now())
   }

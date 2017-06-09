@@ -1,8 +1,10 @@
 package com.amplify.api.daos
 
 import com.amplify.api.daos.models.UserDb
+import com.amplify.api.daos.primitives.Id
 import com.amplify.api.daos.schema.UsersTable
-import com.amplify.api.domain.models.ContentProviderIdentifier
+import com.amplify.api.domain.models.{ContentProviderIdentifier, User}
+import com.amplify.api.utils.FutureUtils._
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import scala.concurrent.ExecutionContext
@@ -12,6 +14,10 @@ class UserDaoImpl @Inject()(
     implicit val ec: ExecutionContext) extends UserDao with UsersTable {
 
   import profile.api._
+
+  override def retrieve(id: Id[User]): DBIO[UserDb] = {
+    usersTable.filter(_.id === id).result.headOption ?! new Exception //
+  }
 
   override def retrieve(identifier: ContentProviderIdentifier): DBIO[Option[UserDb]] = {
     val query = usersTable.filter { user ⇒

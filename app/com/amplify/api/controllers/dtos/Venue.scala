@@ -1,13 +1,13 @@
 package com.amplify.api.controllers.dtos
 
-import com.amplify.api.domain.models.Venue
+import com.amplify.api.domain.models.{Venue ⇒ VenueModel}
 import com.github.tototoshi.play.json.JsonNaming
 import play.api.libs.json.{Json, Reads, Writes}
 
 object Venue {
 
   case class VenueResponse(name: String, uid: String)
-  def venueToVenueResponse(venue: Venue): VenueResponse = {
+  def venueToVenueResponse(venue: VenueModel): VenueResponse = {
     VenueResponse(venue.name, venue.uid)
   }
   implicit val venueResponseWrites: Writes[VenueResponse] = {

@@ -13,7 +13,7 @@ class UserAuthLogicImpl @Inject()(
   override def signUp(implicit authToken: AuthToken): Future[AuthenticatedUser] = {
     for {
       userData ← authService.fetchUser
-      user ← userService.getOrCreate(userData)
+      user ← userService.retrieveOrCreate(userData)
     }
     yield user
   }
@@ -22,7 +22,7 @@ class UserAuthLogicImpl @Inject()(
       implicit authToken: AuthToken): Future[(AuthenticatedUser, Option[UnauthenticatedVenue])] = {
     for {
       userData ← authService.fetchUser
-      userAndVenue ← userService.get(userData.identifier)
+      userAndVenue ← userService.retrieve(userData.identifier)
     }
     yield userAndVenue
   }

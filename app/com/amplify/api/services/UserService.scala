@@ -8,9 +8,9 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[UserServiceImpl])
 trait UserService {
 
-  def get(
+  def retrieve(
       identifier: ContentProviderIdentifier
   ): Future[(AuthenticatedUser, Option[UnauthenticatedVenue])]
 
-  def getOrCreate(userData: UserData): Future[AuthenticatedUser]
+  def retrieveOrCreate(userData: UserData): Future[AuthenticatedUser]
 }

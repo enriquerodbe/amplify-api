@@ -3,6 +3,7 @@ package com.amplify.api.services
 import com.amplify.api.controllers.dtos.Venue.VenueRequest
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
 import com.amplify.api.domain.models._
+import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.exceptions.UserAlreadyHasVenue
 import com.amplify.api.services.converters.PlaylistConverter.playlistDataToPlaylist
 import com.amplify.api.services.converters.TrackConverter.trackDataToTrack
@@ -10,6 +11,7 @@ import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, user
 import com.amplify.api.services.converters.VenueConverter.{venueDbToAuthenticatedVenue, venueDbToVenue, venueReqToVenueDb}
 import com.amplify.api.services.external.ContentProviderRegistry
 import com.amplify.api.services.external.models.UserData
+import com.amplify.api.utils.FutureUtils._
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import slick.dbio.DBIO
@@ -21,10 +23,21 @@ class VenueServiceImpl @Inject()(
     venueDao: VenueDao)(
     implicit ec: ExecutionContext) extends VenueService {
 
-  override def getOrCreate(
+  override def retrieve(uid: Uid): Future[AuthenticatedVenue] = {
+    val action =
+      for {
+        venueDb ← venueDao.retrieve(uid) ?! new Exception //
+        userDb ← userDao.retrieve(venueDb.userId)
+      }
+      yield AuthenticatedVenue(userDbToAuthenticatedUser(userDb), venueDbToVenue(venueDb))
+
+    db.run(action)
+  }
+
+  override def retrieveOrCreate(
       userData: UserData,
       venueReq: VenueRequest): Future[AuthenticatedVenue] = {
-    val action = getUserWithVenue(userData).flatMap {
+    val action = retrieveOrCreateUserWithVenue(userData).flatMap {
       case (_, Some(venueDb)) ⇒ DBIO.failed(UserAlreadyHasVenue(venueDbToVenue(venueDb)))
       case (userDb, _) ⇒
         val venueDb = venueDao.create(venueReqToVenueDb(venueReq, userDb.id))
@@ -34,7 +47,7 @@ class VenueServiceImpl @Inject()(
     db.runTransactionally(action)
   }
 
-  private def getUserWithVenue(userData: UserData) = {
+  private def retrieveOrCreateUserWithVenue(userData: UserData) = {
     for {
       user ← userDao.retrieveOrCreate(userDataToUserDb(userData))
       maybeVenue ← venueDao.retrieve(user.id)
@@ -59,7 +72,7 @@ class VenueServiceImpl @Inject()(
     eventualPlaylist.map(_.map(trackDataToTrack))
   }
 
-  override def retrieveAllVenues(): Future[Seq[Venue]] = {
+  override def retrieveAll(): Future[Seq[Venue]] = {
     db.run(venueDao.retrieveAllVenues()).map(_.map(venueDbToVenue))
   }
 }

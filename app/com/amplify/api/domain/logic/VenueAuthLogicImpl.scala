@@ -14,7 +14,7 @@ class VenueAuthLogicImpl @Inject()(
   override def signUp(authToken: AuthToken, venueReq: VenueRequest): Future[AuthenticatedVenue] = {
     for {
       userData ← authService.fetchUser(authToken)
-      venue ← venueService.getOrCreate(userData, venueReq)
+      venue ← venueService.retrieveOrCreate(userData, venueReq)
     }
     yield venue
   }
