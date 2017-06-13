@@ -9,11 +9,10 @@ object UserConverter {
   def userDataToUserDb(userData: UserData): UserDb = {
     UserDb(
       name = userData.name,
-      email = userData.email,
       authIdentifier = userData.identifier)
   }
 
   def userDbToAuthenticatedUser(userDb: UserDb): AuthenticatedUser = {
-    AuthenticatedUser(userDb.id, userDb.name, userDb.email, userDb.authIdentifier)
+    AuthenticatedUser(userDb.id, userDb.name, userDb.authIdentifier)
   }
 }

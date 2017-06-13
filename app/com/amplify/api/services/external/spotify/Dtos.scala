@@ -2,7 +2,7 @@ package com.amplify.api.services.external.spotify
 
 object Dtos {
 
-  case class User(id: String, displayName: String, email: String)
+  case class User(id: String, displayName: String)
 
   case class Playlists(items: Seq[Playlist])
 

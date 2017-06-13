@@ -3,6 +3,7 @@ package com.amplify.api.utils
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.{AmplifyApiUser, AmplifyApiVenue}
 import com.amplify.api.domain.models.{AuthToken, AuthenticatedUserReq}
+import com.amplify.api.exceptions.VenueNotFound
 import play.api.mvc._
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
@@ -46,6 +47,8 @@ trait AuthenticatedRequests {
       block: AuthenticatedVenueRequest[A] ⇒ Future[Result]): Action[A] = {
     actionBuilder.SubjectPresentAction().defaultHandler.apply(parser) { request ⇒
       request.subject match {
+        case Some(authUser: AmplifyApiUser) ⇒
+          throw VenueNotFound(authUser.userReq.identifier)
         case Some(authVenue: AmplifyApiVenue) ⇒
           block(AuthenticatedVenueRequest[A](authVenue, request))
         case other ⇒

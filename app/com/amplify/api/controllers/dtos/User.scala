@@ -6,9 +6,9 @@ import play.api.libs.json.{Json, Writes}
 
 object User {
 
-  case class UserResponse(name: String, email: String, identifier: String)
+  case class UserResponse(name: String, identifier: String)
   def authenticatedUserToUserResponse(authUser: AuthenticatedUser): UserResponse = {
-    UserResponse(authUser.name, authUser.email, authUser.identifier)
+    UserResponse(authUser.name, authUser.identifier)
   }
   implicit val userResponseWrites: Writes[UserResponse] = {
     JsonNaming.snakecase(Json.writes[UserResponse])
