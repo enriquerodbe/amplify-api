@@ -40,4 +40,4 @@ POST    /    com.amplify.api.controllers.UserAuthController.signUp
 #    required: true
 #    type: string
 ###
-GET    /me    com.amplify.api.controllers.UserCrudController.fetchUser()
+GET    /me    com.amplify.api.controllers.UserCrudController.retrieveCurrent

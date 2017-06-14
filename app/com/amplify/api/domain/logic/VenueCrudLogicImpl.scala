@@ -4,6 +4,7 @@ import com.amplify.api.domain.models.EventSource.SetCurrentPlaylist
 import com.amplify.api.domain.models.QueueEvent.{AddVenueTrack, RemoveVenueTracks, SetCurrentPlaylist ⇒ QueueSetCurrentPlaylist}
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.exceptions.CurrentPlaylistNotSet
 import com.amplify.api.services.{EventService, QueueService, VenueService}
 import com.amplify.api.utils.FutureUtils._
 import javax.inject.Inject
@@ -40,7 +41,7 @@ class VenueCrudLogicImpl @Inject()(
       venue ← venueService.retrieve(uid)
       queue ← queueService.retrieve(venue.unauthenticated)
       venueReq = AuthenticatedVenueReq(venue, user.authToken)
-      currentPlaylist ← queue.currentPlaylist ?! new Exception //
+      currentPlaylist ← queue.currentPlaylist ?! CurrentPlaylistNotSet(uid)
       tracks ← venueService.retrievePlaylistTracks(venueReq, currentPlaylist)
     } yield tracks
   }

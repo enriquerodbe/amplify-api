@@ -12,7 +12,7 @@ import scala.concurrent.Future
 class UserCrudController @Inject()(
     val actionBuilder: ActionBuilders) extends Controller with AuthenticatedRequests {
 
-  def fetchUser() = authenticatedUser() { request ⇒
+  def retrieveCurrent() = authenticatedUser() { request ⇒
     val response = authenticatedUserToUserResponse(request.subject.user)
     Future.successful(Ok(Json.toJson(response)))
   }

@@ -4,7 +4,7 @@ import com.amplify.api.controllers.dtos.Venue.VenueRequest
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.Uid
-import com.amplify.api.exceptions.UserAlreadyHasVenue
+import com.amplify.api.exceptions.{UserAlreadyHasVenue, UserNotFoundById, VenueNotFoundByUid, VenueNotFoundByUserIdentifier}
 import com.amplify.api.services.converters.PlaylistConverter.playlistDataToPlaylist
 import com.amplify.api.services.converters.TrackConverter.trackDataToTrack
 import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
@@ -26,8 +26,8 @@ class VenueServiceImpl @Inject()(
   override def retrieve(uid: Uid): Future[AuthenticatedVenue] = {
     val action =
       for {
-        venueDb ← venueDao.retrieve(uid) ?! new Exception //
-        userDb ← userDao.retrieve(venueDb.userId)
+        venueDb ← venueDao.retrieve(uid) ?! VenueNotFoundByUid(uid)
+        userDb ← userDao.retrieve(venueDb.userId) ?! UserNotFoundById(venueDb.userId)
       }
       yield AuthenticatedVenue(userDbToAuthenticatedUser(userDb), venueDbToVenue(venueDb))
 

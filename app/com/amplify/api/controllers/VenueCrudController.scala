@@ -22,7 +22,7 @@ class VenueCrudController @Inject()(
     val actionBuilder: ActionBuilders)(
     implicit ec: ExecutionContext) extends Controller with AuthenticatedRequests {
 
-  def fetchPlaylists(offset: Int, limit: Int) = authenticatedVenue() { request ⇒
+  def retrievePlaylists(offset: Int, limit: Int) = authenticatedVenue() { request ⇒
     val eventualPlaylists = venueCrudLogic.retrievePlaylists(request.subject.venueReq)
     eventualPlaylists.map(playlists ⇒ Ok(Json.toJson(playlists.map(playlistToPlaylistResponse))))
   }
@@ -36,13 +36,13 @@ class VenueCrudController @Inject()(
     }
   }
 
-  def getQueue() = authenticatedVenue() { request ⇒
+  def retrieveQueue() = authenticatedVenue() { request ⇒
     venueCrudLogic.retrieveQueue(request.subject.venue.unauthenticated).map { queue ⇒
       Ok(Json.toJson(queueToQueueResponse(queue)))
     }
   }
 
-  def fetchVenue() = authenticatedVenue() { request ⇒
+  def retrieveCurrent() = authenticatedVenue() { request ⇒
     val response = venueToVenueResponse(request.subject.venue)
     Future.successful(Ok(Json.toJson(response)))
   }

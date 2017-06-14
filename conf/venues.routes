@@ -47,7 +47,7 @@ POST    /    com.amplify.api.controllers.VenueAuthController.signUp
 #    required: true
 #    type: string
 ###
-GET    /me/playlists    com.amplify.api.controllers.VenueCrudController.fetchPlaylists(offset: Int ?= 0, limit: Int ?= 100)
+GET    /me/playlists    com.amplify.api.controllers.VenueCrudController.retrievePlaylists(offset: Int ?= 0, limit: Int ?= 100)
 
 ###
 #  summary: Set the current playlist of allowed songs for the authenticated venue
@@ -94,7 +94,7 @@ PUT    /me/playlists/current    com.amplify.api.controllers.VenueCrudController.
 #    required: true
 #    type: string
 ###
-GET    /me/queue    com.amplify.api.controllers.VenueCrudController.getQueue
+GET    /me/queue    com.amplify.api.controllers.VenueCrudController.retrieveQueue
 
 ###
 #  summary: Start or resume playing the queue of the authenticated venue
@@ -242,7 +242,7 @@ GET    /    com.amplify.api.controllers.VenueCrudController.retrieveAll
 #    required: true
 #    type: string
 ###
-GET    /me    com.amplify.api.controllers.VenueCrudController.fetchVenue
+GET    /me    com.amplify.api.controllers.VenueCrudController.retrieveCurrent
 
 ###
 #  summary: Retrieve all tracks of the current playlist of the selected venue

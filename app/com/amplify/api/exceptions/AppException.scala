@@ -34,6 +34,7 @@ object AppExceptionCode extends Enumeration {
     UnexpectedExternalServiceResponse,
     UserAlreadyHasVenue,
     InvalidProviderIdentifier,
-    VenueNotFound
+    VenueNotFound,
+    VenueCurrentPlaylistNotSet
   = Value
 }
