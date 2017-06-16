@@ -14,11 +14,19 @@ trait VenueService {
 
   def retrieveOrCreate(userData: UserData, venueReq: VenueRequest): Future[AuthenticatedVenue]
 
-  def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[Playlist]]
+  def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[PlaylistInfo]]
+
+  def retrievePlaylistInfo(
+      venueReq: AuthenticatedVenueReq,
+      identifier: ContentProviderIdentifier): Future[PlaylistInfo]
 
   def retrievePlaylistTracks(
       venue: AuthenticatedVenueReq,
-      playlistIdentifier: ContentProviderIdentifier): Future[Seq[Track]]
+      identifier: ContentProviderIdentifier): Future[Seq[Track]]
+
+  def retrievePlaylist(
+      venue: AuthenticatedVenueReq,
+      identifier: ContentProviderIdentifier): Future[Playlist]
 
   def retrieveAll(): Future[Seq[Venue]]
 }

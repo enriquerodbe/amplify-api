@@ -12,7 +12,11 @@ object Dtos {
 
   case class TrackItem(track: Track)
 
-  case class Track(id: String, name: String)
+  case class Track(id: String, name: String, album: Album)
+
+  case class Album(name: String, artists: Seq[Artist], images: Seq[Image])
+
+  case class Artist(name: String)
 
   case class Page[T](items: Seq[T], total: Int, next: Option[String])
 }

@@ -11,7 +11,7 @@ case class UserAlreadyHasVenue(venue: Venue)
     s"User already registered a venue: ${venue.name}")
 
 case class VenueNotFoundByUserIdentifier(userIdentifier: ContentProviderIdentifier)
-  extends BadRequestException(
+  extends UnauthorizedException(
       AppExceptionCode.VenueNotFound,
       s"Venue not found for user identifier $userIdentifier")
 

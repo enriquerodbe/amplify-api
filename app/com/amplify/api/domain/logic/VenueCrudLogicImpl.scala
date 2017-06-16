@@ -16,7 +16,7 @@ class VenueCrudLogicImpl @Inject()(
     queueService: QueueService)(
     implicit ec: ExecutionContext) extends VenueCrudLogic {
 
-  override def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[Playlist]] = {
+  override def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[PlaylistInfo]] = {
     venueService.retrievePlaylists(venue)
   }
 
@@ -24,10 +24,10 @@ class VenueCrudLogicImpl @Inject()(
       venueReq: AuthenticatedVenueReq,
       playlistIdentifier: ContentProviderIdentifier): Future[Unit] = {
     for {
-      playlist ← venueService.retrievePlaylistTracks(venueReq, playlistIdentifier)
+      playlist ← venueService.retrievePlaylist(venueReq, playlistIdentifier)
+      tracksEvents = playlist.tracks.map(AddVenueTrack.apply)
+      queueEvents = RemoveVenueTracks +: tracksEvents :+ QueueSetCurrentPlaylist(playlist)
       eventSource = SetCurrentPlaylist(venueReq.venue, playlistIdentifier)
-      setCurrentPlaylist = QueueSetCurrentPlaylist(playlistIdentifier)
-      queueEvents = playlist.map(AddVenueTrack.apply) :+ RemoveVenueTracks :+ setCurrentPlaylist
       _ ← eventService.create(eventSource, queueEvents: _*)
       _ ← queueService.update(venueReq.venue.unauthenticated, queueEvents: _*)
     }
@@ -40,10 +40,11 @@ class VenueCrudLogicImpl @Inject()(
     for {
       venue ← venueService.retrieve(uid)
       queue ← queueService.retrieve(venue.unauthenticated)
-      venueReq = AuthenticatedVenueReq(venue, user.authToken)
       currentPlaylist ← queue.currentPlaylist ?! CurrentPlaylistNotSet(uid)
-      tracks ← venueService.retrievePlaylistTracks(venueReq, currentPlaylist)
-    } yield tracks
+      venueReq = AuthenticatedVenueReq(venue, user.authToken)
+      tracks ← venueService.retrievePlaylistTracks(venueReq, currentPlaylist.identifier.identifier)
+    }
+    yield tracks
   }
 
   override def retrieveQueue(venue: UnauthenticatedVenue): Future[Queue] = {

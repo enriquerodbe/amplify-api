@@ -9,10 +9,12 @@ object Queue {
 
   case class QueueResponse(
       currentPlaylist: Option[String],
+      currentTrack: Option[TrackResponse],
       tracks: Seq[TrackResponse])
   def queueToQueueResponse(queue: ModelQueue): QueueResponse = {
     QueueResponse(
-      queue.currentPlaylist.map(_.toString),
+      queue.currentPlaylist.map(_.identifier.identifier.toString),
+      queue.currentTrack.map(trackToTrackResponse),
       queue.items.map(item ⇒ trackToTrackResponse(item.track)))
   }
   implicit val queueResponseWrites: Writes[QueueResponse] = {

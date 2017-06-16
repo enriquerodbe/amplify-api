@@ -1,6 +1,7 @@
 package com.amplify.api.domain.models
 
 import com.amplify.api.domain.models.QueueEventType.QueueEventType
+import scala.util.Try
 
 sealed trait QueueEvent {
 
@@ -8,18 +9,20 @@ sealed trait QueueEvent {
 
   def contentIdentifier: Option[ContentProviderIdentifier]
 
-  def process(queue: Queue): Queue
+  def process(queue: Queue): Try[Queue]
 }
 
 object QueueEvent {
 
-  case class SetCurrentPlaylist(identifier: ContentProviderIdentifier) extends QueueEvent {
+  case class SetCurrentPlaylist(playlist: Playlist) extends QueueEvent {
 
     override def eventType: QueueEventType = QueueEventType.SetCurrentPlaylist
 
-    override def contentIdentifier: Option[ContentProviderIdentifier] = Some(identifier)
+    override def contentIdentifier: Option[ContentProviderIdentifier] = {
+      Some(playlist.identifier.identifier)
+    }
 
-    override def process(queue: Queue): Queue = queue.setCurrentPlaylist(identifier)
+    override def process(queue: Queue): Try[Queue] = queue.setCurrentPlaylist(playlist)
   }
 
   case object RemoveVenueTracks extends QueueEvent {
@@ -28,7 +31,7 @@ object QueueEvent {
 
     override def contentIdentifier: Option[ContentProviderIdentifier] = None
 
-    override def process(queue: Queue): Queue = queue.removeVenueTracks()
+    override def process(queue: Queue): Try[Queue] = queue.removeVenueTracks()
   }
 
   case class AddVenueTrack(track: Track) extends QueueEvent {
@@ -39,7 +42,7 @@ object QueueEvent {
       Some(track.contentProviderIdentifier)
     }
 
-    override def process(queue: Queue): Queue = queue.addVenueTrack(track)
+    override def process(queue: Queue): Try[Queue] = queue.addVenueTrack(track)
   }
 
   case object RemoveAllTracks extends QueueEvent {
@@ -48,7 +51,7 @@ object QueueEvent {
 
     override def contentIdentifier: Option[ContentProviderIdentifier] = None
 
-    override def process(queue: Queue): Queue = queue.removeAllTracks()
+    override def process(queue: Queue): Try[Queue] = queue.removeAllTracks()
   }
 
   case object TrackFinished extends QueueEvent {
@@ -57,6 +60,15 @@ object QueueEvent {
 
     override def contentIdentifier: Option[ContentProviderIdentifier] = None
 
-    override def process(queue: Queue): Queue = queue.trackFinished()
+    override def process(queue: Queue): Try[Queue] = queue.trackFinished()
+  }
+
+  case class AddUserTrack(user: User, identifier: ContentProviderIdentifier) extends QueueEvent {
+
+    override def eventType: QueueEventType = QueueEventType.AddUserTrack
+
+    override def contentIdentifier: Option[ContentProviderIdentifier] = Some(identifier)
+
+    override def process(queue: Queue): Try[Queue] = queue.addUserTrack(user, identifier)
   }
 }

@@ -33,4 +33,6 @@ case class AuthenticatedVenueReq(venue: AuthenticatedVenue, authToken: AuthToken
   override def uid: Uid = venue.uid
 
   def user: AuthenticatedUser = venue.user
+
+  def userIdentifier: ContentProviderIdentifier = user.identifier
 }

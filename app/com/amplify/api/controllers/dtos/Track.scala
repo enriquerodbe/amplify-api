@@ -1,16 +1,22 @@
 package com.amplify.api.controllers.dtos
 
+import com.amplify.api.controllers.dtos.Album.{AlbumResponse, albumToAlbumResponse}
 import com.amplify.api.domain.models.{Track ⇒ ModelTrack}
 import com.github.tototoshi.play.json.JsonNaming
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 
 object Track {
 
-  case class TrackResponse(name: String, identifier: String)
+  case class TrackResponse(name: String, identifier: String, album: AlbumResponse)
   def trackToTrackResponse(track: ModelTrack): TrackResponse = {
-    TrackResponse(track.name, track.contentProviderIdentifier)
+    TrackResponse(track.name, track.contentProviderIdentifier, albumToAlbumResponse(track.album))
   }
   implicit val trackResponseWrites: Writes[TrackResponse] = {
     JsonNaming.snakecase(Json.writes[TrackResponse])
+  }
+
+  case class AddTrackRequest(identifier: String)
+  implicit val addTrackRequestReads: Reads[AddTrackRequest] = {
+    JsonNaming.snakecase(Json.reads[AddTrackRequest])
   }
 }

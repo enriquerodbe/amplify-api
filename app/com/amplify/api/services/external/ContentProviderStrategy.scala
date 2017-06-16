@@ -14,6 +14,11 @@ trait ContentProviderStrategy {
 
   def fetchPlaylists(implicit token: AuthToken): Future[Seq[PlaylistData]]
 
+  def fetchPlaylist(
+      userIdentifier: Identifier,
+      playlistIdentifier: Identifier)(
+      implicit authToken: AuthToken): Future[PlaylistData]
+
   def fetchPlaylistTracks(
       userIdentifier: Identifier,
       playlistIdentifier: Identifier)(

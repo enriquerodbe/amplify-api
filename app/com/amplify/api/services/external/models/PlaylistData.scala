@@ -4,5 +4,3 @@ import com.amplify.api.domain.models.ContentProviderIdentifier
 import com.amplify.api.domain.models.primitives.Name
 
 case class PlaylistData(identifier: ContentProviderIdentifier, name: Name, images: Seq[ImageData])
-
-case class ImageData(url: String, height: Option[Int], width: Option[Int])

@@ -6,9 +6,11 @@ sealed trait EventSource {
 
   def venue: AuthenticatedVenue
 
+  def user: Option[User] = None
+
   def eventType: EventSourceType
 
-  def contentIdentifier: Option[ContentProviderIdentifier]
+  def contentIdentifier: Option[ContentProviderIdentifier] = None
 }
 
 object EventSource {
@@ -25,35 +27,37 @@ object EventSource {
   case class StartPlayback(venue: AuthenticatedVenue) extends EventSource {
 
     override def eventType: EventSourceType = EventSourceType.StartPlayback
-
-    override def contentIdentifier: Option[ContentProviderIdentifier] = None
   }
 
   case class PausePlayback(venue: AuthenticatedVenue) extends EventSource {
 
     override def eventType: EventSourceType = EventSourceType.PausePlayback
-
-    override def contentIdentifier: Option[ContentProviderIdentifier] = None
   }
 
   case class StartAmplifying(venue: AuthenticatedVenue) extends EventSource {
 
     override def eventType: EventSourceType = EventSourceType.StartAmplifying
-
-    override def contentIdentifier: Option[ContentProviderIdentifier] = None
   }
 
   case class StopAmplifying(venue: AuthenticatedVenue) extends EventSource {
 
     override def eventType: EventSourceType = EventSourceType.StopAmplifying
-
-    override def contentIdentifier: Option[ContentProviderIdentifier] = None
   }
 
   case class TrackFinished(venue: AuthenticatedVenue) extends EventSource {
 
     override def eventType: EventSourceType = EventSourceType.TrackFinished
+  }
 
-    override def contentIdentifier: Option[ContentProviderIdentifier] = None
+  case class AddUserTrack(
+      venue: AuthenticatedVenue,
+      authenticatedUser: AuthenticatedUser,
+      trackIdentifier: ContentProviderIdentifier) extends EventSource {
+
+    override def user: Option[User] = Some(authenticatedUser)
+
+    override def eventType: EventSourceType = EventSourceType.AddUserTrack
+
+    override def contentIdentifier: Option[ContentProviderIdentifier] = Some(trackIdentifier)
   }
 }

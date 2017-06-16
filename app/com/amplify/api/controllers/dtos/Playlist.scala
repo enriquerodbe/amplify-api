@@ -1,6 +1,6 @@
 package com.amplify.api.controllers.dtos
 
-import com.amplify.api.domain.models.{Image, Playlist ⇒ ModelPlaylist}
+import com.amplify.api.domain.models.{Image, PlaylistInfo ⇒ ModelPlaylist}
 import com.github.tototoshi.play.json.JsonNaming
 import play.api.libs.json.{Json, Reads, Writes}
 

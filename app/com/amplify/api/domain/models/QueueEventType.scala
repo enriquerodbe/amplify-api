@@ -10,6 +10,7 @@ object QueueEventType extends Enumeration {
     StartPlaying,
     RemoveAllTracks,
     TrackFinished,
-    SetCurrentPlaylist
+    SetCurrentPlaylist,
+    AddUserTrack
   = Value
 }
