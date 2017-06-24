@@ -7,9 +7,13 @@ import play.api.libs.json.{Json, Writes}
 
 object Queue {
 
-  case class QueueResponse(tracks: Seq[TrackResponse])
+  case class QueueResponse(
+      currentPlaylist: Option[String],
+      tracks: Seq[TrackResponse])
   def queueToQueueResponse(queue: ModelQueue): QueueResponse = {
-    QueueResponse(queue.items.map(item ⇒ trackToTrackResponse(item.track)))
+    QueueResponse(
+      queue.currentPlaylist.map(_.toString),
+      queue.items.map(item ⇒ trackToTrackResponse(item.track)))
   }
   implicit val queueResponseWrites: Writes[QueueResponse] = {
     JsonNaming.snakecase(Json.writes[QueueResponse])
