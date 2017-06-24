@@ -9,6 +9,8 @@ object JsonConverters {
 
   implicit val userReads = JsonNaming.snakecase(Json.reads[User])
 
+  implicit val imageReads = JsonNaming.snakecase(Json.reads[Image])
+
   implicit val playlistReads = JsonNaming.snakecase(Json.reads[Playlist])
 
   implicit val playlistsReads = JsonNaming.snakecase(Json.reads[Playlists])

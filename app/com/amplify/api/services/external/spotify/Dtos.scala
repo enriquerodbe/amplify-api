@@ -6,7 +6,9 @@ object Dtos {
 
   case class Playlists(items: Seq[Playlist])
 
-  case class Playlist(id: String, name: String)
+  case class Playlist(id: String, name: String, images: Seq[Image])
+
+  case class Image(url: String, height: Option[Int], width: Option[Int])
 
   case class TrackItem(track: Track)
 
