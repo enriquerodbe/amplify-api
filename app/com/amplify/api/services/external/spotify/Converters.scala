@@ -19,7 +19,8 @@ object Converters {
   }
 
   def trackItemToTrackData(trackItem: TrackItem): TrackData = {
-    val trackIdentifier = ContentProviderIdentifier(ContentProviderType.Spotify, trackItem.track.id)
+    val trackIdentifier =
+      ContentProviderIdentifier(ContentProviderType.Spotify, trackItem.track.uri)
     TrackData(trackIdentifier, trackItem.track.name, albumToAlbumData(trackItem.track.album))
   }
 
