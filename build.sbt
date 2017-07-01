@@ -14,7 +14,7 @@ lazy val dependencies = Seq(
   "com.iheart" %% "play-swagger" % "0.5.4",
   "org.webjars" % "swagger-ui" % "2.2.0",
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "it,test",
-  "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % "it,test")
+  "org.mockito" % "mockito-core" % "2.8.47" % "it,test")
 
 lazy val root = (project in file("."))
   .settings(libraryDependencies ++= dependencies)

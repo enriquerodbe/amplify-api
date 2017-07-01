@@ -12,9 +12,9 @@ import scala.concurrent.Future
 
 trait SpotifyBaseClient extends WsClient {
 
-  def envConfig: EnvConfig
+  val envConfig: EnvConfig
 
-  override val baseUrl = envConfig.spotifyUrl
+  override lazy val baseUrl = envConfig.spotifyUrl
 
   def spotifyGet[T](
       path: String,

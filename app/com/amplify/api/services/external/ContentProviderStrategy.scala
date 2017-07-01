@@ -1,8 +1,8 @@
 package com.amplify.api.services.external
 
-import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
+import com.amplify.api.domain.models.AuthToken
+import com.amplify.api.domain.models.ContentProviderType.{ContentProviderType, Spotify}
 import com.amplify.api.domain.models.primitives.Identifier
-import com.amplify.api.domain.models.{AuthToken, ContentProviderType}
 import com.amplify.api.services.external.models.{PlaylistData, TrackData, UserData}
 import com.amplify.api.services.external.spotify.SpotifyContentProvider
 import javax.inject.Inject
@@ -29,6 +29,6 @@ class ContentProviderRegistry @Inject()(spotifyContentProvider: SpotifyContentPr
 
   def getStrategy(
       contentProvider: ContentProviderType): ContentProviderStrategy = contentProvider match {
-    case ContentProviderType.Spotify ⇒ spotifyContentProvider
+    case Spotify ⇒ spotifyContentProvider
   }
 }

@@ -26,11 +26,15 @@ object ContentProviderIdentifier {
     }
     else {
       ContentProviderType.find(split(0)) match {
-        case Some(providerType) ⇒ Success(ContentProviderIdentifier(providerType, split(1)))
+        case Some(providerType) ⇒ Success(providerType → split(1))
         case _ ⇒ Failure(InvalidProviderIdentifier(identifier))
       }
     }
   }
 
   implicit def toString(id: ContentProviderIdentifier): String = id.toString
+
+  implicit def fromTuple(tuple: (ContentProviderType, String)): ContentProviderIdentifier = {
+    apply(tuple._1, tuple._2)
+  }
 }

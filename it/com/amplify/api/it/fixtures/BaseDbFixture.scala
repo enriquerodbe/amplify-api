@@ -1,11 +1,11 @@
-package com.amplify.api.it
+package com.amplify.api.it.fixtures
 
 import play.api.db.slick.HasDatabaseConfigProvider
 import scala.concurrent.duration.{Duration, DurationInt}
 import scala.concurrent.{Await, Future}
-import slick.relational.RelationalProfile
+import slick.jdbc.JdbcProfile
 
-trait BaseFixture { self: HasDatabaseConfigProvider[RelationalProfile] =>
+trait BaseDbFixture { self: HasDatabaseConfigProvider[JdbcProfile] =>
 
   import profile.api._
 
@@ -17,5 +17,10 @@ trait BaseFixture { self: HasDatabaseConfigProvider[RelationalProfile] =>
   implicit class DbioSpecUtilities[T](action: DBIO[T]) {
 
     def await(atMost: Duration = 2.seconds): T = db.run(action).await(atMost)
+  }
+
+  implicit class QuerySpecUtilities[T](query: Rep[T]) {
+
+    def await(atMost: Duration = 2.seconds): T = query.result.await(atMost)
   }
 }

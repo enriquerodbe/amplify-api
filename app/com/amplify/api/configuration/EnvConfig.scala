@@ -5,11 +5,7 @@ import play.api.Configuration
 
 class EnvConfig @Inject()(configuration: Configuration) {
 
-  private def getString(keyName: String): String = {
-    configuration.getString(keyName).getOrElse {
-      throw new IllegalStateException(s"Undefined env config for $keyName")
-    }
-  }
+  private def getString(keyName: String): String = configuration.getString(keyName).get
 
   val spotifyUrl = getString("spotify.web_api.url")
 }

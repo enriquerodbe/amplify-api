@@ -5,21 +5,20 @@ import com.amplify.api.exceptions.{MissingAuthTokenHeader, UnsupportedAuthProvid
 import com.amplify.api.utils.FutureUtils.OptionT
 import javax.inject.Inject
 import play.api.mvc.{Headers, Request}
+import play.mvc.Http
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success, Try}
 
 class AuthHeadersUtil @Inject()(implicit ec: ExecutionContext) {
 
   val AUTH_PROVIDER_HEADER = "Auth-provider"
-  val AUTH_TOKEN_HEADER = "Authorization"
 
   def getAuthToken(request: Request[_]): Try[AuthToken] = {
     val headers = request.headers
     for {
       authProvider ← getContentProvider(headers)
-      authorizationHeader ← headers.get(AUTH_TOKEN_HEADER) ?? MissingAuthTokenHeader
+      authorizationHeader ← headers.get(Http.HeaderNames.AUTHORIZATION) ?? MissingAuthTokenHeader
       authToken ← parseAuthToken(authorizationHeader)
-
     }
     yield AuthToken(authProvider, authToken)
   }
