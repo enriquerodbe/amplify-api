@@ -1,15 +1,16 @@
 package com.amplify.api.controllers
 
-import com.amplify.api.domain.models.primitives.Name
 import com.amplify.api.exceptions.{BadRequestException, MissingAuthTokenHeader, UserAlreadyHasVenue, UserAuthTokenNotFound}
-import com.amplify.api.it.BaseIntegrationSpec
 import com.amplify.api.it.fixtures.{SpotifyContext, VenueDbFixture}
-import play.api.libs.json.{JsDefined, JsString}
+import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.test.Helpers._
 
-class VenueAuthControllerSpec extends BaseIntegrationSpec with SpotifyContext {
+class VenueAuthControllerSpec extends BaseIntegrationSpec with SpotifyContext with VenueRequests {
 
   val controller = instanceOf[VenueAuthController]
+
+  class SignUpFixture(implicit val dbConfigProvider: DatabaseConfigProvider) extends VenueDbFixture
 
   "signUp" should {
     "respond OK" in {
@@ -20,34 +21,32 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with SpotifyContext {
     "respond with name" in {
       val response = contentAsJson(controller.signUp()(venueRequest("Test venue").withBobToken))
 
-      response \ "name" must matchPattern {
-        case JsDefined(JsString(name)) if name == "Test venue" ⇒
-      }
+      (response \ "name").as[String] mustEqual "Test venue"
     }
     "respond with uid" in {
       val response = contentAsJson(controller.signUp()(venueRequest("Test venue").withBobToken))
 
-      response \ "uid" must matchPattern {
-        case JsDefined(JsString(uid)) if uid.trim.length == 8 ⇒
-      }
+      (response \ "uid").as[String] must have size 8
     }
 
-    "create venue" in new VenueDbFixture { import profile.api._
+    "create venue" in new SignUpFixture {
       controller.signUp()(venueRequest("Test venue").withBobToken).await()
-      venuesTable.filter(_.name === Name("Test venue")).length.await() mustEqual 1
+
+      findVenues("Test venue").headOption mustBe defined
     }
 
-    "create user" in new VenueDbFixture { import profile.api._
+    "create user" in new SignUpFixture {
       controller.signUp()(venueRequest("Test venue").withBobToken).await()
-      usersTable.filter(_.name === aliceUserData.name).length.await() mustEqual 1
+
+      findUsers(aliceUserData.name).headOption mustBe defined
     }
 
-    "retrieve user if it already exists" in new VenueDbFixture { import profile.api._
+    "retrieve user if it already exists" in new SignUpFixture {
       val userId = insertUser(bobUserDb)
 
       controller.signUp()(venueRequest("Test bar").withBobToken).await()
 
-      val venue = db.run(venuesTable.filter(_.name === Name("Test bar")).result.headOption).await()
+      val venue = findVenues("Test bar").headOption
       venue.map(_.userId) must be(Some(userId))
     }
 
@@ -69,7 +68,7 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with SpotifyContext {
         intercept[Exception](status(response))
       }
 
-      "user already has a venue" in new VenueDbFixture {
+      "user already has a venue" in new SignUpFixture {
         controller.signUp()(venueRequest("Test venue").withBobToken).await()
         intercept[UserAlreadyHasVenue] {
           controller.signUp()(venueRequest("Test venue 2").withBobToken).await()

@@ -47,7 +47,7 @@ POST    /    com.amplify.api.controllers.VenueAuthController.signUp
 #    required: true
 #    type: string
 ###
-GET    /me/playlists    com.amplify.api.controllers.VenueCrudController.retrievePlaylists(offset: Int ?= 0, limit: Int ?= 100)
+GET    /me/playlists    com.amplify.api.controllers.VenueCrudController.retrievePlaylists
 
 ###
 #  summary: Set the current playlist of allowed songs for the authenticated venue

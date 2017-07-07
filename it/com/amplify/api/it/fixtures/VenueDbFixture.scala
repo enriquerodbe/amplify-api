@@ -4,24 +4,29 @@ import com.amplify.api.daos.models.{UserDb, VenueDb}
 import com.amplify.api.daos.primitives.Id
 import com.amplify.api.daos.schema.{UsersTable, VenuesTable}
 import com.amplify.api.domain.models.ContentProviderType.Spotify
+import com.amplify.api.domain.models.primitives.Name
 import com.amplify.api.domain.models.{User, Venue}
-import play.api.db.slick.DatabaseConfigProvider
 
-class VenueDbFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-  extends BaseDbFixture with VenuesTable with UsersTable {
+trait VenueDbFixture extends BaseDbFixture with CommonData with VenuesTable with UsersTable {
 
   import profile.api._
 
-  val aliceUserDb =
-    UserDb(id = 1L, name = "Alice Cooper", authIdentifier = Spotify → "alice-spotify-id")
-  val aliceVenueDb = VenueDb(name = "Alice's Bar", userId = aliceUserDb.id, uid = "Fa84A3fl")
-  val bobUserDb = UserDb(name = "Bob Marley", authIdentifier = Spotify → "bob-spotify-id")
+  val aliceUserDb = UserDb(aliceUserDbId, "Alice Cooper", Spotify → aliceSpotifyId)
+  val aliceVenueDb = VenueDb(aliceVenueDbId, "Alice's Bar", aliceUserDb.id, "Fa84A3fl")
+  val bobUserDb = UserDb(bobUserDbId, "Bob Marley", Spotify → bobSpotifyId)
 
   def insertUser(user: UserDb): Id[User] = {
     db.run(usersTable returning usersTable.map(_.id) += user).await()
   }
   def insertVenue(venue: VenueDb): Id[Venue] = {
     db.run(venuesTable returning venuesTable.map(_.id) += venue).await()
+  }
+
+  def findUsers(name: String): Seq[UserDb] = {
+    db.run(usersTable.filter(_.name === Name(name)).result).await()
+  }
+  def findVenues(name: String): Seq[VenueDb] = {
+    db.run(venuesTable.filter(_.name === Name(name)).result).await()
   }
 
   insertUser(aliceUserDb)

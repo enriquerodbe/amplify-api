@@ -1,6 +1,7 @@
 package com.amplify.api.it
 
 import com.amplify.api.services.external.spotify.SpotifyContentProvider
+import org.mockito.Mockito.{RETURNS_SMART_NULLS, withSettings}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -19,7 +20,8 @@ trait BaseIntegrationSpec
 
   protected def instanceOf[T: ClassTag]: T = app.injector.instanceOf[T]
 
-  val spotifyProvider = mock[SpotifyContentProvider]
+  val spotifyProvider =
+    mock[SpotifyContentProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
   implicit val dbConfig = instanceOf[DatabaseConfigProvider]
   val database = instanceOf[DBApi].database("default")
 

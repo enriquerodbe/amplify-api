@@ -2,11 +2,13 @@ package com.amplify.api.services.external.spotify
 
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models.AuthToken
+import com.amplify.api.exceptions.{ExternalResourceNotFound, UnexpectedResponse, UserAuthTokenNotFound}
 import com.amplify.api.services.external.spotify.Dtos.Page
 import com.amplify.api.services.external.spotify.JsonConverters._
 import com.amplify.api.utils.WsClient
 import play.api.libs.json.{Format, JsValue, Json, Reads}
 import play.api.libs.ws.WSResponse
+import play.mvc.Http
 import play.mvc.Http.HeaderNames.AUTHORIZATION
 import scala.concurrent.Future
 
@@ -77,5 +79,20 @@ trait SpotifyBaseClient extends WsClient {
 
   private def withAuthHeader[T](headers: Map[String, String], token: AuthToken) = {
     headers.updated(AUTHORIZATION, s"Bearer ${token.token}")
+  }
+
+  override def customHandleResponse(response: WSResponse): Future[WSResponse] = {
+    response.status match {
+      case Http.Status.OK | Http.Status.NO_CONTENT ⇒
+        Future.successful(response)
+      case Http.Status.UNAUTHORIZED ⇒
+        Future.failed(UserAuthTokenNotFound)
+      case Http.Status.NOT_FOUND ⇒
+        Future.failed(ExternalResourceNotFound)
+      case other ⇒
+        val message = s"Unexpected status $other from Spotify. " +
+          s"Headers: ${response.allHeaders}. Body: ${response.body}"
+        Future.failed(UnexpectedResponse(message))
+    }
   }
 }

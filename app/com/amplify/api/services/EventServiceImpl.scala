@@ -19,7 +19,8 @@ class EventServiceImpl @Inject()(
         createdEventSource ← eventSourceDao.create(eventSourceToEventSourceDb(eventSource))
         newQueueEvents = queueEvents.map(queueEventToQueueEventDb(createdEventSource, _))
         _ ← queueEventDao.create(createdEventSource, newQueueEvents)
-      } yield ()
+      }
+      yield ()
 
     db.runTransactionally(action)
   }

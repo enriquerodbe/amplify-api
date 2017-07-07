@@ -18,17 +18,16 @@ case class ContentProviderIdentifier(
 object ContentProviderIdentifier {
 
   val SEPARATOR = ":"
+  val regex = s"(\\w+)$SEPARATOR(.+)".r
 
   def fromString(identifier: String): Try[ContentProviderIdentifier] = {
-    val split = identifier.split(SEPARATOR)
-    if (split.length != 2) {
-      Failure(InvalidProviderIdentifier(identifier))
-    }
-    else {
-      ContentProviderType.find(split(0)) match {
-        case Some(providerType) ⇒ Success(providerType → split(1))
-        case _ ⇒ Failure(InvalidProviderIdentifier(identifier))
-      }
+    identifier match {
+      case regex(provider, providerIdentifier) ⇒
+        ContentProviderType.find(provider) match {
+          case Some(providerType) ⇒ Success(providerType → providerIdentifier)
+          case _ ⇒ Failure(InvalidProviderIdentifier(identifier))
+        }
+      case _ ⇒ Failure(InvalidProviderIdentifier(identifier))
     }
   }
 

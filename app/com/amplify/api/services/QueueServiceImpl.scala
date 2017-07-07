@@ -17,7 +17,7 @@ class QueueServiceImpl extends QueueService {
 
   override def update(venue: UnauthenticatedVenue, events: QueueEvent*): Future[Queue] = {
     val queue = queues.getOrElse(venue.id, Queue())
-    val result = events.foldLeft(Try(queue))((tried, event) ⇒ tried.flatMap(event.process))
+    val result = events.foldLeft(Try(queue))(_ flatMap _.process)
     result match {
       case Success(q) ⇒
         queues = queues.updated(venue.id, q)

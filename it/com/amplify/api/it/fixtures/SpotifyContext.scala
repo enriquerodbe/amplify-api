@@ -1,17 +1,16 @@
 package com.amplify.api.it.fixtures
 
-import com.amplify.api.controllers.dtos.Venue.VenueRequest
 import com.amplify.api.domain.models.AuthToken
 import com.amplify.api.domain.models.ContentProviderType.Spotify
 import com.amplify.api.exceptions.UserAuthTokenNotFound
-import com.amplify.api.services.external.models.{PlaylistData, UserData}
+import com.amplify.api.services.external.models._
 import com.amplify.api.services.external.spotify.SpotifyContentProvider
 import org.mockito.Mockito.when
 import play.api.test.FakeRequest
 import play.mvc.Http.HeaderNames
 import scala.concurrent.Future
 
-trait SpotifyContext {
+trait SpotifyContext extends CommonData {
 
   def spotifyProvider: SpotifyContentProvider
 
@@ -37,17 +36,23 @@ trait SpotifyContext {
     def withBobToken: FakeRequest[T] = withAuthToken(bobToken)
   }
 
-  def venueRequest(name: String): FakeRequest[VenueRequest] = {
-    FakeRequest().withBody(VenueRequest(name))
-  }
-
-  val aliceUserData = UserData(Spotify → "alice-spotify-id", "Alice Cooper")
-  val alicePlaylistData = PlaylistData(Spotify → "alice-playlist", "Alice playlist", Seq.empty)
-  val bobUserData = UserData(Spotify → "bob-spotify-id", "Bob Marley")
+  val aliceUserData = UserData(Spotify → aliceSpotifyId, "Alice Cooper")
+  val alicePlaylistIdentifier = "alice-playlist"
+  val trashAlbumData = AlbumData("Trash", Seq(ArtistData("Alice Cooper")), Seq.empty)
+  val poisonTrackData = TrackData(Spotify → "track:poison", "Poison", trashAlbumData)
+  val alicePlaylistTracks = Seq(poisonTrackData)
+  val alicePlaylistImages = Seq(ImageData("url", Some(360), Some(360)))
+  val alicePlaylistData =
+    PlaylistData(Spotify → alicePlaylistIdentifier, "Alice playlist", alicePlaylistImages)
+  val bobUserData = UserData(Spotify → bobSpotifyId, "Bob Marley")
 
   when(spotifyProvider.fetchUser(aliceAuthToken)).thenReturn(Future.successful(aliceUserData))
   when(spotifyProvider.fetchUser(bobAuthToken)).thenReturn(Future.successful(bobUserData))
   when(spotifyProvider.fetchUser(invalidAuthToken)).thenReturn(Future.failed(UserAuthTokenNotFound))
   when(spotifyProvider.fetchPlaylists(aliceAuthToken))
     .thenReturn(Future.successful(Seq(alicePlaylistData)))
+  when(spotifyProvider.fetchPlaylist(aliceSpotifyId, alicePlaylistIdentifier)(aliceAuthToken))
+    .thenReturn(Future.successful(alicePlaylistData))
+  when(spotifyProvider.fetchPlaylistTracks(aliceSpotifyId, alicePlaylistIdentifier)(aliceAuthToken))
+    .thenReturn(Future.successful(alicePlaylistTracks))
 }
