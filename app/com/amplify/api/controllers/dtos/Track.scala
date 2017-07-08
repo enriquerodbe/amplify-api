@@ -14,8 +14,8 @@ object Track {
       album: AlbumResponse)
   def trackToTrackResponse(track: ModelTrack): TrackResponse = {
     TrackResponse(track.name,
-      track.contentProviderIdentifier.contentProvider.toString,
-      track.contentProviderIdentifier.identifier,
+      track.identifier.contentProvider.toString,
+      track.identifier.identifier,
       albumToAlbumResponse(track.album))
   }
   implicit val trackResponseWrites: Writes[TrackResponse] = {

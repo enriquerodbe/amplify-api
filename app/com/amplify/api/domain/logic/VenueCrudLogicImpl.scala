@@ -39,7 +39,7 @@ class VenueCrudLogicImpl @Inject()(
       user: AuthenticatedUserReq): Future[Seq[Track]] = {
     for {
       venue ← venueService.retrieve(uid)
-      queue ← queueService.retrieve(venue.unauthenticated)
+      queue ← queueService.retrieve(venue.id)
       currentPlaylist ← queue.currentPlaylist ?! CurrentPlaylistNotSet(uid)
       venueReq = AuthenticatedVenueReq(venue, user.authToken)
       tracks ← venueService.retrievePlaylistTracks(venueReq, currentPlaylist.identifier.identifier)
@@ -48,7 +48,7 @@ class VenueCrudLogicImpl @Inject()(
   }
 
   override def retrieveQueue(venue: UnauthenticatedVenue): Future[Queue] = {
-    queueService.retrieve(venue)
+    queueService.retrieve(venue.id)
   }
 
   override def retrieveAll(): Future[Seq[Venue]] = venueService.retrieveAll()

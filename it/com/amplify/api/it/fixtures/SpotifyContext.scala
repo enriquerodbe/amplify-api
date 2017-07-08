@@ -40,7 +40,9 @@ trait SpotifyContext extends CommonData {
   val alicePlaylistIdentifier = "alice-playlist"
   val trashAlbumData = AlbumData("Trash", Seq(ArtistData("Alice Cooper")), Seq.empty)
   val poisonTrackData = TrackData(Spotify → "track:poison", "Poison", trashAlbumData)
-  val alicePlaylistTracks = Seq(poisonTrackData)
+  val bedOfNailsTrackData =
+    TrackData(Spotify → "track:bed_of_nails", "Bed of Nails", trashAlbumData)
+  val alicePlaylistTracks = Seq(poisonTrackData, bedOfNailsTrackData)
   val alicePlaylistImages = Seq(ImageData("url", Some(360), Some(360)))
   val alicePlaylistData =
     PlaylistData(Spotify → alicePlaylistIdentifier, "Alice playlist", alicePlaylistImages)

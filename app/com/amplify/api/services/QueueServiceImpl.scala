@@ -11,8 +11,8 @@ class QueueServiceImpl extends QueueService {
 
   private var queues: Map[Id[Venue], Queue] = Map.empty
 
-  override def retrieve(venue: UnauthenticatedVenue): Future[Queue] = {
-    Future.successful(queues.getOrElse(venue.id, Queue()))
+  override def retrieve(venueId: Id[Venue]): Future[Queue] = {
+    Future.successful(queues.getOrElse(venueId, Queue()))
   }
 
   override def update(venue: UnauthenticatedVenue, events: QueueEvent*): Future[Queue] = {

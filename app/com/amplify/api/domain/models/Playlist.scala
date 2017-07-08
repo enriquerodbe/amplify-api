@@ -6,7 +6,7 @@ import scala.util.{Failure, Success, Try}
 case class Playlist(identifier: PlaylistInfo, tracks: Seq[Track]) {
 
   def findTrack(identifier: ContentProviderIdentifier): Option[Track] = {
-    tracks.find(_.contentProviderIdentifier == identifier)
+    tracks.find(_.identifier == identifier)
   }
 
   def getTrack(identifier: ContentProviderIdentifier): Try[Track] = {

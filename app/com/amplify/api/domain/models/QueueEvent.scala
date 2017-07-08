@@ -39,7 +39,7 @@ object QueueEvent {
     override def eventType: QueueEventType = QueueEventType.AddVenueTrack
 
     override def contentIdentifier: Option[ContentProviderIdentifier] = {
-      Some(track.contentProviderIdentifier)
+      Some(track.identifier)
     }
 
     override def process(queue: Queue): Try[Queue] = queue.addVenueTrack(track)
