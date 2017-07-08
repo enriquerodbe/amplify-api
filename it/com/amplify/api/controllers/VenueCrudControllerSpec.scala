@@ -11,6 +11,7 @@ import com.amplify.api.services.QueueService
 import org.mockito.Mockito.when
 import org.scalatest.Inside
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.{JsArray, JsDefined, JsValue}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http
@@ -192,6 +193,36 @@ class VenueCrudControllerSpec
             playlistRequest("wrong_provider:wrong_identifier").withAliceToken).await()
         }
       }
+    }
+  }
+
+  class RetrieveQueueFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+    extends VenueDbFixture
+
+  "retrieveQueue" should {
+    "respond OK" in new RetrieveQueueFixture {
+      val response = controller.retrieveQueue()(FakeRequest().withAliceToken)
+
+      status(response) mustBe OK
+    }
+
+    "respond with queue" in new RetrieveQueueFixture {
+      val response = controller.retrieveQueue()(FakeRequest().withAliceToken)
+
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      val jsonResponse = contentAsJson(response)
+
+      (jsonResponse \ "current_playlist").as[String] mustEqual alicePlaylistData.identifier.toString
+      val currentTrack = jsonResponse \ "current_track"
+      (currentTrack \ "name").as[String] mustEqual poisonTrackData.name.toString
+      (currentTrack \ "content_provider").as[String] mustEqual Spotify.toString
+      ((currentTrack \ "content_identifier").as[String]
+        mustEqual poisonTrackData.identifier.identifier.toString)
+      val album = currentTrack \ "album"
+      (album \ "name").as[String] mustEqual trashAlbumData.name.toString
+      (((album \ "artists")(0) \ "name").as[String]
+        mustEqual trashAlbumData.artists.head.name.toString)
+      (album \ "images").as[JsArray].value mustBe empty
     }
   }
 }
