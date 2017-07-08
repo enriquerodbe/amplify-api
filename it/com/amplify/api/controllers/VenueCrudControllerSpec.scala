@@ -11,7 +11,7 @@ import com.amplify.api.services.QueueService
 import org.mockito.Mockito.when
 import org.scalatest.Inside
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.{JsArray, JsDefined, JsValue}
+import play.api.libs.json.JsArray
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http
@@ -223,6 +223,45 @@ class VenueCrudControllerSpec
       (((album \ "artists")(0) \ "name").as[String]
         mustEqual trashAlbumData.artists.head.name.toString)
       (album \ "images").as[JsArray].value mustBe empty
+    }
+  }
+
+  class RetrieveCurrentFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+    extends VenueDbFixture
+
+  "retrieveCurrent" should {
+    "respond OK" in new RetrieveCurrentFixture {
+      val response = controller.retrieveCurrent()(FakeRequest().withAliceToken)
+
+      status(response) mustBe OK
+    }
+    "respond with venue" in new RetrieveCurrentFixture {
+      val response = controller.retrieveCurrent()(FakeRequest().withAliceToken)
+
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      val jsonResponse = contentAsJson(response)
+      (jsonResponse \ "name").as[String] mustEqual aliceVenueDb.name.toString
+      (jsonResponse \ "uid").as[String] must have size 8
+    }
+  }
+
+  class RetrieveAllFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+    extends VenueDbFixture
+
+  "retrieveAll" should {
+    "respond OK" in new RetrieveAllFixture {
+      val response = controller.retrieveAll()(FakeRequest().withAliceToken)
+
+      status(response) mustBe OK
+    }
+    "respond with venues" in new RetrieveAllFixture {
+      val response = controller.retrieveAll()(FakeRequest().withAliceToken)
+
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      inside(contentAsJson(response)) { case JsArray(Seq(venue)) ⇒
+        (venue \ "name").as[String] mustEqual aliceVenueDb.name.toString
+        (venue \ "uid").as[String] must have size 8
+      }
     }
   }
 }
