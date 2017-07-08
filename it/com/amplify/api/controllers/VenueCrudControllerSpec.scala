@@ -4,7 +4,7 @@ import com.amplify.api.domain.models.ContentProviderType.Spotify
 import com.amplify.api.domain.models.EventSourceType.SetCurrentPlaylist
 import com.amplify.api.domain.models.QueueEventType.{AddVenueTrack, SetCurrentPlaylist ⇒ QueueSetCurrentPlaylist}
 import com.amplify.api.domain.models.{ContentProviderIdentifier, Playlist, QueueEventType, QueueItemType}
-import com.amplify.api.exceptions.UnexpectedResponse
+import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
 import com.amplify.api.it.fixtures.{EventSourceDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import com.amplify.api.services.QueueService
@@ -180,7 +180,18 @@ class VenueCrudControllerSpec
     }
 
     "fail" when {
-      "invalid identifier" ignore "TODO"
+      "invalid identifier" in new SetCurrentPlaylistFixture {
+        intercept[InvalidProviderIdentifier] {
+          controller.setCurrentPlaylist()(
+            playlistRequest("wrong_identifier").withAliceToken).await()
+        }
+      }
+      "invalid content provider" in new SetCurrentPlaylistFixture {
+        intercept[InvalidProviderIdentifier] {
+          controller.setCurrentPlaylist()(
+            playlistRequest("wrong_provider:wrong_identifier").withAliceToken).await()
+        }
+      }
     }
   }
 }
