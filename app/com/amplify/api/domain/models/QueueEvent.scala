@@ -71,4 +71,13 @@ object QueueEvent {
 
     override def process(queue: Queue): Try[Queue] = queue.addUserTrack(user, identifier)
   }
+
+  case object SkipCurrentTrack extends QueueEvent {
+
+    override def eventType: QueueEventType = QueueEventType.SkipCurrentTrack
+
+    override def contentIdentifier: Option[ContentProviderIdentifier] = None
+
+    override def process(queue: Queue): Try[Queue] = queue.skipCurrentTrack()
+  }
 }

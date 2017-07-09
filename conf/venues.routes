@@ -50,7 +50,7 @@ POST    /    com.amplify.api.controllers.VenueAuthController.signUp
 GET    /me/playlists    com.amplify.api.controllers.VenueCrudController.retrievePlaylists
 
 ###
-#  summary: Set the current playlist of allowed songs for the authenticated venue
+#  summary: Set the current playlist of allowed tracks for the authenticated venue
 #  responses:
 #    204:
 #      description: success
@@ -136,6 +136,27 @@ PUT    /me/queue/play    com.amplify.api.controllers.VenuePlayerController.play
 #    type: string
 ###
 PUT    /me/queue/pause    com.amplify.api.controllers.VenuePlayerController.pause
+
+
+###
+#  summary: Skip playing the current track of the authenticated venue
+#  responses:
+#    204:
+#      description: success
+#  parameters:
+#  - name: Auth-provider
+#    description: Name of the OAuth authorization server
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: Authorization
+#    description: Access token issued by the authorization server
+#    in: header
+#    required: true
+#    type: string
+###
+PUT    /me/queue/skip    com.amplify.api.controllers.VenuePlayerController.skip
 
 
 ###

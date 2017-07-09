@@ -23,6 +23,10 @@ class VenuePlayerController @Inject()(
     venuePlayerLogic.pause(request.subject.venue).map(_ ⇒ NoContent)
   }
 
+  def skip() = authenticatedVenue(parse.empty) { request ⇒
+    venuePlayerLogic.skip(request.subject.venue).map(_ ⇒ NoContent)
+  }
+
   def startAmplifying() = authenticatedVenue(parse.empty) { request ⇒
     implicit val authToken = request.authToken
     venuePlayerLogic.startAmplifying(request.subject.venue).map(_ ⇒ NoContent)

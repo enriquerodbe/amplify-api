@@ -34,6 +34,11 @@ object EventSource {
     override def eventType: EventSourceType = EventSourceType.PausePlayback
   }
 
+  case class SkipCurrentTrack(venue: AuthenticatedVenue) extends EventSource {
+
+    override def eventType: EventSourceType = EventSourceType.SkipCurrentTrack
+  }
+
   case class StartAmplifying(venue: AuthenticatedVenue) extends EventSource {
 
     override def eventType: EventSourceType = EventSourceType.StartAmplifying

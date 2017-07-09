@@ -22,9 +22,3 @@ case class VenueNotFoundByUid(uid: Uid)
       AppExceptionCode.VenueNotFound,
       s"Venue not found with UID $uid")
     with VenueException
-
-case class CurrentPlaylistNotSet(venueUid: Uid)
-  extends BadRequestException(
-    AppExceptionCode.VenueCurrentPlaylistNotSet,
-    s"Current playlist not set for venue $venueUid")
-    with VenueException

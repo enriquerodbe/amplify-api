@@ -60,4 +60,11 @@ case class Queue(
         case QueueItemType.Venue ⇒ (acc :+ QueueItem(track, QueueItemType.User)) ++ items
       }
   }
+
+  def skipCurrentTrack(): Try[Queue] = Success(items match {
+    case _ :: (newPosition @ upNext :: rest) ⇒
+      copy(currentTrack = Some(upNext.track), items = rest, position = newPosition)
+    case _ ⇒
+      copy(currentTrack = None, items = Nil, position = Nil)
+  })
 }

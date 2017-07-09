@@ -9,6 +9,7 @@ object EventSourceType extends Enumeration {
     AddTrack,
     StartPlayback,
     PausePlayback,
+    SkipCurrentTrack,
     StartAmplifying,
     StopAmplifying,
     TrackFinished,

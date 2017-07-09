@@ -2,7 +2,7 @@ package com.amplify.api.domain.logic
 
 import com.amplify.api.domain.models.AuthenticatedVenue
 import com.amplify.api.domain.models.EventSource._
-import com.amplify.api.domain.models.QueueEvent.{RemoveAllTracks, TrackFinished ⇒ QueueTrackFinished}
+import com.amplify.api.domain.models.QueueEvent.{RemoveAllTracks, TrackFinished ⇒ QueueTrackFinished, SkipCurrentTrack ⇒ QueueSkipCurrentTrack}
 import com.amplify.api.services.{EventService, QueueService}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,6 +18,14 @@ class VenuePlayerLogicImpl @Inject()(
 
   override def pause(venue: AuthenticatedVenue): Future[Unit] = {
     eventService.create(PausePlayback(venue))
+  }
+
+  override def skip(venue: AuthenticatedVenue): Future[Unit] = {
+    for {
+      _ ← eventService.create(SkipCurrentTrack(venue), QueueSkipCurrentTrack)
+      _ ← queueService.update(venue.unauthenticated, QueueSkipCurrentTrack)
+    }
+    yield ()
   }
 
   override def startAmplifying(venue: AuthenticatedVenue): Future[Unit] = {

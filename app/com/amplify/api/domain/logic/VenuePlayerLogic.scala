@@ -11,6 +11,8 @@ trait VenuePlayerLogic {
 
   def pause(venue: AuthenticatedVenue): Future[Unit]
 
+  def skip(venue: AuthenticatedVenue): Future[Unit]
+
   def startAmplifying(venue: AuthenticatedVenue): Future[Unit]
 
   def stopAmplifying(venue: AuthenticatedVenue): Future[Unit]
