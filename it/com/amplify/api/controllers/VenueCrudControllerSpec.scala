@@ -1,11 +1,11 @@
 package com.amplify.api.controllers
 
 import com.amplify.api.domain.models.ContentProviderType.Spotify
-import com.amplify.api.domain.models.EventSourceType.SetCurrentPlaylist
-import com.amplify.api.domain.models.QueueEventType.{AddVenueTrack, SetCurrentPlaylist ⇒ QueueSetCurrentPlaylist}
+import com.amplify.api.domain.models.QueueCommandType.SetCurrentPlaylist
+import com.amplify.api.domain.models.QueueEventType.{VenueTrackAdded, CurrentPlaylistSet}
 import com.amplify.api.domain.models.{ContentProviderIdentifier, Playlist, QueueEventType, QueueItemType}
 import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
-import com.amplify.api.it.fixtures.{EventSourceDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
+import com.amplify.api.it.fixtures.{QueueCommandDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import com.amplify.api.services.QueueService
 import org.mockito.Mockito.when
@@ -57,7 +57,7 @@ class VenueCrudControllerSpec
   }
 
   class SetCurrentPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends VenueDbFixture with EventSourceDbFixture with QueueEventDbFixture
+    extends VenueDbFixture with QueueCommandDbFixture with QueueEventDbFixture
 
   "setCurrentPlaylist" should {
     "respond No content" in new SetCurrentPlaylistFixture {
@@ -66,14 +66,14 @@ class VenueCrudControllerSpec
 
       status(response) mustEqual NO_CONTENT
     }
-    "create event source" in new SetCurrentPlaylistFixture {
+    "create queue command" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
-      val eventSources = findEventSources(aliceVenueDbId)
+      val queueCommands = findQueueCommands(aliceVenueDbId)
 
-      eventSources must have size 1
-      eventSources.head must have(
+      queueCommands must have size 1
+      queueCommands.head must have(
         'eventType (SetCurrentPlaylist),
         'contentIdentifier (Some(ContentProviderIdentifier(Spotify, alicePlaylistIdentifier)))
       )
@@ -82,21 +82,21 @@ class VenueCrudControllerSpec
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
-      val eventSources = findEventSources(aliceVenueDbId)
-      val queueEvents = findQueueEvents(eventSources.head.id)
+      val queueCommands = findQueueCommands(aliceVenueDbId)
+      val queueEvents = findQueueEvents(queueCommands.head.id)
 
       queueEvents must have size 4
-      queueEvents(0) must have ('eventType (QueueEventType.RemoveVenueTracks))
+      queueEvents(0) must have ('eventType (QueueEventType.VenueTracksRemoved))
       queueEvents(1) must have(
-        'eventType (AddVenueTrack),
+        'eventType (VenueTrackAdded),
         'contentIdentifier (Some(poisonTrackData.identifier))
       )
       queueEvents(2) must have(
-        'eventType (AddVenueTrack),
+        'eventType (VenueTrackAdded),
         'contentIdentifier (Some(bedOfNailsTrackData.identifier))
       )
       queueEvents(3) must have(
-        'eventType (QueueSetCurrentPlaylist),
+        'eventType (CurrentPlaylistSet),
         'contentIdentifier (Some(ContentProviderIdentifier(Spotify, alicePlaylistIdentifier)))
       )
     }

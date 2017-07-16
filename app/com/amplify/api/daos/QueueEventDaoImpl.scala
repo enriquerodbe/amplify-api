@@ -1,6 +1,6 @@
 package com.amplify.api.daos
 
-import com.amplify.api.daos.models.{EventSourceDb, QueueEventDb}
+import com.amplify.api.daos.models.QueueEventDb
 import com.amplify.api.daos.schema.QueueEventsTable
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
@@ -12,7 +12,7 @@ class QueueEventDaoImpl @Inject()(
 
   import profile.api._
 
-  override def create(eventSource: EventSourceDb, queueEvents: Seq[QueueEventDb]): DBIO[Unit] = {
+  override def create(queueEvents: Seq[QueueEventDb]): DBIO[Unit] = {
     (queueEventsTable ++= queueEvents).map(_ ⇒ ())
   }
 }

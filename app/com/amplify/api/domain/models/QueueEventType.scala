@@ -5,13 +5,13 @@ object QueueEventType extends Enumeration {
   type QueueEventType = Value
 
   val
-    RemoveVenueTracks,
-    AddVenueTrack,
-    StartPlaying,
-    RemoveAllTracks,
+    VenueTracksRemoved,
+    VenueTrackAdded,
+    PlaybackStarted,
+    AllTracksRemoved,
     TrackFinished,
-    SetCurrentPlaylist,
-    AddUserTrack,
-    SkipCurrentTrack
+    CurrentPlaylistSet,
+    UserTrackAdded,
+    CurrentTrackSkipped
   = Value
 }

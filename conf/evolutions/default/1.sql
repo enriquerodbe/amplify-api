@@ -14,19 +14,19 @@ CREATE TABLE "venues" (
   "uid" CHAR(8) NOT NULL,
   UNIQUE KEY "unique_user_id" ("user_id"));
 
-CREATE TABLE "event_sources" (
+CREATE TABLE "queue_commands" (
   "id" BIGINT IDENTITY NOT NULL,
   "venue_id" BIGINT NOT NULL,
   "user_id" BIGINT,
-  "event_type" TINYINT NOT NULL,
+  "queue_command_type" TINYINT NOT NULL,
   "content_provider" TINYINT,
   "content_identifier" VARCHAR(255),
   "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 CREATE TABLE "queue_events" (
   "id" BIGINT IDENTITY NOT NULL,
-  "event_source_id" BIGINT NOT NULL,
-  "event_type" TINYINT NOT NULL,
+  "queue_command_id" BIGINT NOT NULL,
+  "queue_event_type" TINYINT NOT NULL,
   "content_provider" TINYINT,
   "content_identifier" VARCHAR(255),
   "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
@@ -36,5 +36,5 @@ CREATE TABLE "queue_events" (
 
 DROP TABLE "users" IF EXISTS;
 DROP TABLE "venues" IF EXISTS;
-DROP TABLE "event_sources" IF EXISTS;
+DROP TABLE "queue_commands" IF EXISTS;
 DROP TABLE "queue_events" IF EXISTS;

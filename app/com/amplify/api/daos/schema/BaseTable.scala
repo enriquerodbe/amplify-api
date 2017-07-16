@@ -1,10 +1,10 @@
 package com.amplify.api.daos.schema
 
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
-import com.amplify.api.domain.models.EventSourceType.EventSourceType
+import com.amplify.api.domain.models.QueueCommandType.QueueCommandType
 import com.amplify.api.domain.models.QueueEventType.QueueEventType
 import com.amplify.api.domain.models.primitives.{Identifier, Name, Uid}
-import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProviderType, EventSourceType, QueueEventType}
+import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProviderType, QueueCommandType, QueueEventType}
 import java.sql.Timestamp
 import java.time.Instant
 import play.api.db.slick.HasDatabaseConfigProvider
@@ -28,8 +28,8 @@ trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
   implicit val authProviderTypeType =
     MappedColumnType.base[ContentProviderType, Int](_.id, ContentProviderType.apply)
 
-  implicit val eventSourceTypeType =
-    MappedColumnType.base[EventSourceType, Int](_.id, EventSourceType.apply)
+  implicit val queueCommandTypeType =
+    MappedColumnType.base[QueueCommandType, Int](_.id, QueueCommandType.apply)
 
   implicit val queueEventTypeType =
     MappedColumnType.base[QueueEventType, Int](_.id, QueueEventType.apply)

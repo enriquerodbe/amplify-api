@@ -1,8 +1,8 @@
 package com.amplify.api.domain.models
 
-object EventSourceType extends Enumeration {
+object QueueCommandType extends Enumeration {
 
-  type EventSourceType = Value
+  type QueueCommandType = Value
 
   val
     SetCurrentPlaylist,
@@ -12,7 +12,7 @@ object EventSourceType extends Enumeration {
     SkipCurrentTrack,
     StartAmplifying,
     StopAmplifying,
-    TrackFinished,
+    FinishTrack,
     AddUserTrack
   = Value
 }

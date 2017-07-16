@@ -1,14 +1,14 @@
 package com.amplify.api.domain.logic
 
 import com.amplify.api.domain.models.AuthenticatedVenue
-import com.amplify.api.domain.models.EventSource._
-import com.amplify.api.domain.models.QueueEvent.{RemoveAllTracks, TrackFinished ⇒ QueueTrackFinished, SkipCurrentTrack ⇒ QueueSkipCurrentTrack}
-import com.amplify.api.services.{EventService, QueueService}
+import com.amplify.api.domain.models.QueueCommand._
+import com.amplify.api.domain.models.QueueEvent.{AllTracksRemoved, TrackFinished, CurrentTrackSkipped}
+import com.amplify.api.services.{QueueEventService, QueueService}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class VenuePlayerLogicImpl @Inject()(
-    eventService: EventService,
+    eventService: QueueEventService,
     queueService: QueueService)(
     implicit ec: ExecutionContext) extends VenuePlayerLogic {
 
@@ -22,8 +22,8 @@ class VenuePlayerLogicImpl @Inject()(
 
   override def skip(venue: AuthenticatedVenue): Future[Unit] = {
     for {
-      _ ← eventService.create(SkipCurrentTrack(venue), QueueSkipCurrentTrack)
-      _ ← queueService.update(venue.unauthenticated, QueueSkipCurrentTrack)
+      _ ← eventService.create(SkipCurrentTrack(venue), CurrentTrackSkipped)
+      _ ← queueService.update(venue.unauthenticated, CurrentTrackSkipped)
     }
     yield ()
   }
@@ -34,16 +34,16 @@ class VenuePlayerLogicImpl @Inject()(
 
   override def stopAmplifying(venue: AuthenticatedVenue): Future[Unit] = {
     for {
-      _ ← eventService.create(StopAmplifying(venue), RemoveAllTracks)
-      _ ← queueService.update(venue.unauthenticated, RemoveAllTracks)
+      _ ← eventService.create(StopAmplifying(venue), AllTracksRemoved)
+      _ ← queueService.update(venue.unauthenticated, AllTracksRemoved)
     }
     yield ()
   }
 
   override def trackFinished(venue: AuthenticatedVenue): Future[Unit] = {
     for {
-      _ ← eventService.create(TrackFinished(venue), QueueTrackFinished)
-      _ ← queueService.update(venue.unauthenticated, QueueTrackFinished)
+      _ ← eventService.create(FinishTrack(venue), TrackFinished)
+      _ ← queueService.update(venue.unauthenticated, TrackFinished)
     }
     yield ()
   }

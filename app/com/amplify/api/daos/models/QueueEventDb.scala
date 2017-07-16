@@ -7,7 +7,7 @@ import java.time.Instant
 
 case class QueueEventDb(
     id: Id[QueueEvent] = -1L,
-    eventSourceId: Id[EventSource],
+    queueCommandId: Id[QueueCommand],
     eventType: QueueEventType,
     contentIdentifier: Option[ContentProviderIdentifier],
     createdAt: Instant)
