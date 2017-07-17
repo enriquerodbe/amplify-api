@@ -74,7 +74,7 @@ class VenueCrudControllerSpec
 
       queueCommands must have size 1
       queueCommands.head must have(
-        'eventType (SetCurrentPlaylist),
+        'queueCommandType (SetCurrentPlaylist),
         'contentIdentifier (Some(ContentProviderIdentifier(Spotify, alicePlaylistIdentifier)))
       )
     }
@@ -86,17 +86,17 @@ class VenueCrudControllerSpec
       val queueEvents = findQueueEvents(queueCommands.head.id)
 
       queueEvents must have size 4
-      queueEvents(0) must have ('eventType (QueueEventType.VenueTracksRemoved))
+      queueEvents(0) must have ('queueEventType (QueueEventType.VenueTracksRemoved))
       queueEvents(1) must have(
-        'eventType (VenueTrackAdded),
+        'queueEventType (VenueTrackAdded),
         'contentIdentifier (Some(poisonTrackData.identifier))
       )
       queueEvents(2) must have(
-        'eventType (VenueTrackAdded),
+        'queueEventType (VenueTrackAdded),
         'contentIdentifier (Some(bedOfNailsTrackData.identifier))
       )
       queueEvents(3) must have(
-        'eventType (CurrentPlaylistSet),
+        'queueEventType (CurrentPlaylistSet),
         'contentIdentifier (Some(ContentProviderIdentifier(Spotify, alicePlaylistIdentifier)))
       )
     }

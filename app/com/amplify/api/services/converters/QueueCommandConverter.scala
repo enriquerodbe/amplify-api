@@ -10,7 +10,7 @@ object QueueCommandConverter {
     QueueCommandDb(
       venueId = queueCommand.venue.id,
       userId = None,
-      eventType = queueCommand.queueCommandType,
+      queueCommandType = queueCommand.queueCommandType,
       contentIdentifier = queueCommand.contentIdentifier,
       createdAt = Instant.now())
   }

@@ -11,7 +11,7 @@ object QueueEventConverter {
       queueEvent: QueueEvent): QueueEventDb = {
     QueueEventDb(
       queueCommandId = queueCommand.id,
-      eventType = queueEvent.eventType,
+      queueEventType = queueEvent.eventType,
       contentIdentifier = queueEvent.contentIdentifier,
       createdAt = Instant.now())
   }

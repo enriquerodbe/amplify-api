@@ -9,6 +9,6 @@ case class QueueCommandDb(
     id: Id[QueueCommand] = -1L,
     venueId: Id[Venue],
     userId: Option[Id[User]],
-    eventType: QueueCommandType,
+    queueCommandType: QueueCommandType,
     contentIdentifier: Option[ContentProviderIdentifier],
     createdAt: Instant)
