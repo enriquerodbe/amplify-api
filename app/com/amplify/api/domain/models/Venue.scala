@@ -34,5 +34,7 @@ case class AuthenticatedVenueReq(venue: AuthenticatedVenue, authToken: AuthToken
 
   def user: AuthenticatedUser = venue.user
 
+  def id: Id[Venue] = venue.id
+
   def userIdentifier: ContentProviderIdentifier = user.identifier
 }

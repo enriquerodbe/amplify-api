@@ -3,7 +3,6 @@ package com.amplify.api.controllers
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.dtos.Playlist.{PlaylistRequest, playlistToPlaylistResponse}
 import com.amplify.api.controllers.dtos.Queue.queueToQueueResponse
-import com.amplify.api.controllers.dtos.Track.trackToTrackResponse
 import com.amplify.api.controllers.dtos.Venue.venueToVenueResponse
 import com.amplify.api.domain.logic.{VenueCrudLogic, VenuePlayerLogic}
 import com.amplify.api.domain.models.ContentProviderIdentifier
@@ -37,7 +36,7 @@ class VenueCrudController @Inject()(
   }
 
   def retrieveQueue() = authenticatedVenue() { request ⇒
-    venueCrudLogic.retrieveQueue(request.subject.venue.unauthenticated).map { queue ⇒
+    venueCrudLogic.retrieveQueue(request.subject.venueReq).map { queue ⇒
       Ok(Json.toJson(queueToQueueResponse(queue)))
     }
   }
@@ -50,12 +49,6 @@ class VenueCrudController @Inject()(
   def retrieveAll() = authenticatedUser() { _ ⇒
     venueCrudLogic.retrieveAll().map { venues ⇒
       Ok(Json.toJson(venues.map(venueToVenueResponse)))
-    }
-  }
-
-  def retrieveCurrentPlaylistTracks(uid: String) = authenticatedUser() { request ⇒
-    venueCrudLogic.retrieveCurrentPlaylistTracks(uid, request.subject.userReq).map { tracks =>
-      Ok(Json.toJson(tracks.map(trackToTrackResponse)))
     }
   }
 }

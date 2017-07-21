@@ -1,13 +1,13 @@
 package com.amplify.api.controllers
 
+import akka.pattern.ask
+import com.amplify.api.command_processors.queue.CommandProcessor.RetrieveMaterialized
+import com.amplify.api.command_processors.queue.{CommandType, EventType}
 import com.amplify.api.domain.models.ContentProviderType.Spotify
-import com.amplify.api.domain.models.QueueCommandType.SetCurrentPlaylist
-import com.amplify.api.domain.models.QueueEventType.{VenueTrackAdded, CurrentPlaylistSet}
-import com.amplify.api.domain.models.{ContentProviderIdentifier, Playlist, QueueEventType, QueueItemType}
+import com.amplify.api.domain.models.{ContentProviderIdentifier, Playlist, Queue, QueueItemType}
 import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
 import com.amplify.api.it.fixtures.{QueueCommandDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
-import com.amplify.api.services.QueueService
 import org.mockito.Mockito.when
 import org.scalatest.Inside
 import play.api.db.slick.DatabaseConfigProvider
@@ -20,7 +20,8 @@ class VenueCrudControllerSpec
   extends BaseIntegrationSpec with SpotifyContext with VenueRequests with Inside {
 
   val controller = instanceOf[VenueCrudController]
-  val queueService = instanceOf[QueueService]
+  val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueDbId"
+  val queueService = app.actorSystem.actorSelection(path)
 
   class RetrievePlaylistsFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
     extends VenueDbFixture
@@ -74,7 +75,7 @@ class VenueCrudControllerSpec
 
       queueCommands must have size 1
       queueCommands.head must have(
-        'queueCommandType (SetCurrentPlaylist),
+        'queueCommandType (CommandType.SetCurrentPlaylist),
         'contentIdentifier (Some(ContentProviderIdentifier(Spotify, alicePlaylistIdentifier)))
       )
     }
@@ -86,17 +87,17 @@ class VenueCrudControllerSpec
       val queueEvents = findQueueEvents(queueCommands.head.id)
 
       queueEvents must have size 4
-      queueEvents(0) must have ('queueEventType (QueueEventType.VenueTracksRemoved))
+      queueEvents(0) must have ('queueEventType (EventType.VenueTracksRemoved))
       queueEvents(1) must have(
-        'queueEventType (VenueTrackAdded),
+        'queueEventType (EventType.VenueTrackAdded),
         'contentIdentifier (Some(poisonTrackData.identifier))
       )
       queueEvents(2) must have(
-        'queueEventType (VenueTrackAdded),
+        'queueEventType (EventType.VenueTrackAdded),
         'contentIdentifier (Some(bedOfNailsTrackData.identifier))
       )
       queueEvents(3) must have(
-        'queueEventType (CurrentPlaylistSet),
+        'queueEventType (EventType.CurrentPlaylistSet),
         'contentIdentifier (Some(ContentProviderIdentifier(Spotify, alicePlaylistIdentifier)))
       )
     }
@@ -104,7 +105,7 @@ class VenueCrudControllerSpec
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
-      val queue = queueService.retrieve(aliceVenueDb.id).await()
+      val queue = (queueService ? RetrieveMaterialized).mapTo[Queue].await()
 
       inside(queue.currentPlaylist) { case Some(Playlist(playlistInfo, tracks)) ⇒
         playlistInfo must have(
@@ -151,7 +152,7 @@ class VenueCrudControllerSpec
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
-      val queue = queueService.retrieve(aliceVenueDb.id).await()
+      val queue = (queueService ? RetrieveMaterialized).mapTo[Queue].await()
 
       inside(queue.currentTrack) { case Some(track) ⇒
         track must have(
@@ -165,7 +166,7 @@ class VenueCrudControllerSpec
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
-      val queue = queueService.retrieve(aliceVenueDb.id).await()
+      val queue = (queueService ? RetrieveMaterialized).mapTo[Queue].await()
 
       for (item ← queue.items) item must have ('itemType (QueueItemType.Venue))
       queue.items.map(_.track) must contain theSameElementsAs queue.currentPlaylist.get.tracks
@@ -175,7 +176,7 @@ class VenueCrudControllerSpec
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
-      val queue = queueService.retrieve(aliceVenueDb.id).await()
+      val queue = (queueService ? RetrieveMaterialized).mapTo[Queue].await()
 
       queue.position mustEqual Nil
     }

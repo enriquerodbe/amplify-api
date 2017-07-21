@@ -16,7 +16,7 @@ lazy val dependencies = Seq(
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "it,test",
   "org.mockito" % "mockito-core" % "2.8.47" % "it,test")
 
-lazy val root = (project in file("."))
+lazy val `amplify-api` = (project in file("."))
   .settings(libraryDependencies ++= dependencies)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)

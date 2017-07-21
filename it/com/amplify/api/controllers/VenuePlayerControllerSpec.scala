@@ -1,9 +1,11 @@
 package com.amplify.api.controllers
 
-import com.amplify.api.domain.models.{QueueCommandType, QueueEventType}
+import akka.pattern.ask
+import com.amplify.api.command_processors.queue.CommandProcessor.RetrieveMaterialized
+import com.amplify.api.command_processors.queue.{CommandType, EventType}
+import com.amplify.api.domain.models.Queue
 import com.amplify.api.it.BaseIntegrationSpec
 import com.amplify.api.it.fixtures.{QueueCommandDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
-import com.amplify.api.services.QueueService
 import org.scalatest.Inside
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.test.FakeRequest
@@ -12,7 +14,8 @@ import play.api.test.Helpers._
 class VenuePlayerControllerSpec extends BaseIntegrationSpec with SpotifyContext with Inside {
 
   val controller = instanceOf[VenuePlayerController]
-  val queueService = instanceOf[QueueService]
+  val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueDbId"
+  val queueService = app.actorSystem.actorSelection(path)
 
   class PlayFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
     extends VenueDbFixture with QueueCommandDbFixture
@@ -31,7 +34,7 @@ class VenuePlayerControllerSpec extends BaseIntegrationSpec with SpotifyContext 
       inside(queueCommands) { case Seq(queueCommand) ⇒
           queueCommand must have(
             'userId (None),
-            'queueCommandType (QueueCommandType.StartPlayback),
+            'queueCommandType (CommandType.StartPlayback),
             'contentIdentifier (None)
           )
       }
@@ -55,7 +58,7 @@ class VenuePlayerControllerSpec extends BaseIntegrationSpec with SpotifyContext 
       inside(queueCommands) { case Seq(queueCommand) ⇒
           queueCommand must have(
             'userId (None),
-            'queueCommandType (QueueCommandType.PausePlayback),
+            'queueCommandType (CommandType.PausePlayback),
             'contentIdentifier (None)
           )
       }
@@ -79,7 +82,7 @@ class VenuePlayerControllerSpec extends BaseIntegrationSpec with SpotifyContext 
       inside(queueCommands) { case Seq(queueCommand) ⇒
         queueCommand must have(
           'userId (None),
-          'queueCommandType (QueueCommandType.SkipCurrentTrack),
+          'queueCommandType (CommandType.SkipCurrentTrack),
           'contentIdentifier (None)
         )
       }
@@ -93,14 +96,14 @@ class VenuePlayerControllerSpec extends BaseIntegrationSpec with SpotifyContext 
       queueEvents must have size 1
       queueEvents(0) must have(
         'queueCommandId (queueCommands(0).id.value),
-        'queueEventType (QueueEventType.CurrentTrackSkipped),
+        'queueEventType (EventType.CurrentTrackSkipped),
         'contentIdentifier (None)
       )
     }
     "update queue current track" in new SkipFixture {
       controller.skip()(FakeRequest().withBody(()).withAliceToken).await()
 
-      val queue = queueService.retrieve(aliceVenueDb.id).await()
+      val queue = (queueService ? RetrieveMaterialized).mapTo[Queue].await()
 
       queue must have(
         'currentTrack (None),

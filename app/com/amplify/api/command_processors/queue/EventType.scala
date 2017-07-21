@@ -1,6 +1,6 @@
-package com.amplify.api.domain.models
+package com.amplify.api.command_processors.queue
 
-object QueueEventType extends Enumeration {
+object EventType extends Enumeration {
 
   type QueueEventType = Value
 

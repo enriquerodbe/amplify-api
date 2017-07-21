@@ -3,15 +3,13 @@ package com.amplify.api.services
 import com.amplify.api.controllers.dtos.Venue.VenueRequest
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.Uid
-import com.amplify.api.exceptions.{UserAlreadyHasVenue, UserNotFoundById, VenueNotFoundByUid}
+import com.amplify.api.exceptions.UserAlreadyHasVenue
 import com.amplify.api.services.converters.PlaylistConverter.playlistDataToPlaylistInfo
 import com.amplify.api.services.converters.TrackConverter.trackDataToTrack
 import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
 import com.amplify.api.services.converters.VenueConverter.{venueDbToAuthenticatedVenue, venueDbToVenue, venueReqToVenueDb}
 import com.amplify.api.services.external.ContentProviderRegistry
 import com.amplify.api.services.external.models.UserData
-import com.amplify.api.utils.FutureUtils._
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import slick.dbio.DBIO
@@ -22,17 +20,6 @@ class VenueServiceImpl @Inject()(
     userDao: UserDao,
     venueDao: VenueDao)(
     implicit ec: ExecutionContext) extends VenueService {
-
-  override def retrieve(uid: Uid): Future[AuthenticatedVenue] = {
-    val action =
-      for {
-        venueDb ← venueDao.retrieve(uid) ?! VenueNotFoundByUid(uid)
-        userDb ← userDao.retrieve(venueDb.userId) ?! UserNotFoundById(venueDb.userId)
-      }
-      yield AuthenticatedVenue(userDbToAuthenticatedUser(userDb), venueDbToVenue(venueDb))
-
-    db.run(action)
-  }
 
   override def retrieveOrCreate(
       userData: UserData,

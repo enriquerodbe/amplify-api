@@ -1,50 +1,28 @@
 package com.amplify.api.domain.logic
 
-import com.amplify.api.domain.models.AuthenticatedVenue
-import com.amplify.api.domain.models.QueueCommand._
-import com.amplify.api.domain.models.QueueEvent.{AllTracksRemoved, TrackFinished, CurrentTrackSkipped}
-import com.amplify.api.services.{QueueEventService, QueueService}
-import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import akka.actor.ActorRef
+import akka.pattern.ask
+import com.amplify.api.command_processors.queue.CommandProcessor.{PausePlayback, SkipCurrentTrack, StartPlayback}
+import com.amplify.api.configuration.EnvConfig
+import com.amplify.api.domain.models.AuthenticatedVenueReq
+import javax.inject.{Inject, Named}
+import scala.concurrent.Future
 
 class VenuePlayerLogicImpl @Inject()(
-    eventService: QueueEventService,
-    queueService: QueueService)(
-    implicit ec: ExecutionContext) extends VenuePlayerLogic {
+    @Named("queue-command-router") queueCommandRouter: ActorRef,
+    envConfig: EnvConfig) extends VenuePlayerLogic {
 
-  override def play(venue: AuthenticatedVenue): Future[Unit] = {
-    eventService.create(StartPlayback(venue))
+  implicit val askTimeout = envConfig.defaultAskTimeout
+
+  override def play(venue: AuthenticatedVenueReq): Future[Unit] = {
+    (queueCommandRouter ? StartPlayback(venue)).mapTo[Unit]
   }
 
-  override def pause(venue: AuthenticatedVenue): Future[Unit] = {
-    eventService.create(PausePlayback(venue))
+  override def pause(venue: AuthenticatedVenueReq): Future[Unit] = {
+    (queueCommandRouter ? PausePlayback(venue)).mapTo[Unit]
   }
 
-  override def skip(venue: AuthenticatedVenue): Future[Unit] = {
-    for {
-      _ ← eventService.create(SkipCurrentTrack(venue), CurrentTrackSkipped)
-      _ ← queueService.update(venue.unauthenticated, CurrentTrackSkipped)
-    }
-    yield ()
-  }
-
-  override def startAmplifying(venue: AuthenticatedVenue): Future[Unit] = {
-    eventService.create(StartAmplifying(venue))
-  }
-
-  override def stopAmplifying(venue: AuthenticatedVenue): Future[Unit] = {
-    for {
-      _ ← eventService.create(StopAmplifying(venue), AllTracksRemoved)
-      _ ← queueService.update(venue.unauthenticated, AllTracksRemoved)
-    }
-    yield ()
-  }
-
-  override def trackFinished(venue: AuthenticatedVenue): Future[Unit] = {
-    for {
-      _ ← eventService.create(FinishTrack(venue), TrackFinished)
-      _ ← queueService.update(venue.unauthenticated, TrackFinished)
-    }
-    yield ()
+  override def skip(venue: AuthenticatedVenueReq): Future[Unit] = {
+    (queueCommandRouter ? SkipCurrentTrack(venue)).mapTo[Unit]
   }
 }

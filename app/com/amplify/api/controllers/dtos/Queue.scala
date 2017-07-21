@@ -13,7 +13,7 @@ object Queue {
       tracks: Seq[TrackResponse])
   def queueToQueueResponse(queue: ModelQueue): QueueResponse = {
     QueueResponse(
-      queue.currentPlaylist.map(_.identifier.identifier.toString),
+      queue.currentPlaylist.map(_.info.identifier.toString),
       queue.currentTrack.map(trackToTrackResponse),
       queue.items.map(item ⇒ trackToTrackResponse(item.track)))
   }

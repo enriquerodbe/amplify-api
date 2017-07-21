@@ -1,7 +1,6 @@
 package com.amplify.api.domain.models
 
 import scala.annotation.tailrec
-import scala.util.{Failure, Success, Try}
 
 case class Queue(
     currentPlaylist: Option[Playlist] = None,
@@ -9,17 +8,17 @@ case class Queue(
     items: List[QueueItem] = Nil,
     position: List[QueueItem] = Nil) {
 
-  def setCurrentPlaylist(playlist: Playlist): Try[Queue] = Success {
+  def setCurrentPlaylist(playlist: Playlist): Queue = {
     copy(currentPlaylist = Some(playlist), currentTrack = playlist.tracks.headOption)
   }
 
-  def addVenueTrack(track: Track): Try[Queue] = Success {
+  def addVenueTrack(track: Track): Queue = {
     copy(items = items :+ QueueItem(track, QueueItemType.Venue))
   }
 
-  def removeVenueTracks(): Try[Queue] = Success(copy(items = removeVenueTracks(items)))
+  def removeVenueTracks(): Queue = copy(items = removeVenueTracks(items))
 
-  def removeAllTracks(): Try[Queue] = Success(Queue(currentPlaylist))
+  def removeAllTracks(): Queue = Queue(currentPlaylist)
 
   @tailrec
   private def removeVenueTracks(items: List[QueueItem]): List[QueueItem] = items match {
@@ -30,21 +29,22 @@ case class Queue(
     }
   }
 
-  def trackFinished(): Try[Queue] = Success {
+  def trackFinished(): Queue = {
     position match {
       case Nil ⇒ this
       case _ :: tail ⇒ copy(position = tail)
     }
   }
 
-  def addUserTrack(user: User, identifier: ContentProviderIdentifier): Try[Queue] = {
+  def addUserTrack(user: User, identifier: ContentProviderIdentifier): Queue = {
     findTrack(identifier).map(track ⇒ copy(items = addUserTrack(position, Nil, track)))
+      .getOrElse(this)
   }
 
-  private def findTrack(identifier: ContentProviderIdentifier): Try[Track] = {
+  private def findTrack(identifier: ContentProviderIdentifier): Option[Track] = {
     currentPlaylist match {
-      case Some(playlist) ⇒ playlist.getTrack(identifier)
-      case _ ⇒ Failure(new Exception)
+      case Some(playlist) ⇒ playlist.findTrack(identifier)
+      case _ ⇒ None
     }
   }
 
@@ -61,10 +61,10 @@ case class Queue(
       }
   }
 
-  def skipCurrentTrack(): Try[Queue] = Success(items match {
-    case _ :: (newPosition @ upNext :: rest) ⇒
-      copy(currentTrack = Some(upNext.track), items = rest, position = newPosition)
+  def skipCurrentTrack(): Queue = items match {
+    case _ :: (newPosition @ upNext :: _) ⇒
+      copy(currentTrack = Some(upNext.track), position = newPosition)
     case _ ⇒
       copy(currentTrack = None, items = Nil, position = Nil)
-  })
+  }
 }
