@@ -1,8 +1,8 @@
 package com.amplify.api.controllers
 
 import akka.pattern.ask
-import com.amplify.api.command_processors.queue.CommandProcessor.RetrieveMaterialized
-import com.amplify.api.command_processors.queue.{CommandType, EventType}
+import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveMaterialized
+import com.amplify.api.aggregates.queue.{CommandType, EventType}
 import com.amplify.api.domain.models.Queue
 import com.amplify.api.it.BaseIntegrationSpec
 import com.amplify.api.it.fixtures.{QueueCommandDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
@@ -15,7 +15,7 @@ class VenuePlayerControllerSpec extends BaseIntegrationSpec with SpotifyContext 
 
   val controller = instanceOf[VenuePlayerController]
   val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueDbId"
-  val queueService = app.actorSystem.actorSelection(path)
+  val commandProcessor = app.actorSystem.actorSelection(path)
 
   class PlayFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
     extends VenueDbFixture with QueueCommandDbFixture
@@ -103,12 +103,12 @@ class VenuePlayerControllerSpec extends BaseIntegrationSpec with SpotifyContext 
     "update queue current track" in new SkipFixture {
       controller.skip()(FakeRequest().withBody(()).withAliceToken).await()
 
-      val queue = (queueService ? RetrieveMaterialized).mapTo[Queue].await()
+      val queue = (commandProcessor ? RetrieveMaterialized).mapTo[Queue].await()
 
       queue must have(
-        'currentTrack (None),
-        'items (Nil),
-        'position (Nil)
+        'currentItem (None),
+        'futureItems (Nil),
+        'pastItems (Nil)
       )
     }
   }

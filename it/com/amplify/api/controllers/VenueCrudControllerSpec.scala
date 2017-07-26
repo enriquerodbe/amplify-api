@@ -1,17 +1,17 @@
 package com.amplify.api.controllers
 
 import akka.pattern.ask
-import com.amplify.api.command_processors.queue.CommandProcessor.RetrieveMaterialized
-import com.amplify.api.command_processors.queue.{CommandType, EventType}
+import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveMaterialized
+import com.amplify.api.aggregates.queue.{CommandType, EventType}
 import com.amplify.api.domain.models.ContentProviderType.Spotify
-import com.amplify.api.domain.models.{ContentProviderIdentifier, Playlist, Queue, QueueItemType}
+import com.amplify.api.domain.models._
 import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
 import com.amplify.api.it.fixtures.{QueueCommandDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import org.mockito.Mockito.when
 import org.scalatest.Inside
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.JsArray
+import play.api.libs.json.{JsArray, JsDefined}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http
@@ -21,7 +21,7 @@ class VenueCrudControllerSpec
 
   val controller = instanceOf[VenueCrudController]
   val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueDbId"
-  val queueService = app.actorSystem.actorSelection(path)
+  val commandProcessor = app.actorSystem.actorSelection(path)
 
   class RetrievePlaylistsFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
     extends VenueDbFixture
@@ -105,7 +105,7 @@ class VenueCrudControllerSpec
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
-      val queue = (queueService ? RetrieveMaterialized).mapTo[Queue].await()
+      val queue = (commandProcessor ? RetrieveMaterialized).mapTo[Queue].await()
 
       inside(queue.currentPlaylist) { case Some(Playlist(playlistInfo, tracks)) ⇒
         playlistInfo must have(
@@ -147,38 +147,22 @@ class VenueCrudControllerSpec
         }
       }
     }
-
-    "update queue current track" in new SetCurrentPlaylistFixture {
+    "not update queue current track" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
-      val queue = (queueService ? RetrieveMaterialized).mapTo[Queue].await()
+      val queue = (commandProcessor ? RetrieveMaterialized).mapTo[Queue].await()
 
-      inside(queue.currentTrack) { case Some(track) ⇒
-        track must have(
-          'name (alicePlaylistTracks.head.name.toString),
-          'identifier (alicePlaylistTracks.head.identifier)
-        )
-      }
+      queue.currentItem mustBe empty
     }
-
     "update queue items" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
-      val queue = (queueService ? RetrieveMaterialized).mapTo[Queue].await()
+      val queue = (commandProcessor ? RetrieveMaterialized).mapTo[Queue].await()
 
-      for (item ← queue.items) item must have ('itemType (QueueItemType.Venue))
-      queue.items.map(_.track) must contain theSameElementsAs queue.currentPlaylist.get.tracks
-    }
-
-    "update queue position" in new SetCurrentPlaylistFixture {
-      controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
-
-      val queue = (queueService ? RetrieveMaterialized).mapTo[Queue].await()
-
-      queue.position mustEqual Nil
+      for (item ← queue.allItems) item must have ('itemType (QueueItemType.Venue))
+      queue.allItems.map(_.track) must contain theSameElementsAs queue.currentPlaylist.get.tracks
     }
 
     "fail" when {
@@ -213,17 +197,7 @@ class VenueCrudControllerSpec
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response)
 
-      (jsonResponse \ "current_playlist").as[String] mustEqual alicePlaylistData.identifier.toString
-      val currentTrack = jsonResponse \ "current_track"
-      (currentTrack \ "name").as[String] mustEqual poisonTrackData.name.toString
-      (currentTrack \ "content_provider").as[String] mustEqual Spotify.toString
-      ((currentTrack \ "content_identifier").as[String]
-        mustEqual poisonTrackData.identifier.identifier.toString)
-      val album = currentTrack \ "album"
-      (album \ "name").as[String] mustEqual trashAlbumData.name.toString
-      (((album \ "artists")(0) \ "name").as[String]
-        mustEqual trashAlbumData.artists.head.name.toString)
-      (album \ "images").as[JsArray].value mustBe empty
+      (jsonResponse \ "tracks") mustEqual JsDefined(JsArray(Seq.empty))
     }
   }
 

@@ -2,8 +2,8 @@ package com.amplify.api.domain.logic
 
 import akka.actor.ActorRef
 import akka.pattern.ask
-import com.amplify.api.command_processors.queue.CommandProcessor.SetCurrentPlaylist
-import com.amplify.api.command_processors.queue.CommandRouter.RetrieveQueue
+import com.amplify.api.aggregates.queue.CommandProcessor.SetCurrentPlaylist
+import com.amplify.api.aggregates.queue.CommandRouter.RetrieveQueue
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models._
 import com.amplify.api.services.VenueService

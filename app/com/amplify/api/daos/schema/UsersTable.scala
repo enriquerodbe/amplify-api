@@ -1,10 +1,9 @@
 package com.amplify.api.daos.schema
 
 import com.amplify.api.daos.models.UserDb
-import com.amplify.api.daos.primitives.Id
+import com.amplify.api.domain.models.ContentProviderIdentifier
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
-import com.amplify.api.domain.models.primitives.{Identifier, Name}
-import com.amplify.api.domain.models.{ContentProviderIdentifier, User}
+import com.amplify.api.domain.models.primitives.{Id, Identifier, Name}
 
 trait UsersTable extends BaseTable {
 
@@ -13,7 +12,7 @@ trait UsersTable extends BaseTable {
   // scalastyle:off public.methods.have.type
   // scalastyle:off method.name
   class Users(tag: Tag) extends Table[UserDb](tag, "users") {
-    def id = column[Id[User]]("id", O.PrimaryKey, O.AutoInc)
+    def id = column[Id]("id", O.PrimaryKey, O.AutoInc)
     def name = column[Name]("name")
     def authProviderType = column[ContentProviderType]("auth_provider")
     def authIdentifier = column[Identifier]("auth_identifier")

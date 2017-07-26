@@ -1,6 +1,6 @@
-package com.amplify.api.command_processors.queue
+package com.amplify.api.aggregates.queue
 
-import com.amplify.api.command_processors.queue.CommandProcessor.Command
+import com.amplify.api.aggregates.queue.CommandProcessor.Command
 import java.time.Instant
 
 object CommandConverter {

@@ -1,15 +1,12 @@
-package com.amplify.api.command_processors.queue
+package com.amplify.api.aggregates.queue
 
-import com.amplify.api.command_processors.queue.CommandProcessor.Command
-import com.amplify.api.command_processors.queue.CommandType.QueueCommandType
-import com.amplify.api.daos.primitives.Id
-import com.amplify.api.daos.schema.{BaseTable, UsersTable, VenuesTable}
+import com.amplify.api.aggregates.queue.CommandType.QueueCommandType
+import com.amplify.api.daos.schema.BaseTable
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
-import com.amplify.api.domain.models.primitives.Identifier
-import com.amplify.api.domain.models.{User, Venue}
+import com.amplify.api.domain.models.primitives.{Id, Identifier}
 import java.time.Instant
 
-trait CommandsTable extends BaseTable with VenuesTable with UsersTable {
+trait CommandsTable extends BaseTable {
 
   import profile.api._
 
@@ -19,9 +16,9 @@ trait CommandsTable extends BaseTable with VenuesTable with UsersTable {
   // scalastyle:off public.methods.have.type
   // scalastyle:off method.name
   class QueueCommands(tag: Tag) extends Table[CommandDb](tag, "queue_commands") {
-    def id = column[Id[Command]]("id", O.PrimaryKey, O.AutoInc)
-    def venueId = column[Id[Venue]]("venue_id")
-    def userId = column[Option[Id[User]]]("user_id")
+    def id = column[Id]("id", O.PrimaryKey, O.AutoInc)
+    def venueId = column[Id]("venue_id")
+    def userId = column[Option[Id]]("user_id")
     def queueCommandType = column[QueueCommandType]("queue_command_type")
     def contentProvider = column[Option[ContentProviderType]]("content_provider")
     def contentProviderIdentifier = column[Option[Identifier]]("content_identifier")
@@ -30,9 +27,6 @@ trait CommandsTable extends BaseTable with VenuesTable with UsersTable {
     def contentIdentifier =
       (contentProvider, contentProviderIdentifier) <>
         (mapOptionalProviderIdentifier, unmapOptionalProviderIdentifier)
-
-    def venue = foreignKey("venue_fk", venueId, venuesTable)(_.id)
-    def user = foreignKey("user_fk", userId, usersTable)(_.id.?)
 
     def * = (id, venueId, userId, queueCommandType, contentIdentifier, createdAt) <>
       (CommandDb.tupled, CommandDb.unapply)

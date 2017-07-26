@@ -1,15 +1,15 @@
-package com.amplify.api.command_processors.queue
+package com.amplify.api.aggregates.queue
 
 import akka.actor.{Actor, Props}
 import akka.pattern.pipe
-import com.amplify.api.command_processors.queue.CommandConverter.commandToCommandDb
-import com.amplify.api.command_processors.queue.CommandProcessor._
-import com.amplify.api.command_processors.queue.CommandType.QueueCommandType
-import com.amplify.api.command_processors.queue.Event.{CurrentPlaylistSet, CurrentTrackSkipped, VenueTrackAdded, VenueTracksRemoved}
-import com.amplify.api.command_processors.queue.EventConverter.queueEventToQueueEventDb
-import com.amplify.api.command_processors.queue.MaterializedView.Materialize
-import com.amplify.api.daos.primitives.Id
+import com.amplify.api.aggregates.queue.CommandConverter.commandToCommandDb
+import com.amplify.api.aggregates.queue.CommandProcessor._
+import com.amplify.api.aggregates.queue.CommandType.QueueCommandType
+import com.amplify.api.aggregates.queue.Event.{CurrentPlaylistSet, CurrentTrackSkipped, VenueTrackAdded, VenueTracksRemoved}
+import com.amplify.api.aggregates.queue.EventConverter.queueEventToQueueEventDb
+import com.amplify.api.aggregates.queue.MaterializedView.{EventsBatch, Materialize, SetState}
 import com.amplify.api.domain.models._
+import com.amplify.api.domain.models.primitives.Id
 import com.amplify.api.services.VenueService
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,7 +20,7 @@ class CommandProcessor @Inject()(
     venueService: VenueService)(
     implicit ec: ExecutionContext) extends Actor {
 
-  lazy val materializedView = context.actorOf(Props[MaterializedView])
+  val materializedView = context.actorOf(Props[MaterializedView])
 
   override def receive: Receive = {
     case command: Command ⇒
@@ -31,11 +31,14 @@ class CommandProcessor @Inject()(
           events ← createEvents(command)
           _ ← eventDao.create(events.map(queueEventToQueueEventDb(commandDb, _)))
         }
-        yield materializedView ! events
+        yield materializedView ! EventsBatch(events)
       future pipeTo origSender
 
     case RetrieveMaterialized ⇒
       materializedView forward Materialize
+
+    case setState: SetState ⇒
+      materializedView forward setState
   }
 
   private def createEvents(command: Command): Future[Seq[Event]] = command match {
@@ -57,7 +60,7 @@ class CommandProcessor @Inject()(
 object CommandProcessor {
 
   trait Factory {
-    def apply(venueId: Id[Venue]): Actor
+    def apply(): Actor
   }
 
   case object RetrieveMaterialized
@@ -66,7 +69,7 @@ object CommandProcessor {
 
     def venue: AuthenticatedVenueReq
 
-    def userId: Option[Id[User]] = None
+    def userId: Option[Id] = None
 
     def queueCommandType: QueueCommandType
 

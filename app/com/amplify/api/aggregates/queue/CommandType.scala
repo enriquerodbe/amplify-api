@@ -1,4 +1,4 @@
-package com.amplify.api.command_processors.queue
+package com.amplify.api.aggregates.queue
 
 object CommandType extends Enumeration {
 

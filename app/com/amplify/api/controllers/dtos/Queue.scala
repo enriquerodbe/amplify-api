@@ -14,8 +14,8 @@ object Queue {
   def queueToQueueResponse(queue: ModelQueue): QueueResponse = {
     QueueResponse(
       queue.currentPlaylist.map(_.info.identifier.toString),
-      queue.currentTrack.map(trackToTrackResponse),
-      queue.items.map(item ⇒ trackToTrackResponse(item.track)))
+      queue.currentItem.map(item ⇒ trackToTrackResponse(item.track)),
+      queue.allItems.map(item ⇒ trackToTrackResponse(item.track)))
   }
   implicit val queueResponseWrites: Writes[QueueResponse] = {
     JsonNaming.snakecase(Json.writes[QueueResponse])

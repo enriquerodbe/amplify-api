@@ -1,7 +1,7 @@
 package com.amplify.api.daos.schema
 
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
-import com.amplify.api.domain.models.primitives.{Identifier, Name, Uid}
+import com.amplify.api.domain.models.primitives.{Id, Identifier, Name, Uid}
 import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProviderType}
 import java.sql.Timestamp
 import java.time.Instant
@@ -14,6 +14,8 @@ trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
   import profile.api._
 
   implicit val instantType = MappedColumnType.base[Instant, Timestamp](Timestamp.from, _.toInstant)
+
+  implicit val idType = MappedColumnType.base[Id, Long](_.value, Id.apply)
 
   implicit val nameType =
     MappedColumnType.base[Name, String](_.value, Name.apply)
@@ -38,8 +40,8 @@ trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
   }
 
   def unmapOptionalProviderIdentifier(
-      maybeProviderIdentifier: Option[ContentProviderIdentifier])
-  : Option[(Option[ContentProviderType], Option[Identifier])] = {
+      maybeProviderIdentifier: Option[ContentProviderIdentifier]
+  ) : Option[(Option[ContentProviderType], Option[Identifier])] = {
     maybeProviderIdentifier match {
       case Some(providerIdentifier) ⇒
         Some(Some(providerIdentifier.contentProvider), Some(providerIdentifier.identifier))

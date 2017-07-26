@@ -1,7 +1,6 @@
 package com.amplify.api.domain.models
 
-import com.amplify.api.daos.primitives.Id
-import com.amplify.api.domain.models.primitives.Name
+import com.amplify.api.domain.models.primitives.{Id, Name}
 
 sealed trait User {
 
@@ -9,7 +8,7 @@ sealed trait User {
 }
 
 case class AuthenticatedUser(
-    id: Id[User],
+    id: Id,
     name: Name,
     identifier: ContentProviderIdentifier) extends User
 

@@ -1,14 +1,13 @@
 package com.amplify.api.it.fixtures
 
-import com.amplify.api.command_processors.queue.CommandProcessor.Command
-import com.amplify.api.command_processors.queue.{EventDb, EventsTable}
-import com.amplify.api.daos.primitives.Id
+import com.amplify.api.aggregates.queue.{EventDb, EventsTable}
+import com.amplify.api.domain.models.primitives.Id
 
 trait QueueEventDbFixture extends BaseDbFixture with EventsTable {
 
   import profile.api._
 
-  def findQueueEvents(queueCommandId: Id[Command]): Seq[EventDb] = {
+  def findQueueEvents(queueCommandId: Id): Seq[EventDb] = {
     queueEventsTable.filter(_.queueCommandId === queueCommandId).result.await()
   }
 }

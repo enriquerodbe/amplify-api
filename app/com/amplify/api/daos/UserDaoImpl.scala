@@ -1,9 +1,9 @@
 package com.amplify.api.daos
 
 import com.amplify.api.daos.models.UserDb
-import com.amplify.api.daos.primitives.Id
 import com.amplify.api.daos.schema.UsersTable
-import com.amplify.api.domain.models.{ContentProviderIdentifier, User}
+import com.amplify.api.domain.models.ContentProviderIdentifier
+import com.amplify.api.domain.models.primitives.Id
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import scala.concurrent.ExecutionContext
@@ -14,7 +14,7 @@ class UserDaoImpl @Inject()(
 
   import profile.api._
 
-  override def retrieve(id: Id[User]): DBIO[Option[UserDb]] = {
+  override def retrieve(id: Id): DBIO[Option[UserDb]] = {
     usersTable.filter(_.id === id).result.headOption
   }
 

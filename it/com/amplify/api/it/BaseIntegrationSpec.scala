@@ -1,5 +1,7 @@
 package com.amplify.api.it
 
+import com.amplify.api.aggregates.queue.MaterializedView.SetState
+import com.amplify.api.domain.models.Queue
 import com.amplify.api.services.external.spotify.SpotifyContentProvider
 import org.mockito.Mockito.{RETURNS_SMART_NULLS, withSettings}
 import org.scalatest.BeforeAndAfterEach
@@ -31,7 +33,10 @@ trait BaseIntegrationSpec
       .build()
   }
 
-  override def beforeEach(): Unit = Evolutions.applyEvolutions(database)
+  override def beforeEach(): Unit = {
+    app.actorSystem.actorSelection(s"/user/queue-command-router/*") ! SetState(Queue())
+    Evolutions.applyEvolutions(database)
+  }
 
   override def afterEach(): Unit = Evolutions.cleanupEvolutions(database)
 }

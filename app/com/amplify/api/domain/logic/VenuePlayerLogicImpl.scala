@@ -2,7 +2,7 @@ package com.amplify.api.domain.logic
 
 import akka.actor.ActorRef
 import akka.pattern.ask
-import com.amplify.api.command_processors.queue.CommandProcessor.{PausePlayback, SkipCurrentTrack, StartPlayback}
+import com.amplify.api.aggregates.queue.CommandProcessor.{PausePlayback, SkipCurrentTrack, StartPlayback}
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models.AuthenticatedVenueReq
 import javax.inject.{Inject, Named}

@@ -1,4 +1,4 @@
-package com.amplify.api.command_processors.queue
+package com.amplify.api.aggregates.queue
 
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider

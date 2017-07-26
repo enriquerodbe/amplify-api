@@ -1,11 +1,9 @@
 package com.amplify.api.it.fixtures
 
 import com.amplify.api.daos.models.{UserDb, VenueDb}
-import com.amplify.api.daos.primitives.Id
 import com.amplify.api.daos.schema.{UsersTable, VenuesTable}
 import com.amplify.api.domain.models.ContentProviderType.Spotify
-import com.amplify.api.domain.models.primitives.Name
-import com.amplify.api.domain.models.{User, Venue}
+import com.amplify.api.domain.models.primitives.{Id, Name}
 
 trait VenueDbFixture extends BaseDbFixture with CommonData with VenuesTable with UsersTable {
 
@@ -15,10 +13,10 @@ trait VenueDbFixture extends BaseDbFixture with CommonData with VenuesTable with
   val aliceVenueDb = VenueDb(aliceVenueDbId, "Alice's Bar", aliceUserDb.id, aliceVenueUid)
   val bobUserDb = UserDb(bobUserDbId, "Bob Marley", Spotify → bobSpotifyId)
 
-  def insertUser(user: UserDb): Id[User] = {
+  def insertUser(user: UserDb): Id = {
     db.run(usersTable returning usersTable.map(_.id) += user).await()
   }
-  def insertVenue(venue: VenueDb): Id[Venue] = {
+  def insertVenue(venue: VenueDb): Id = {
     db.run(venuesTable returning venuesTable.map(_.id) += venue).await()
   }
 

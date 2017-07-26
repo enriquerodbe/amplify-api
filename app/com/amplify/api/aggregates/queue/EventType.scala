@@ -1,4 +1,4 @@
-package com.amplify.api.command_processors.queue
+package com.amplify.api.aggregates.queue
 
 object EventType extends Enumeration {
 
@@ -7,7 +7,6 @@ object EventType extends Enumeration {
   val
     VenueTracksRemoved,
     VenueTrackAdded,
-    PlaybackStarted,
     AllTracksRemoved,
     TrackFinished,
     CurrentPlaylistSet,

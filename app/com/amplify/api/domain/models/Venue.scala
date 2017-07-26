@@ -1,7 +1,6 @@
 package com.amplify.api.domain.models
 
-import com.amplify.api.daos.primitives.Id
-import com.amplify.api.domain.models.primitives.{Name, Uid}
+import com.amplify.api.domain.models.primitives.{Id, Name, Uid}
 
 trait Venue {
 
@@ -11,7 +10,7 @@ trait Venue {
 }
 
 case class UnauthenticatedVenue(
-    id: Id[Venue],
+    id: Id,
     name: Name,
     uid: Uid) extends Venue
 
@@ -23,7 +22,7 @@ case class AuthenticatedVenue(
 
   override def uid: Uid = unauthenticated.uid
 
-  def id: Id[Venue] = unauthenticated.id
+  def id: Id = unauthenticated.id
 }
 
 case class AuthenticatedVenueReq(venue: AuthenticatedVenue, authToken: AuthToken) extends Venue {
@@ -34,7 +33,7 @@ case class AuthenticatedVenueReq(venue: AuthenticatedVenue, authToken: AuthToken
 
   def user: AuthenticatedUser = venue.user
 
-  def id: Id[Venue] = venue.id
+  def id: Id = venue.id
 
   def userIdentifier: ContentProviderIdentifier = user.identifier
 }

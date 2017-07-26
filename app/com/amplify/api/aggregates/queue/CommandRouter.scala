@@ -1,10 +1,10 @@
-package com.amplify.api.command_processors.queue
+package com.amplify.api.aggregates.queue
 
 import akka.actor.Actor
-import com.amplify.api.command_processors.queue.CommandProcessor.RetrieveMaterialized
-import com.amplify.api.command_processors.queue.CommandRouter.RetrieveQueue
-import com.amplify.api.daos.primitives.Id
-import com.amplify.api.domain.models.{AuthenticatedVenueReq, Venue}
+import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveMaterialized
+import com.amplify.api.aggregates.queue.CommandRouter.RetrieveQueue
+import com.amplify.api.domain.models.AuthenticatedVenueReq
+import com.amplify.api.domain.models.primitives.Id
 import javax.inject.Inject
 import play.api.libs.concurrent.InjectedActorSupport
 
@@ -21,16 +21,16 @@ class CommandRouter @Inject()(
       commandProcessor forward RetrieveMaterialized
   }
 
-  private def getCommandProcessor(venueId: Id[Venue]) = {
+  private def getCommandProcessor(venueId: Id) = {
     val name = createCommandProcessorName(venueId)
     context.child(name).getOrElse(createCommandProcessor(venueId))
   }
 
-  private def createCommandProcessorName(venueId: Id[Venue]) = s"queue-command-processor-$venueId"
+  private def createCommandProcessorName(venueId: Id) = s"queue-command-processor-$venueId"
 
-  private def createCommandProcessor(venueId: Id[Venue]) = {
+  private def createCommandProcessor(venueId: Id) = {
     val name = createCommandProcessorName(venueId)
-    injectedChild(commandProcessorFactory(venueId), name)
+    injectedChild(commandProcessorFactory(), name)
   }
 }
 
