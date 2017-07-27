@@ -147,13 +147,19 @@ class VenueCrudControllerSpec
         }
       }
     }
-    "not update queue current track" in new SetCurrentPlaylistFixture {
+    "update queue current track" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
       val queue = (commandProcessor ? RetrieveMaterialized).mapTo[Queue].await()
 
-      queue.currentItem mustBe empty
+      inside(queue.currentItem) { case Some(QueueItem(track, itemType)) ⇒
+        itemType mustEqual QueueItemType.Venue
+        track must have(
+          'name (alicePlaylistTracks.head.name.toString),
+          'identifier (alicePlaylistTracks.head.identifier)
+        )
+      }
     }
     "update queue items" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(

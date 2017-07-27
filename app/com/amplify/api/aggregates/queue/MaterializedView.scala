@@ -31,7 +31,12 @@ class MaterializedView extends Actor {
   }
 
   private def addVenueTrack(queue: Queue, track: Track): Queue = {
-    queue.copy(futureItems = queue.futureItems :+ QueueItem(track, QueueItemType.Venue))
+    val newItem = QueueItem(track, QueueItemType.Venue)
+
+    queue.currentItem match {
+      case None ⇒ queue.copy(currentItem = Some(newItem))
+      case _ ⇒ queue.copy(futureItems = queue.futureItems :+ newItem)
+    }
   }
 
   private def setCurrentPlaylist(queue: Queue, playlist: Playlist): Queue = {
