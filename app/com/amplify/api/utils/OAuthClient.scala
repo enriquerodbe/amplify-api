@@ -66,8 +66,8 @@ trait OAuthClient {
     val request =
       ws.url(s"$baseUrl$path")
         .withRequestTimeout(MAX_WAIT_RESPONSE)
-        .withHeaders(authorizedHeaders.toSeq: _*)
-        .withQueryString(query.toSeq: _*)
+        .addHttpHeaders(authorizedHeaders.toSeq: _*)
+        .addQueryStringParameters(query.toSeq: _*)
 
     val requestWithBody = if (body.isEmpty) request else request.withBody(body)
 

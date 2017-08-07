@@ -2,20 +2,21 @@ name := "amplify-api"
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.4"
 
 lazy val dependencies = Seq(
-  "com.typesafe.play" %% "play-ws" % "2.5.4",
-  "com.typesafe.play" %% "play-slick" % "2.1.0",
-  "com.typesafe.play" %% "play-slick-evolutions" % "2.1.0",
-  "com.h2database" % "h2" % "1.4.194",
-  "com.github.tototoshi" %% "play-json-naming" % "1.1.0",
-  "be.objectify" %% "deadbolt-scala" % "2.5.1",
-  "com.iheart" %% "play-swagger" % "0.5.4",
-  "org.webjars" % "swagger-ui" % "2.2.0",
+  "com.typesafe.play" %% "play-ws" % "2.6.10",
+  "com.typesafe.play" %% "play-slick" % "3.0.3",
+  "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
+  "com.h2database" % "h2" % "1.4.196",
+  "be.objectify" %% "deadbolt-scala" % "2.6.1",
+  "com.iheart" %% "play-swagger" % "0.7.3",
+  "org.webjars" % "swagger-ui" % "3.8.0",
   "com.google.api-client" % "google-api-client" % "1.23.0",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "it,test",
-  "org.mockito" % "mockito-core" % "2.8.47" % "it,test")
+  guice,
+  ws,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "it,test",
+  "org.mockito" % "mockito-core" % "2.13.0" % "it,test")
 
 lazy val `amplify-api` = (project in file("."))
   .settings(libraryDependencies ++= dependencies)
@@ -38,9 +39,9 @@ swaggerDomainNameSpaces := Seq("com.amplify.api.controllers.dtos")
 
 // Scalastyle
 lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")
-compileScalastyle := org.scalastyle.sbt.ScalastylePlugin.scalastyle.in(Compile).toTask("").value
+compileScalastyle := scalastyle.in(Compile).toTask("").value
 (compile in Compile) := (compile in Compile).dependsOn(compileScalastyle).value
 lazy val testScalastyle = taskKey[Unit]("testScalastyle")
-testScalastyle := org.scalastyle.sbt.ScalastylePlugin.scalastyle.in(Test).toTask("").value
+testScalastyle := scalastyle.in(Test).toTask("").value
 (test in Test) := (test in Test).dependsOn(testScalastyle).value
 scalastyleFailOnError := true

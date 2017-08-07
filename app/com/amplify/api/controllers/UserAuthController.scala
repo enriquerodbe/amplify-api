@@ -6,16 +6,17 @@ import com.amplify.api.controllers.dtos.User.authenticatedUserToUserResponse
 import com.amplify.api.domain.logic.UserAuthLogic
 import javax.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 // scalastyle:off public.methods.have.type
 class UserAuthController @Inject()(
+    cc: ControllerComponents,
     userAuthLogic: UserAuthLogic,
     authHeadersUtil: AuthHeadersUtil,
     actionBuilder: ActionBuilders)(
-    implicit ec: ExecutionContext) extends Controller {
+    implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def signUp = Action.async(parse.empty) { request ⇒
     authHeadersUtil.getAuthToken(request) match {

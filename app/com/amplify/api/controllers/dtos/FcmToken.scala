@@ -1,12 +1,9 @@
 package com.amplify.api.controllers.dtos
 
-import com.github.tototoshi.play.json.JsonNaming
 import play.api.libs.json.{Json, Reads}
 
-object FcmToken {
+object FcmToken extends DtosDefinition {
 
   case class FcmTokenRequest(token: String)
-  implicit val fcmTokenRequestReads: Reads[FcmTokenRequest] = {
-    JsonNaming.snakecase(Json.reads[FcmTokenRequest])
-  }
+  implicit val fcmTokenRequestReads: Reads[FcmTokenRequest] = Json.reads[FcmTokenRequest]
 }

@@ -7,7 +7,7 @@ import scala.concurrent.duration.DurationDouble
 
 class EnvConfig @Inject()(configuration: Configuration) {
 
-  private def getString(keyName: String): String = configuration.getString(keyName).get
+  private def getString(keyName: String): String = configuration.get[String](keyName)
 
   val spotifyUrl = getString("spotify.web_api.url")
 

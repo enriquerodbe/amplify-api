@@ -11,16 +11,17 @@ import com.amplify.api.domain.models.ContentProviderIdentifier
 import com.amplify.api.domain.models.primitives.Token
 import javax.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc.Controller
+import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 // scalastyle:off public.methods.have.type
 class VenueCrudController @Inject()(
+    cc: ControllerComponents,
     venueCrudLogic: VenueCrudLogic,
     venuePlayerLogic: VenuePlayerLogic,
     val actionBuilder: ActionBuilders)(
-    implicit ec: ExecutionContext) extends Controller with AuthenticatedRequests {
+    implicit ec: ExecutionContext) extends AbstractController(cc) with AuthenticatedRequests {
 
   def retrievePlaylists() = authenticatedVenue() { request ⇒
     val eventualPlaylists = venueCrudLogic.retrievePlaylists(request.subject.venueReq)

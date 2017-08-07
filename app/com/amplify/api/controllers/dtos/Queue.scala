@@ -2,10 +2,9 @@ package com.amplify.api.controllers.dtos
 
 import com.amplify.api.controllers.dtos.Album.{AlbumResponse, albumToAlbumResponse}
 import com.amplify.api.domain.models.{QueueItem, Queue ⇒ ModelQueue}
-import com.github.tototoshi.play.json.JsonNaming
 import play.api.libs.json.{Json, Reads, Writes}
 
-object Queue {
+object Queue extends DtosDefinition {
 
   case class QueueTrackResponse(
       name: String,
@@ -20,7 +19,7 @@ object Queue {
       albumToAlbumResponse(item.track.album))
   }
   implicit val queueTrackResponseWrites: Writes[QueueTrackResponse] = {
-    JsonNaming.snakecase(Json.writes[QueueTrackResponse])
+    Json.writes[QueueTrackResponse]
   }
 
   case class CurrentTrackResponse(
@@ -38,7 +37,7 @@ object Queue {
       index)
   }
   implicit val currentTrackResponseWrites: Writes[CurrentTrackResponse] = {
-    JsonNaming.snakecase(Json.writes[CurrentTrackResponse])
+    Json.writes[CurrentTrackResponse]
   }
 
   case class QueueResponse(
@@ -54,12 +53,8 @@ object Queue {
       },
       queue.allItems.map(itemToQueueTrackResponse))
   }
-  implicit val queueResponseWrites: Writes[QueueResponse] = {
-    JsonNaming.snakecase(Json.writes[QueueResponse])
-  }
+  implicit val queueResponseWrites: Writes[QueueResponse] = Json.writes[QueueResponse]
 
   case class AddTrackRequest(identifier: String)
-  implicit val addTrackRequestReads: Reads[AddTrackRequest] = {
-    JsonNaming.snakecase(Json.reads[AddTrackRequest])
-  }
+  implicit val addTrackRequestReads: Reads[AddTrackRequest] = Json.reads[AddTrackRequest]
 }

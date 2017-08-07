@@ -23,7 +23,7 @@ trait SpotifyBaseProvider extends OAuthClient {
         Future.failed(ExternalResourceNotFound)
       case other ⇒
         val message = s"Unexpected status $other from Spotify. " +
-          s"Headers: ${response.allHeaders}. Body: ${response.body}"
+          s"Headers: ${response.headers}. Body: ${response.body}"
         Future.failed(UnexpectedResponse(message))
     }
   }

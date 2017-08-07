@@ -7,9 +7,6 @@ GET   /assets/*file                 controllers.Assets.versioned(path="/public",
 ### NoDocs ###
 GET    /    controllers.Default.todo
 
-### NoDocs ###
-GET    /assets/swagger.json    com.amplify.api.controllers.SwaggerController.specs
-
 -> /venues  venues.Routes
 
 -> /users  users.Routes

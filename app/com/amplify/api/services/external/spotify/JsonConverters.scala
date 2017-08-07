@@ -1,24 +1,26 @@
 package com.amplify.api.services.external.spotify
 
 import com.amplify.api.services.external.spotify.Dtos._
-import com.github.tototoshi.play.json.JsonNaming
+import play.api.libs.json.JsonNaming.SnakeCase
 import play.api.libs.json._
 
 object JsonConverters {
 
-  implicit val userReads = JsonNaming.snakecase(Json.format[User])
+  implicit val config = JsonConfiguration(SnakeCase)
 
-  implicit val imageReads = JsonNaming.snakecase(Json.format[Image])
+  implicit val userReads = Json.format[User]
 
-  implicit val playlistReads = JsonNaming.snakecase(Json.format[Playlist])
+  implicit val imageReads = Json.format[Image]
 
-  implicit val playlistsReads = JsonNaming.snakecase(Json.format[Playlists])
+  implicit val playlistReads = Json.format[Playlist]
 
-  implicit val artistFormat = JsonNaming.snakecase(Json.format[Artist])
+  implicit val playlistsReads = Json.format[Playlists]
 
-  implicit val albumFormat = JsonNaming.snakecase(Json.format[Album])
+  implicit val artistFormat = Json.format[Artist]
 
-  implicit val trackFormat = JsonNaming.snakecase(Json.format[Track])
+  implicit val albumFormat = Json.format[Album]
 
-  implicit val trackItemFormat = JsonNaming.snakecase(Json.format[TrackItem])
+  implicit val trackFormat = Json.format[Track]
+
+  implicit val trackItemFormat = Json.format[TrackItem]
 }

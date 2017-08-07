@@ -7,7 +7,7 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
 
-trait AuthenticatedRequests {
+trait AuthenticatedRequests { self: AbstractController ⇒
 
   def actionBuilder: ActionBuilders
 
@@ -26,7 +26,7 @@ trait AuthenticatedRequests {
   }
 
   def authenticatedUser[A](
-      parser: BodyParser[A] = BodyParsers.parse.anyContent)(
+      parser: BodyParser[A] = parse.anyContent)(
       block: AuthenticatedUserRequest[A] ⇒ Future[Result]): Action[A] = {
     actionBuilder.SubjectPresentAction().defaultHandler.apply(parser) { request ⇒
       request.subject match {
@@ -42,7 +42,7 @@ trait AuthenticatedRequests {
   }
 
   def authenticatedVenue[A](
-      parser: BodyParser[A] = BodyParsers.parse.anyContent)(
+      parser: BodyParser[A] = parse.anyContent)(
       block: AuthenticatedVenueRequest[A] ⇒ Future[Result]): Action[A] = {
     actionBuilder.SubjectPresentAction().defaultHandler.apply(parser) { request ⇒
       request.subject match {

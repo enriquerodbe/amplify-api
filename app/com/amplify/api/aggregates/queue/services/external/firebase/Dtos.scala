@@ -1,13 +1,15 @@
 package com.amplify.api.aggregates.queue.services.external.firebase
 
-import com.github.tototoshi.play.json.JsonNaming
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.JsonNaming.SnakeCase
+import play.api.libs.json.{Json, JsonConfiguration, Reads}
 
 object Dtos {
+
+  implicit val config = JsonConfiguration(SnakeCase)
 
   case class SendNotificationResponse(name: Option[String])
 
   implicit val sendNotificationResponseReads: Reads[SendNotificationResponse] = {
-    JsonNaming.snakecase(Json.reads[SendNotificationResponse])
+    Json.reads[SendNotificationResponse]
   }
 }

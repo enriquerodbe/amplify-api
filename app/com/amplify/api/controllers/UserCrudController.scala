@@ -5,12 +5,13 @@ import com.amplify.api.controllers.auth.AuthenticatedRequests
 import com.amplify.api.controllers.dtos.User._
 import javax.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc.Controller
+import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.Future
 
 // scalastyle:off public.methods.have.type
 class UserCrudController @Inject()(
-    val actionBuilder: ActionBuilders) extends Controller with AuthenticatedRequests {
+    cc: ControllerComponents,
+    val actionBuilder: ActionBuilders) extends AbstractController(cc) with AuthenticatedRequests {
 
   def retrieveCurrent() = authenticatedUser() { request ⇒
     val response = authenticatedUserToUserResponse(request.subject.user)
