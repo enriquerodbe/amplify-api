@@ -23,15 +23,10 @@ class CommandRouter @Inject()(
 
   private def getCommandProcessor(venueId: Id) = {
     val name = createCommandProcessorName(venueId)
-    context.child(name).getOrElse(createCommandProcessor(venueId))
+    context.child(name).getOrElse(injectedChild(commandProcessorFactory(), name))
   }
 
   private def createCommandProcessorName(venueId: Id) = s"queue-command-processor-$venueId"
-
-  private def createCommandProcessor(venueId: Id) = {
-    val name = createCommandProcessorName(venueId)
-    injectedChild(commandProcessorFactory(), name)
-  }
 }
 
 object CommandRouter {

@@ -52,9 +52,9 @@ class MaterializedView extends Actor {
   }
 
   private def addUserTrack(queue: Queue, identifier: ContentProviderIdentifier): Queue = {
-    val result = findTrack(identifier).map { item ⇒
+    val result = findTrack(identifier).map { track ⇒
       val userItems = queue.futureItems.takeWhile(_.itemType == QueueItemType.User)
-      val newItem = QueueItem(item, QueueItemType.User)
+      val newItem = QueueItem(track, QueueItemType.User)
       val venueItems = queue.futureItems.dropWhile(_.itemType == QueueItemType.User)
 
       queue.copy(futureItems = (userItems :+ newItem) ++ venueItems)

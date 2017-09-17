@@ -7,19 +7,44 @@ import play.api.libs.json.{Json, Reads, Writes}
 
 object Track {
 
-  case class TrackResponse(
+  sealed trait TrackResponse {
+    def name: String
+    def contentProvider: String
+    def contentIdentifier: String
+    def album: AlbumResponse
+  }
+
+  case class QueueTrackResponse(
       name: String,
       contentProvider: String,
       contentIdentifier: String,
-      album: AlbumResponse)
-  def trackToTrackResponse(track: ModelTrack): TrackResponse = {
-    TrackResponse(track.name,
+      album: AlbumResponse) extends TrackResponse
+
+  case class CurrentTrackResponse(
+      name: String,
+      contentProvider: String,
+      contentIdentifier: String,
+      album: AlbumResponse,
+      position: Int) extends TrackResponse
+
+  def trackToQueueTrackResponse(track: ModelTrack): QueueTrackResponse = {
+    QueueTrackResponse(track.name,
       track.identifier.contentProvider.toString,
       track.identifier.identifier,
       albumToAlbumResponse(track.album))
   }
-  implicit val trackResponseWrites: Writes[TrackResponse] = {
-    JsonNaming.snakecase(Json.writes[TrackResponse])
+  def trackToCurrentTrackResponse(track: ModelTrack, index: Int): CurrentTrackResponse = {
+    CurrentTrackResponse(track.name,
+      track.identifier.contentProvider.toString,
+      track.identifier.identifier,
+      albumToAlbumResponse(track.album),
+      index)
+  }
+  implicit val queueTrackResponseWrites: Writes[QueueTrackResponse] = {
+    JsonNaming.snakecase(Json.writes[QueueTrackResponse])
+  }
+  implicit val currentTrackResponseWrites: Writes[CurrentTrackResponse] = {
+    JsonNaming.snakecase(Json.writes[CurrentTrackResponse])
   }
 
   case class AddTrackRequest(identifier: String)
