@@ -18,59 +18,13 @@ class MaterializedView extends Actor {
   }
 
   private def process(queue: Queue, event: Event): Queue = event match {
-    case VenueTracksRemoved ⇒ removeVenueTracks(queue)
-    case VenueTrackAdded(track) ⇒ addVenueTrack(queue, track)
-    case CurrentPlaylistSet(playlist) ⇒ setCurrentPlaylist(queue, playlist)
-    case TrackFinished ⇒ finishCurrentTrack(queue)
-    case UserTrackAdded(_, identifier) ⇒ addUserTrack(queue, identifier)
-    case CurrentTrackSkipped ⇒ skipCurrentTrack(queue)
+    case VenueTracksRemoved ⇒ queue.removeVenueTracks()
+    case VenueTrackAdded(track) ⇒ queue.addVenueTrack(track)
+    case CurrentPlaylistSet(playlist) ⇒ queue.setCurrentPlaylist(playlist)
+    case TrackFinished ⇒ queue.finishCurrentTrack()
+    case UserTrackAdded(_, identifier) ⇒ queue.addUserTrack(identifier)
+    case CurrentTrackSkipped ⇒ queue.skipCurrentTrack()
   }
-
-  private def removeVenueTracks(queue: Queue): Queue = {
-    queue.copy(futureItems = queue.futureItems.takeWhile(_.itemType == QueueItemType.User))
-  }
-
-  private def addVenueTrack(queue: Queue, track: Track): Queue = {
-    val newItem = QueueItem(track, QueueItemType.Venue)
-
-    queue.currentItem match {
-      case None ⇒ queue.copy(currentItem = Some(newItem))
-      case _ ⇒ queue.copy(futureItems = queue.futureItems :+ newItem)
-    }
-  }
-
-  private def setCurrentPlaylist(queue: Queue, playlist: Playlist): Queue = {
-    queue.copy(currentPlaylist = Some(playlist))
-  }
-
-  private def finishCurrentTrack(queue: Queue): Queue = {
-    queue.copy(
-      pastItems = queue.pastItems ++ queue.currentItem.toList,
-      currentItem = queue.futureItems.headOption,
-      futureItems = queue.futureItems.drop(1)
-    )
-  }
-
-  private def addUserTrack(queue: Queue, identifier: ContentProviderIdentifier): Queue = {
-    val result = findTrack(identifier).map { track ⇒
-      val userItems = queue.futureItems.takeWhile(_.itemType == QueueItemType.User)
-      val newItem = QueueItem(track, QueueItemType.User)
-      val venueItems = queue.futureItems.dropWhile(_.itemType == QueueItemType.User)
-
-      queue.copy(futureItems = (userItems :+ newItem) ++ venueItems)
-    }
-
-    result.getOrElse(queue)
-  }
-
-  private def findTrack(identifier: ContentProviderIdentifier): Option[Track] = {
-    queue.currentPlaylist match {
-      case Some(playlist) ⇒ playlist.findTrack(identifier)
-      case _ ⇒ None
-    }
-  }
-
-  private def skipCurrentTrack(queue: Queue): Queue = finishCurrentTrack(queue)
 }
 
 object MaterializedView {

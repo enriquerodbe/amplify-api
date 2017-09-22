@@ -1,8 +1,8 @@
 package com.amplify.api.controllers
 
 import be.objectify.deadbolt.scala.ActionBuilders
+import com.amplify.api.controllers.auth.AuthenticatedRequests
 import com.amplify.api.controllers.dtos.User._
-import com.amplify.api.utils.AuthenticatedRequests
 import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.Controller

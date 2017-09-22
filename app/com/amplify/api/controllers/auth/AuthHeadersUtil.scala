@@ -2,7 +2,7 @@ package com.amplify.api.controllers.auth
 
 import com.amplify.api.domain.models.{AuthToken, ContentProviderType}
 import com.amplify.api.exceptions.{MissingAuthTokenHeader, UnsupportedAuthProvider, WrongAuthorizationHeader}
-import com.amplify.api.utils.FutureUtils.OptionT
+import com.amplify.api.utils.DbioUtils.OptionT
 import javax.inject.Inject
 import play.api.mvc.{Headers, Request}
 import play.mvc.Http
@@ -17,7 +17,7 @@ class AuthHeadersUtil @Inject()(implicit ec: ExecutionContext) {
     val headers = request.headers
     for {
       authProvider ← getContentProvider(headers)
-      authorizationHeader ← headers.get(Http.HeaderNames.AUTHORIZATION) ?? MissingAuthTokenHeader
+      authorizationHeader ← headers.get(Http.HeaderNames.AUTHORIZATION) ?! MissingAuthTokenHeader
       authToken ← parseAuthToken(authorizationHeader)
     }
     yield AuthToken(authProvider, authToken)
@@ -26,7 +26,7 @@ class AuthHeadersUtil @Inject()(implicit ec: ExecutionContext) {
   private def getContentProvider(headers: Headers) = {
     headers.get(AUTH_PROVIDER_HEADER) match {
       case Some(providerName) ⇒
-        ContentProviderType.find(providerName) ?? UnsupportedAuthProvider(providerName)
+        ContentProviderType.find(providerName) ?! UnsupportedAuthProvider(providerName)
       case _ ⇒
         Success(ContentProviderType.default)
     }

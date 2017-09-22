@@ -1,12 +1,12 @@
 package com.amplify.api.controllers
 
 import be.objectify.deadbolt.scala.ActionBuilders
+import com.amplify.api.controllers.auth.AuthenticatedRequests
 import com.amplify.api.controllers.dtos.Playlist.{PlaylistRequest, playlistToPlaylistResponse}
 import com.amplify.api.controllers.dtos.Queue.queueToQueueResponse
 import com.amplify.api.controllers.dtos.Venue.venueToVenueResponse
 import com.amplify.api.domain.logic.{VenueCrudLogic, VenuePlayerLogic}
 import com.amplify.api.domain.models.ContentProviderIdentifier
-import com.amplify.api.utils.AuthenticatedRequests
 import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.Controller

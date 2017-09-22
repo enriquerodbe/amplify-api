@@ -1,9 +1,8 @@
 package com.amplify.api.controllers
 
 import be.objectify.deadbolt.scala.ActionBuilders
-import com.amplify.api.controllers.auth.AuthHeadersUtil
+import com.amplify.api.controllers.auth.{AuthHeadersUtil, AuthenticatedRequests}
 import com.amplify.api.domain.logic.VenuePlayerLogic
-import com.amplify.api.utils.AuthenticatedRequests
 import javax.inject.Inject
 import play.api.mvc.Controller
 import scala.concurrent.ExecutionContext

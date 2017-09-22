@@ -1,7 +1,6 @@
-package com.amplify.api.utils
+package com.amplify.api.controllers.auth
 
 import be.objectify.deadbolt.scala.ActionBuilders
-import com.amplify.api.controllers.auth.{AmplifyApiUser, AmplifyApiVenue}
 import com.amplify.api.domain.models.{AuthToken, AuthenticatedUserReq}
 import com.amplify.api.exceptions.VenueNotFoundByUserIdentifier
 import play.api.mvc._

@@ -6,7 +6,7 @@ import com.amplify.api.exceptions.UserNotFoundByIdentifier
 import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
 import com.amplify.api.services.converters.VenueConverter.venueDbToVenue
 import com.amplify.api.services.external.models.UserData
-import com.amplify.api.utils.FutureUtils.DbioT
+import com.amplify.api.utils.DbioUtils.DbioT
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
