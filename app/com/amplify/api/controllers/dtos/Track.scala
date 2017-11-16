@@ -1,7 +1,7 @@
 package com.amplify.api.controllers.dtos
 
 import com.amplify.api.controllers.dtos.Album.{AlbumResponse, albumToAlbumResponse}
-import com.amplify.api.domain.models.{Track ⇒ ModelTrack}
+import com.amplify.api.domain.models.QueueItem
 import com.github.tototoshi.play.json.JsonNaming
 import play.api.libs.json.{Json, Reads, Writes}
 
@@ -9,6 +9,7 @@ object Track {
 
   sealed trait TrackResponse {
     def name: String
+    def priority: String
     def contentProvider: String
     def contentIdentifier: String
     def album: AlbumResponse
@@ -16,28 +17,32 @@ object Track {
 
   case class QueueTrackResponse(
       name: String,
+      priority: String,
       contentProvider: String,
       contentIdentifier: String,
       album: AlbumResponse) extends TrackResponse
 
   case class CurrentTrackResponse(
       name: String,
+      priority: String,
       contentProvider: String,
       contentIdentifier: String,
       album: AlbumResponse,
       position: Int) extends TrackResponse
 
-  def trackToQueueTrackResponse(track: ModelTrack): QueueTrackResponse = {
-    QueueTrackResponse(track.name,
-      track.identifier.contentProvider.toString,
-      track.identifier.identifier,
-      albumToAlbumResponse(track.album))
+  def itemToQueueTrackResponse(item: QueueItem): QueueTrackResponse = {
+    QueueTrackResponse(item.track.name,
+      item.itemType.toString,
+      item.track.identifier.contentProvider.toString,
+      item.track.identifier.identifier,
+      albumToAlbumResponse(item.track.album))
   }
-  def trackToCurrentTrackResponse(track: ModelTrack, index: Int): CurrentTrackResponse = {
-    CurrentTrackResponse(track.name,
-      track.identifier.contentProvider.toString,
-      track.identifier.identifier,
-      albumToAlbumResponse(track.album),
+  def itemToCurrentTrackResponse(item: QueueItem, index: Int): CurrentTrackResponse = {
+    CurrentTrackResponse(item.track.name,
+      item.itemType.toString,
+      item.track.identifier.contentProvider.toString,
+      item.track.identifier.identifier,
+      albumToAlbumResponse(item.track.album),
       index)
   }
   implicit val queueTrackResponseWrites: Writes[QueueTrackResponse] = {
