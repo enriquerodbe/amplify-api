@@ -3,7 +3,7 @@ package com.amplify.api.domain.logic
 import akka.actor.ActorRef
 import akka.pattern.ask
 import com.amplify.api.aggregates.queue.CommandProcessor.SetCurrentPlaylist
-import com.amplify.api.aggregates.queue.CommandRouter.RetrieveQueue
+import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveCurrentPlaylist, RetrieveQueue}
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models._
 import com.amplify.api.services.VenueService
@@ -21,6 +21,14 @@ class VenueCrudLogicImpl @Inject()(
 
   override def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[PlaylistInfo]] = {
     venueService.retrievePlaylists(venue)
+  }
+
+  override def retrieveCurrentPlaylist(uid: String): Future[Option[Playlist]] = {
+    for {
+      venue ← venueService.retrieve(uid)
+      playlist ← (queueCommandRouter ? RetrieveCurrentPlaylist(venue)).mapTo[Option[Playlist]]
+    }
+    yield playlist
   }
 
   override def setCurrentPlaylist(

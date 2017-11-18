@@ -9,6 +9,8 @@ trait VenueCrudLogic {
 
   def retrievePlaylists(user: AuthenticatedVenueReq): Future[Seq[PlaylistInfo]]
 
+  def retrieveCurrentPlaylist(uid: String): Future[Option[Playlist]]
+
   def setCurrentPlaylist(
       venue: AuthenticatedVenueReq,
       playlistIdentifier: ContentProviderIdentifier): Future[Unit]

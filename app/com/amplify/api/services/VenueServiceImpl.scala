@@ -3,7 +3,7 @@ package com.amplify.api.services
 import com.amplify.api.controllers.dtos.Venue.VenueRequest
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
 import com.amplify.api.domain.models._
-import com.amplify.api.exceptions.UserAlreadyHasVenue
+import com.amplify.api.exceptions.{UserAlreadyHasVenue, VenueNotFoundByUid}
 import com.amplify.api.services.converters.PlaylistConverter.playlistDataToPlaylistInfo
 import com.amplify.api.services.converters.TrackConverter.trackDataToTrack
 import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
@@ -13,6 +13,7 @@ import com.amplify.api.services.external.models.UserData
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import slick.dbio.DBIO
+import com.amplify.api.utils.DbioUtils.DbioT
 
 class VenueServiceImpl @Inject()(
     db: DbioRunner,
@@ -20,6 +21,11 @@ class VenueServiceImpl @Inject()(
     userDao: UserDao,
     venueDao: VenueDao)(
     implicit ec: ExecutionContext) extends VenueService {
+
+  override def retrieve(uid: String): Future[UnauthenticatedVenue] = {
+    val maybeVenue = venueDao.retrieve(uid).map(_.map(venueDbToVenue))
+    db.run(maybeVenue ?! VenueNotFoundByUid(uid))
+  }
 
   override def retrieveOrCreate(
       userData: UserData,

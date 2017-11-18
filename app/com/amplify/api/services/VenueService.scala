@@ -9,6 +9,8 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[VenueServiceImpl])
 trait VenueService {
 
+  def retrieve(uid: String): Future[UnauthenticatedVenue]
+
   def retrieveOrCreate(userData: UserData, venueReq: VenueRequest): Future[AuthenticatedVenue]
 
   def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[PlaylistInfo]]

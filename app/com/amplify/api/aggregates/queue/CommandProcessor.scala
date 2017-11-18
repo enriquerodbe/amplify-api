@@ -1,13 +1,14 @@
 package com.amplify.api.aggregates.queue
 
 import akka.actor.{Actor, Props}
-import akka.pattern.pipe
+import akka.pattern.{ask, pipe}
 import com.amplify.api.aggregates.queue.CommandConverter.commandToCommandDb
 import com.amplify.api.aggregates.queue.CommandProcessor._
 import com.amplify.api.aggregates.queue.CommandType.QueueCommandType
 import com.amplify.api.aggregates.queue.Event.{CurrentPlaylistSet, CurrentTrackSkipped, VenueTrackAdded, VenueTracksRemoved}
 import com.amplify.api.aggregates.queue.EventConverter.queueEventToQueueEventDb
 import com.amplify.api.aggregates.queue.MaterializedView.{EventsBatch, Materialize, SetState}
+import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.Id
 import com.amplify.api.services.VenueService
@@ -15,12 +16,15 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CommandProcessor @Inject()(
+    envConfig: EnvConfig,
     commandDao: CommandDao,
     eventDao: EventDao,
     venueService: VenueService)(
     implicit ec: ExecutionContext) extends Actor {
 
   val materializedView = context.actorOf(Props[MaterializedView])
+
+  implicit val askTimeout = envConfig.defaultAskTimeout
 
   override def receive: Receive = {
     case command: Command ⇒
@@ -36,6 +40,11 @@ class CommandProcessor @Inject()(
 
     case RetrieveMaterialized ⇒
       materializedView forward Materialize
+
+    case RetrieveCurrentPlaylist ⇒
+      val origSender = sender()
+      val eventualQueue = (materializedView ? Materialize).mapTo[Queue]
+      eventualQueue.map(_.currentPlaylist) pipeTo origSender
 
     case setState: SetState ⇒
       materializedView forward setState
@@ -62,6 +71,8 @@ object CommandProcessor {
   trait Factory {
     def apply(): Actor
   }
+
+  case object RetrieveCurrentPlaylist
 
   case object RetrieveMaterialized
 

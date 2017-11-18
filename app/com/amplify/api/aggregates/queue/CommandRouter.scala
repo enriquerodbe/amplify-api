@@ -2,9 +2,9 @@ package com.amplify.api.aggregates.queue
 
 import akka.actor.Actor
 import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveMaterialized
-import com.amplify.api.aggregates.queue.CommandRouter.RetrieveQueue
-import com.amplify.api.domain.models.AuthenticatedVenueReq
+import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveCurrentPlaylist, RetrieveQueue}
 import com.amplify.api.domain.models.primitives.Id
+import com.amplify.api.domain.models.{AuthenticatedVenueReq, UnauthenticatedVenue}
 import javax.inject.Inject
 import play.api.libs.concurrent.InjectedActorSupport
 
@@ -19,6 +19,10 @@ class CommandRouter @Inject()(
     case RetrieveQueue(venue) ⇒
       val commandProcessor = getCommandProcessor(venue.id)
       commandProcessor forward RetrieveMaterialized
+
+    case RetrieveCurrentPlaylist(venue) ⇒
+      val commandProcessor = getCommandProcessor(venue.id)
+      commandProcessor forward CommandProcessor.RetrieveCurrentPlaylist
   }
 
   private def getCommandProcessor(venueId: Id) = {
@@ -32,4 +36,6 @@ class CommandRouter @Inject()(
 object CommandRouter {
 
   case class RetrieveQueue(venue: AuthenticatedVenueReq)
+
+  case class RetrieveCurrentPlaylist(venue: UnauthenticatedVenue)
 }

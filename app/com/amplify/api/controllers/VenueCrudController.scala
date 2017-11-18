@@ -26,6 +26,13 @@ class VenueCrudController @Inject()(
     eventualPlaylists.map(playlists ⇒ Ok(Json.toJson(playlists.map(playlistToPlaylistResponse))))
   }
 
+  def retrieveCurrentPlaylist(uid: String) = authenticatedUser() { _ ⇒
+    venueCrudLogic.retrieveCurrentPlaylist(uid).map {
+      case Some(playlist) ⇒ Ok(Json.toJson(playlistToPlaylistResponse(playlist.info)))
+      case _ ⇒ NoContent
+    }
+  }
+
   def setCurrentPlaylist() = authenticatedVenue(parse.json[PlaylistRequest]) { request ⇒
     ContentProviderIdentifier.fromString(request.body.identifier) match {
       case Success(identifier) ⇒
