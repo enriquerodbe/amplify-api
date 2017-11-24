@@ -15,7 +15,7 @@ object Converters {
   }
 
   def trackItemToTrackData(trackItem: TrackItem): TrackData = {
-    val trackIdentifier = Spotify → trackItem.track.uri
+    val trackIdentifier = Spotify → trackItem.track.id
     TrackData(trackIdentifier, trackItem.track.name, albumToAlbumData(trackItem.track.album))
   }
 

@@ -1,7 +1,7 @@
 package com.amplify.api.controllers.dtos
 
 import com.amplify.api.controllers.dtos.Artist.{ArtistResponse, artistToArtistResponse}
-import com.amplify.api.controllers.dtos.Playlist.{ImageResponse, imageToImageResponse}
+import com.amplify.api.controllers.dtos.Image.{ImageResponse, imageToImageResponse}
 import com.amplify.api.domain.models.{Album ⇒ ModelAlbum}
 import com.github.tototoshi.play.json.JsonNaming
 import play.api.libs.json.{Json, Writes}

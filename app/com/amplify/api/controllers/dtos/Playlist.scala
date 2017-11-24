@@ -1,22 +1,45 @@
 package com.amplify.api.controllers.dtos
 
-import com.amplify.api.domain.models.{Image, PlaylistInfo ⇒ ModelPlaylist}
+import com.amplify.api.controllers.dtos.Album.{AlbumResponse, albumToAlbumResponse}
+import com.amplify.api.controllers.dtos.Image.{ImageResponse, imageToImageResponse}
+import com.amplify.api.domain.models.{PlaylistInfo, Track, Playlist ⇒ ModelPlaylist}
 import com.github.tototoshi.play.json.JsonNaming
 import play.api.libs.json.{Json, Reads, Writes}
 
 object Playlist {
 
-  case class ImageResponse(url: String, height: Option[Int], width: Option[Int])
-  def imageToImageResponse(image: Image): ImageResponse = {
-    ImageResponse(image.url, image.height, image.width)
+  case class PlaylistTrackResponse(
+      name: String,
+      contentProvider: String,
+      contentIdentifier: String,
+      album: AlbumResponse)
+  def trackToPlaylistTrackResponse(track: Track): PlaylistTrackResponse = {
+    PlaylistTrackResponse(
+      track.name,
+      track.identifier.contentProvider.toString,
+      track.identifier.identifier,
+      albumToAlbumResponse(track.album))
   }
-  implicit val imageResponseWrites: Writes[ImageResponse] = {
-    JsonNaming.snakecase(Json.writes[ImageResponse])
+  implicit val playlistTrackResponseWrites: Writes[PlaylistTrackResponse] = {
+    JsonNaming.snakecase(Json.writes[PlaylistTrackResponse])
   }
 
-  case class PlaylistResponse(name: String, identifier: String, images: Seq[ImageResponse])
+  case class PlaylistInfoResponse(name: String, identifier: String, images: Seq[ImageResponse])
+  def playlistInfoToPlaylistInfoResponse(info: PlaylistInfo): PlaylistInfoResponse = {
+    PlaylistInfoResponse(
+      info.name,
+      info.identifier,
+      info.images.map(imageToImageResponse))
+  }
+  implicit val playlistInfoResponseWrites: Writes[PlaylistInfoResponse] = {
+    JsonNaming.snakecase(Json.writes[PlaylistInfoResponse])
+  }
+
+  case class PlaylistResponse(info: PlaylistInfoResponse, tracks: Seq[PlaylistTrackResponse])
   def playlistToPlaylistResponse(playlist: ModelPlaylist): PlaylistResponse = {
-    PlaylistResponse(playlist.name, playlist.identifier, playlist.images.map(imageToImageResponse))
+    PlaylistResponse(
+      playlistInfoToPlaylistInfoResponse(playlist.info),
+      playlist.tracks.map(trackToPlaylistTrackResponse))
   }
   implicit val playlistResponseWrites: Writes[PlaylistResponse] = {
     JsonNaming.snakecase(Json.writes[PlaylistResponse])

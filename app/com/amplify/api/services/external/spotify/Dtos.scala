@@ -12,7 +12,7 @@ object Dtos {
 
   case class TrackItem(track: Track)
 
-  case class Track(uri: String, name: String, album: Album)
+  case class Track(id: String, name: String, album: Album)
 
   case class Album(name: String, artists: Seq[Artist], images: Seq[Image])
 

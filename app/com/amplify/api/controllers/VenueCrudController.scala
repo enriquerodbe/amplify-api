@@ -2,7 +2,7 @@ package com.amplify.api.controllers
 
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.AuthenticatedRequests
-import com.amplify.api.controllers.dtos.Playlist.{PlaylistRequest, playlistToPlaylistResponse}
+import com.amplify.api.controllers.dtos.Playlist.{PlaylistRequest, playlistInfoToPlaylistInfoResponse, playlistToPlaylistResponse}
 import com.amplify.api.controllers.dtos.Queue.queueToQueueResponse
 import com.amplify.api.controllers.dtos.Venue.venueToVenueResponse
 import com.amplify.api.domain.logic.{VenueCrudLogic, VenuePlayerLogic}
@@ -11,7 +11,6 @@ import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.Controller
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.reflectiveCalls
 import scala.util.{Failure, Success}
 
 // scalastyle:off public.methods.have.type
@@ -23,12 +22,14 @@ class VenueCrudController @Inject()(
 
   def retrievePlaylists() = authenticatedVenue() { request ⇒
     val eventualPlaylists = venueCrudLogic.retrievePlaylists(request.subject.venueReq)
-    eventualPlaylists.map(playlists ⇒ Ok(Json.toJson(playlists.map(playlistToPlaylistResponse))))
+    eventualPlaylists.map { playlists =>
+      Ok(Json.toJson(playlists.map(playlistInfoToPlaylistInfoResponse)))
+    }
   }
 
   def retrieveCurrentPlaylist(uid: String) = authenticatedUser() { _ ⇒
     venueCrudLogic.retrieveCurrentPlaylist(uid).map {
-      case Some(playlist) ⇒ Ok(Json.toJson(playlistToPlaylistResponse(playlist.info)))
+      case Some(playlist) ⇒ Ok(Json.toJson(playlistToPlaylistResponse(playlist)))
       case _ ⇒ NoContent
     }
   }

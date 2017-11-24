@@ -38,7 +38,7 @@ class SpotifyContentProvider @Inject()(
       playlistIdentifier: Identifier)(
       implicit token: AuthToken): Future[Seq[TrackData]] = {
     val path = s"/users/$userIdentifier/playlists/$playlistIdentifier/tracks"
-    val query = Map("fields" → "next,total,items(track(uri,name,album))")
+    val query = Map("fields" → "next,total,items(track(id,name,album))")
     val eventualItems = paginatedFetch[TrackItem](path, query, Seq.empty, 0)
     eventualItems.map(_.map(trackItemToTrackData))
   }
