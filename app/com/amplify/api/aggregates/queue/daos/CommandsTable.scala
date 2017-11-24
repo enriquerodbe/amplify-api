@@ -1,5 +1,6 @@
-package com.amplify.api.aggregates.queue
+package com.amplify.api.aggregates.queue.daos
 
+import com.amplify.api.aggregates.queue.CommandType
 import com.amplify.api.aggregates.queue.CommandType.QueueCommandType
 import com.amplify.api.daos.schema.BaseTable
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
@@ -26,7 +27,7 @@ trait CommandsTable extends BaseTable {
 
     def contentIdentifier =
       (contentProvider, contentProviderIdentifier) <>
-        (mapOptionalProviderIdentifier, unmapOptionalProviderIdentifier)
+        (mapOptionalContentProviderIdentifier, unmapOptionalContentProviderIdentifier)
 
     def * = (id, venueId, userId, queueCommandType, contentIdentifier, createdAt) <>
       (CommandDb.tupled, CommandDb.unapply)

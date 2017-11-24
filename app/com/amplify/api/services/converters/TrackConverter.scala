@@ -2,7 +2,7 @@ package com.amplify.api.services.converters
 
 import com.amplify.api.domain.models.Track
 import com.amplify.api.services.converters.AlbumConverter.albumDataToAlbum
-import com.amplify.api.services.external.models.TrackData
+import com.amplify.api.services.models.TrackData
 
 object TrackConverter {
 

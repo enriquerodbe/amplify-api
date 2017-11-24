@@ -3,7 +3,7 @@ package com.amplify.api.services.converters
 import com.amplify.api.domain.models.Album
 import com.amplify.api.services.converters.ArtistConverter.artistDataToArtist
 import com.amplify.api.services.converters.PlaylistConverter.imageDataToImage
-import com.amplify.api.services.external.models.AlbumData
+import com.amplify.api.services.models.AlbumData
 
 object AlbumConverter {
 

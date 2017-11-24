@@ -1,4 +1,4 @@
-package com.amplify.api.aggregates.queue
+package com.amplify.api.aggregates.queue.daos
 
 import com.amplify.api.aggregates.queue.EventType.QueueEventType
 import com.amplify.api.domain.models._

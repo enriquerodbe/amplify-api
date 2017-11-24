@@ -1,6 +1,7 @@
 package com.amplify.api.domain.models
 
-import com.amplify.api.domain.models.primitives.{Id, Name, Uid}
+import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
+import com.amplify.api.domain.models.primitives.{Id, Name, Token, Uid}
 
 trait Venue {
 
@@ -12,7 +13,8 @@ trait Venue {
 case class UnauthenticatedVenue(
     id: Id,
     name: Name,
-    uid: Uid) extends Venue
+    uid: Uid,
+    fcmToken: Option[Token]) extends Venue
 
 case class AuthenticatedVenue(
     user: AuthenticatedUser,
@@ -23,6 +25,8 @@ case class AuthenticatedVenue(
   override def uid: Uid = unauthenticated.uid
 
   def id: Id = unauthenticated.id
+
+  def contentProviders: ContentProviderType = ContentProviderType.Spotify
 }
 
 case class AuthenticatedVenueReq(venue: AuthenticatedVenue, authToken: AuthToken) extends Venue {
@@ -35,5 +39,9 @@ case class AuthenticatedVenueReq(venue: AuthenticatedVenue, authToken: AuthToken
 
   def id: Id = venue.id
 
-  def userIdentifier: ContentProviderIdentifier = user.identifier
+  def userIdentifier: AuthProviderIdentifier = user.identifier
+
+  def contentProviders: ContentProviderType = venue.contentProviders
+
+  def unauthenticated: UnauthenticatedVenue = venue.unauthenticated
 }

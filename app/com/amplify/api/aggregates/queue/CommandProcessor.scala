@@ -1,25 +1,25 @@
 package com.amplify.api.aggregates.queue
 
-import akka.actor.{Actor, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import akka.pattern.{ask, pipe}
 import com.amplify.api.aggregates.queue.CommandConverter.commandToCommandDb
 import com.amplify.api.aggregates.queue.CommandProcessor._
 import com.amplify.api.aggregates.queue.CommandType.QueueCommandType
-import com.amplify.api.aggregates.queue.Event.{CurrentPlaylistSet, CurrentTrackSkipped, VenueTrackAdded, VenueTracksRemoved}
+import com.amplify.api.aggregates.queue.Event._
 import com.amplify.api.aggregates.queue.EventConverter.queueEventToQueueEventDb
 import com.amplify.api.aggregates.queue.MaterializedView.{EventsBatch, Materialize, SetState}
+import com.amplify.api.aggregates.queue.daos.{CommandDao, EventDao}
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.Id
-import com.amplify.api.services.VenueService
-import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{Inject, Named}
+import scala.concurrent.ExecutionContext
 
 class CommandProcessor @Inject()(
     envConfig: EnvConfig,
+    @Named("push-notification-gateway") pushNotificationGateway: ActorRef,
     commandDao: CommandDao,
-    eventDao: EventDao,
-    venueService: VenueService)(
+    eventDao: EventDao)(
     implicit ec: ExecutionContext) extends Actor {
 
   val materializedView = context.actorOf(Props[MaterializedView])
@@ -32,10 +32,13 @@ class CommandProcessor @Inject()(
       val future =
         for {
           commandDb ← commandDao.create(commandToCommandDb(command))
-          events ← createEvents(command)
+          events = createEvents(command)
           _ ← eventDao.create(events.map(queueEventToQueueEventDb(commandDb, _)))
         }
-        yield materializedView ! EventsBatch(events)
+        yield {
+          materializedView ! EventsBatch(events)
+          pushNotificationGateway ! command
+        }
       future pipeTo origSender
 
     case RetrieveMaterialized ⇒
@@ -50,19 +53,19 @@ class CommandProcessor @Inject()(
       materializedView forward setState
   }
 
-  private def createEvents(command: Command): Future[Seq[Event]] = command match {
-    case SetCurrentPlaylist(venue, playlistIdentifier) ⇒
-      val eventualPlaylist = venueService.retrievePlaylist(venue, playlistIdentifier)
-      eventualPlaylist.map { playlist ⇒
-        val tracksEvents = playlist.tracks.map(VenueTrackAdded)
-        VenueTracksRemoved +: tracksEvents :+ CurrentPlaylistSet(playlist)
-      }
+  private def createEvents(command: Command): Seq[Event] = command match {
+    case SetCurrentPlaylist(_, playlist) ⇒
+      val tracksEvents = playlist.tracks.map(VenueTrackAdded)
+      VenueTracksRemoved +: tracksEvents :+ CurrentPlaylistSet(playlist)
 
     case SkipCurrentTrack(_) ⇒
-      Future.successful(Seq(CurrentTrackSkipped))
+      Seq(CurrentTrackSkipped)
 
     case StartPlayback(_) | PausePlayback(_) ⇒
-      Future.successful(Seq.empty[Event])
+      Seq.empty[Event]
+
+    case AddTrack(_, user, trackIdentifier) ⇒
+      Seq(UserTrackAdded(user, trackIdentifier))
   }
 }
 
@@ -78,7 +81,7 @@ object CommandProcessor {
 
   sealed trait Command {
 
-    def venue: AuthenticatedVenueReq
+    def venue: UnauthenticatedVenue
 
     def userId: Option[Id] = None
 
@@ -87,27 +90,35 @@ object CommandProcessor {
     def contentIdentifier: Option[ContentProviderIdentifier] = None
   }
 
-  case class SetCurrentPlaylist(
-      venue: AuthenticatedVenueReq,
-      playlistIdentifier: ContentProviderIdentifier) extends Command {
+  case class SetCurrentPlaylist(venue: UnauthenticatedVenue, playlist: Playlist) extends Command {
 
     override def queueCommandType: QueueCommandType = CommandType.SetCurrentPlaylist
 
-    override def contentIdentifier: Option[ContentProviderIdentifier] = Some(playlistIdentifier)
+    override def contentIdentifier: Option[ContentProviderIdentifier] = {
+      Some(playlist.info.identifier)
+    }
   }
 
-  case class StartPlayback(venue: AuthenticatedVenueReq) extends Command {
+  case class StartPlayback(venue: UnauthenticatedVenue) extends Command {
 
     override def queueCommandType: QueueCommandType = CommandType.StartPlayback
   }
 
-  case class PausePlayback(venue: AuthenticatedVenueReq) extends Command {
+  case class PausePlayback(venue: UnauthenticatedVenue) extends Command {
 
     override def queueCommandType: QueueCommandType = CommandType.PausePlayback
   }
 
-  case class SkipCurrentTrack(venue: AuthenticatedVenueReq) extends Command {
+  case class SkipCurrentTrack(venue: UnauthenticatedVenue) extends Command {
 
     override def queueCommandType: QueueCommandType = CommandType.SkipCurrentTrack
+  }
+
+  case class AddTrack(
+      venue: UnauthenticatedVenue,
+      user: User,
+      trackIdentifier: ContentProviderIdentifier) extends Command {
+
+    override def queueCommandType: QueueCommandType = CommandType.AddTrack
   }
 }

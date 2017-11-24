@@ -1,8 +1,8 @@
 package com.amplify.api.daos.schema
 
 import com.amplify.api.daos.models.UserDb
-import com.amplify.api.domain.models.ContentProviderIdentifier
-import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
+import com.amplify.api.domain.models.AuthProviderIdentifier
+import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
 import com.amplify.api.domain.models.primitives.{Id, Identifier, Name}
 
 trait UsersTable extends BaseTable {
@@ -14,12 +14,12 @@ trait UsersTable extends BaseTable {
   class Users(tag: Tag) extends Table[UserDb](tag, "users") {
     def id = column[Id]("id", O.PrimaryKey, O.AutoInc)
     def name = column[Name]("name")
-    def authProviderType = column[ContentProviderType]("auth_provider")
+    def authProviderType = column[AuthProviderType]("auth_provider")
     def authIdentifier = column[Identifier]("auth_identifier")
 
     def contentProviderIdentifier =
       (authProviderType, authIdentifier) <>
-        ((ContentProviderIdentifier.apply _).tupled, ContentProviderIdentifier.unapply)
+        ((AuthProviderIdentifier.apply _).tupled, AuthProviderIdentifier.unapply)
 
     def * = (id, name, contentProviderIdentifier) <> (UserDb.tupled, UserDb.unapply)
   }

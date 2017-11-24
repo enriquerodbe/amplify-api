@@ -1,7 +1,5 @@
 package com.amplify.api.domain.models
 
-import scala.language.implicitConversions
-
 object ContentProviderType extends Enumeration {
 
   type ContentProviderType = Value

@@ -17,6 +17,4 @@ object Dtos {
   case class Album(name: String, artists: Seq[Artist], images: Seq[Image])
 
   case class Artist(name: String)
-
-  case class Page[T](items: Seq[T], total: Int, next: Option[String])
 }

@@ -48,7 +48,7 @@ class VenueCrudControllerSpec
 
     "fail" when {
       "Spotify responds with unexpectedly" in new RetrievePlaylistsFixture {
-        when(spotifyProvider.fetchPlaylists(aliceAuthToken))
+        when(spotifyContentProvider.fetchPlaylists(aliceAuthToken))
           .thenThrow(classOf[UnexpectedResponse])
 
         intercept[UnexpectedResponse] {

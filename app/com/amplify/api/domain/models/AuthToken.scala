@@ -1,8 +1,8 @@
 package com.amplify.api.domain.models
 
-import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
+import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
 
-case class AuthToken(contentProvider: ContentProviderType, token: String) {
+case class AuthToken(authProvider: AuthProviderType, token: String) {
 
-  override def toString: String = s"$contentProvider:$token"
+  override def toString: String = s"$authProvider:$token"
 }

@@ -1,10 +1,11 @@
 package com.amplify.api.it.fixtures
 
 import com.amplify.api.domain.models.AuthToken
+import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
 import com.amplify.api.domain.models.ContentProviderType.Spotify
 import com.amplify.api.exceptions.UserAuthTokenNotFound
-import com.amplify.api.services.external.models._
-import com.amplify.api.services.external.spotify.SpotifyContentProvider
+import com.amplify.api.services.models._
+import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
 import org.mockito.Mockito.when
 import play.api.test.FakeRequest
 import play.mvc.Http.HeaderNames
@@ -12,16 +13,17 @@ import scala.concurrent.Future
 
 trait SpotifyContext extends CommonData {
 
-  def spotifyProvider: SpotifyContentProvider
+  def spotifyContentProvider: SpotifyContentProvider
+  def spotifyAuthProvider: SpotifyAuthProvider
 
   val authorizationHeader = HeaderNames.AUTHORIZATION
   val aliceToken = "alice-token"
   val bobToken = "bob-token"
   val invalidToken = "invalid-token"
 
-  val aliceAuthToken = AuthToken(Spotify, aliceToken)
-  val bobAuthToken = AuthToken(Spotify, bobToken)
-  val invalidAuthToken = AuthToken(Spotify, invalidToken)
+  implicit val aliceAuthToken = AuthToken(AuthSpotify, aliceToken)
+  val bobAuthToken = AuthToken(AuthSpotify, bobToken)
+  val invalidAuthToken = AuthToken(AuthSpotify, invalidToken)
 
   def tokenHeader(token: String): (String, String) = authorizationHeader → s"Bearer $token"
 
@@ -36,7 +38,7 @@ trait SpotifyContext extends CommonData {
     def withBobToken: FakeRequest[T] = withAuthToken(bobToken)
   }
 
-  val aliceUserData = UserData(Spotify → aliceSpotifyId, "Alice Cooper")
+  val aliceUserData = UserData(AuthSpotify → aliceSpotifyId, "Alice Cooper")
   val alicePlaylistIdentifier = "alice-playlist"
   val trashAlbumData = AlbumData("Trash", Seq(ArtistData("Alice Cooper")), Seq.empty)
   val poisonTrackData = TrackData(Spotify → "track:poison", "Poison", trashAlbumData)
@@ -46,15 +48,16 @@ trait SpotifyContext extends CommonData {
   val alicePlaylistImages = Seq(ImageData("url", Some(360), Some(360)))
   val alicePlaylistData =
     PlaylistData(Spotify → alicePlaylistIdentifier, "Alice playlist", alicePlaylistImages)
-  val bobUserData = UserData(Spotify → bobSpotifyId, "Bob Marley")
+  val bobUserData = UserData(AuthSpotify → bobSpotifyId, "Bob Marley")
 
-  when(spotifyProvider.fetchUser(aliceAuthToken)).thenReturn(Future.successful(aliceUserData))
-  when(spotifyProvider.fetchUser(bobAuthToken)).thenReturn(Future.successful(bobUserData))
-  when(spotifyProvider.fetchUser(invalidAuthToken)).thenReturn(Future.failed(UserAuthTokenNotFound))
-  when(spotifyProvider.fetchPlaylists(aliceAuthToken))
+  when(spotifyAuthProvider.fetchUser(aliceAuthToken)).thenReturn(Future.successful(aliceUserData))
+  when(spotifyAuthProvider.fetchUser(bobAuthToken)).thenReturn(Future.successful(bobUserData))
+  when(spotifyAuthProvider.fetchUser(invalidAuthToken))
+    .thenReturn(Future.failed(UserAuthTokenNotFound))
+  when(spotifyContentProvider.fetchPlaylists(aliceAuthToken))
     .thenReturn(Future.successful(Seq(alicePlaylistData)))
-  when(spotifyProvider.fetchPlaylist(aliceSpotifyId, alicePlaylistIdentifier)(aliceAuthToken))
+  when(spotifyContentProvider.fetchPlaylist(aliceSpotifyId, alicePlaylistIdentifier))
     .thenReturn(Future.successful(alicePlaylistData))
-  when(spotifyProvider.fetchPlaylistTracks(aliceSpotifyId, alicePlaylistIdentifier)(aliceAuthToken))
+  when(spotifyContentProvider.fetchPlaylistTracks(aliceSpotifyId, alicePlaylistIdentifier))
     .thenReturn(Future.successful(alicePlaylistTracks))
 }

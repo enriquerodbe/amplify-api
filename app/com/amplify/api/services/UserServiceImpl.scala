@@ -1,11 +1,11 @@
 package com.amplify.api.services
 
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
-import com.amplify.api.domain.models.{AuthenticatedUser, ContentProviderIdentifier, UnauthenticatedVenue}
+import com.amplify.api.domain.models.{AuthenticatedUser, AuthProviderIdentifier, UnauthenticatedVenue}
 import com.amplify.api.exceptions.UserNotFoundByIdentifier
 import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
 import com.amplify.api.services.converters.VenueConverter.venueDbToVenue
-import com.amplify.api.services.external.models.UserData
+import com.amplify.api.services.models.UserData
 import com.amplify.api.utils.DbioUtils.DbioT
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -17,7 +17,7 @@ class UserServiceImpl @Inject()(
     implicit ec: ExecutionContext) extends UserService {
 
   override def retrieve(
-      identifier: ContentProviderIdentifier
+      identifier: AuthProviderIdentifier
   ): Future[(AuthenticatedUser, Option[UnauthenticatedVenue])] = {
     val action =
       for {

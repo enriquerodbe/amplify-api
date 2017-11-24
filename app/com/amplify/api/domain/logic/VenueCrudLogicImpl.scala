@@ -35,7 +35,12 @@ class VenueCrudLogicImpl @Inject()(
   override def setCurrentPlaylist(
       venueReq: AuthenticatedVenueReq,
       playlistIdentifier: ContentProviderIdentifier): Future[Unit] = {
-    (queueCommandRouter ? SetCurrentPlaylist(venueReq, playlistIdentifier)).mapTo[Unit]
+    for {
+      playlist ← venueService.retrievePlaylist(venueReq, playlistIdentifier)
+      unauthenticatedVenue = venueReq.unauthenticated
+      result ← (queueCommandRouter ? SetCurrentPlaylist(unauthenticatedVenue, playlist)).mapTo[Unit]
+    }
+    yield result
   }
 
   override def setFcmToken(venue: AuthenticatedVenue, token: Token): Future[Unit] = {

@@ -1,5 +1,6 @@
-package com.amplify.api.aggregates.queue
+package com.amplify.api.aggregates.queue.daos
 
+import com.amplify.api.aggregates.queue.EventType
 import com.amplify.api.aggregates.queue.EventType.QueueEventType
 import com.amplify.api.daos.schema.BaseTable
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
@@ -25,7 +26,7 @@ trait EventsTable extends BaseTable {
 
     def contentIdentifier =
       (contentProvider, contentProviderIdentifier) <>
-        (mapOptionalProviderIdentifier, unmapOptionalProviderIdentifier)
+        (mapOptionalContentProviderIdentifier, unmapOptionalContentProviderIdentifier)
 
     def * = (id, queueCommandId, eventType, contentIdentifier, createdAt) <>
       (EventDb.tupled, EventDb.unapply)

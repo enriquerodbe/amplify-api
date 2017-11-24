@@ -1,27 +1,30 @@
 package com.amplify.api.utils
 
+import com.amplify.api.domain.models.AuthToken
 import com.amplify.api.exceptions.{AppExceptionCode, InternalException}
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json, Reads}
 import play.api.libs.ws.{WSResponse, WSClient ⇒ PlayClient}
+import play.mvc.Http.HeaderNames.AUTHORIZATION
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
 
-trait WsClient {
+trait OAuthClient {
 
   implicit val ec: ExecutionContext
   val ws: PlayClient
   val baseUrl: String
 
-  val MAX_WAIT_RESPONSE = 20.seconds
+  private val MAX_WAIT_RESPONSE = 20.seconds
 
-  private lazy val logger = Logger(classOf[WsClient])
+  private lazy val logger = Logger(classOf[OAuthClient])
 
   def apiGet[T](
       path: String,
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty)(
-      implicit reads: Reads[T]): Future[T] = {
+      implicit reads: Reads[T],
+      token: AuthToken): Future[T] = {
     apiCallForResponse[T]("GET", path, query, headers)
   }
 
@@ -30,7 +33,8 @@ trait WsClient {
       body: JsValue = Json.obj(),
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty)(
-      implicit reads: Reads[T]): Future[T] = {
+      implicit reads: Reads[T],
+      token: AuthToken): Future[T] = {
     apiCallForResponse[T]("POST", path, query, headers, Json.stringify(body))
   }
 
@@ -38,26 +42,31 @@ trait WsClient {
       path: String,
       body: JsValue = Json.obj(),
       query: Map[String, String] = Map.empty,
-      headers: Map[String, String] = Map.empty): Future[WSResponse] = {
+      headers: Map[String, String] = Map.empty)(
+      implicit token: AuthToken): Future[WSResponse] = {
     apiCall("PUT", path, query, headers, Json.stringify(body))
   }
 
   def apiDelete(path: String,
       query: Map[String, String] = Map.empty,
-      headers: Map[String, String] = Map.empty): Future[WSResponse] = {
+      headers: Map[String, String] = Map.empty)(
+      implicit token: AuthToken): Future[WSResponse] = {
     apiCall("DELETE", path, query, headers)
   }
 
-  protected def apiCall(
+  def apiCall(
       method: String,
       path: String,
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty,
-      body: String = "") = {
+      body: String = "")(
+      implicit token: AuthToken): Future[WSResponse] = {
+    val authorizedHeaders = headers.updated(AUTHORIZATION, s"Bearer ${token.token}")
+
     val request =
       ws.url(s"$baseUrl$path")
         .withRequestTimeout(MAX_WAIT_RESPONSE)
-        .withHeaders(headers.toSeq: _*)
+        .withHeaders(authorizedHeaders.toSeq: _*)
         .withQueryString(query.toSeq: _*)
 
     val requestWithBody = if (body.isEmpty) request else request.withBody(body)
@@ -73,7 +82,8 @@ trait WsClient {
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty,
       body: String = "")(
-      implicit reads: Reads[T]) = {
+      implicit reads: Reads[T],
+      token: AuthToken): Future[T] = {
     apiCall(method, path, query, headers, body).flatMap(r ⇒ validate[T](r.json))
   }
 
@@ -81,7 +91,7 @@ trait WsClient {
     Future.successful(response)
   }
 
-  protected def validate[T](json: JsValue)(implicit reads: Reads[T]) = {
+  protected def validate[T](json: JsValue)(implicit reads: Reads[T]): Future[T] = {
     json.validate[T].asEither match {
       case Left(errors) =>
         val errorsString = errors.map(e => s"${e._1}: ${e._2.map(_.message)}").mkString(", ")

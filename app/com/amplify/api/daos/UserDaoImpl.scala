@@ -2,7 +2,7 @@ package com.amplify.api.daos
 
 import com.amplify.api.daos.models.UserDb
 import com.amplify.api.daos.schema.UsersTable
-import com.amplify.api.domain.models.ContentProviderIdentifier
+import com.amplify.api.domain.models.{AuthProviderIdentifier, ContentProviderIdentifier}
 import com.amplify.api.domain.models.primitives.Id
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
@@ -18,10 +18,10 @@ class UserDaoImpl @Inject()(
     usersTable.filter(_.id === id).result.headOption
   }
 
-  override def retrieve(identifier: ContentProviderIdentifier): DBIO[Option[UserDb]] = {
+  override def retrieve(identifier: AuthProviderIdentifier): DBIO[Option[UserDb]] = {
     val query = usersTable.filter { user ⇒
       user.authIdentifier === identifier.identifier &&
-        user.authProviderType === identifier.contentProvider
+        user.authProviderType === identifier.authProvider
     }
 
     query.result.headOption

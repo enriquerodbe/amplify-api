@@ -1,14 +1,13 @@
 package com.amplify.api.services.converters
 
-import com.amplify.api.controllers.dtos.Venue.VenueRequest
 import com.amplify.api.daos.models.VenueDb
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.{Id, Uid}
+import com.amplify.api.domain.models.primitives.{Id, Name, Uid}
 
 object VenueConverter {
 
   def venueDbToVenue(venueDb: VenueDb): UnauthenticatedVenue = {
-    UnauthenticatedVenue(venueDb.id, venueDb.name, venueDb.uid)
+    UnauthenticatedVenue(venueDb.id, venueDb.name, venueDb.uid, venueDb.fcmToken)
   }
 
   def venueDbToAuthenticatedVenue(
@@ -17,7 +16,7 @@ object VenueConverter {
     AuthenticatedVenue(user, venueDbToVenue(venueDb))
   }
 
-  def venueReqToVenueDb(venueReq: VenueRequest, userId: Id): VenueDb = {
-    VenueDb(name = venueReq.name, userId = userId, uid = Uid(), fcmToken = None)
+  def venueReqToVenueDb(name: Name, userId: Id): VenueDb = {
+    VenueDb(name = name, userId = userId, uid = Uid(), fcmToken = None)
   }
 }

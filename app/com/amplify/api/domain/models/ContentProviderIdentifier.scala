@@ -6,9 +6,7 @@ import com.amplify.api.exceptions.InvalidProviderIdentifier
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 
-case class ContentProviderIdentifier(
-    contentProvider: ContentProviderType,
-    identifier: Identifier) {
+case class ContentProviderIdentifier(contentProvider: ContentProviderType, identifier: Identifier) {
 
   override def toString: String = {
     s"$contentProvider${ContentProviderIdentifier.SEPARATOR}$identifier"

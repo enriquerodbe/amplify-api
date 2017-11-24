@@ -13,6 +13,7 @@ lazy val dependencies = Seq(
   "be.objectify" %% "deadbolt-scala" % "2.5.1",
   "com.iheart" %% "play-swagger" % "0.5.4",
   "org.webjars" % "swagger-ui" % "2.2.0",
+  "com.google.api-client" % "google-api-client" % "1.23.0",
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % "it,test",
   "org.mockito" % "mockito-core" % "2.8.47" % "it,test")
 

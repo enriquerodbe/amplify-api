@@ -1,11 +1,11 @@
 package com.amplify.api.exceptions
 
-import com.amplify.api.domain.models.ContentProviderIdentifier
+import com.amplify.api.domain.models.AuthProviderIdentifier
 import com.amplify.api.domain.models.primitives.Id
 
 trait UserException
 
-case class UserNotFoundByIdentifier(identifier: ContentProviderIdentifier)
+case class UserNotFoundByIdentifier(identifier: AuthProviderIdentifier)
   extends UnauthorizedException(AppExceptionCode.UserNotFound,
     s"User with identifier $identifier not found")
     with UserException

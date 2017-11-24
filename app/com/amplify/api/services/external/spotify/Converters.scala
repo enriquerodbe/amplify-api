@@ -1,12 +1,13 @@
 package com.amplify.api.services.external.spotify
 
+import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
 import com.amplify.api.domain.models.ContentProviderType.Spotify
-import com.amplify.api.services.external.models._
+import com.amplify.api.services.models._
 import com.amplify.api.services.external.spotify.Dtos._
 
 object Converters {
 
-  def userToUserData(user: User): UserData = UserData(Spotify → user.id, user.displayName)
+  def userToUserData(user: User): UserData = UserData(AuthSpotify → user.id, user.displayName)
 
   def imageToImageData(image: Image): ImageData = ImageData(image.url, image.height, image.width)
 

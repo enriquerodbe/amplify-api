@@ -20,7 +20,7 @@ class VenueAuthController @Inject()(
   def signUp = Action.async(parse.json[VenueRequest]) { request ⇒
     authHeadersUtil.getAuthToken(request) match {
       case Success(authToken) ⇒
-        val eventualVenue = venueAuthLogic.signUp(authToken, request.body)
+        val eventualVenue = venueAuthLogic.signUp(authToken, request.body.name)
         eventualVenue.map(venue ⇒ Ok(Json.toJson(venueToVenueResponse(venue))))
       case Failure(exception) ⇒
         Future.failed(exception)

@@ -4,32 +4,35 @@ import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models.AuthToken
 import com.amplify.api.domain.models.primitives.Identifier
 import com.amplify.api.services.external._
-import com.amplify.api.services.external.models.{PlaylistData, TrackData, UserData}
-import com.amplify.api.services.external.spotify.Converters.{playlistToPlaylistData, trackItemToTrackData, userToUserData}
-import com.amplify.api.services.external.spotify.Dtos.{Playlist, Playlists, TrackItem, User ⇒ SpotifyUser}
+import com.amplify.api.services.models.{PlaylistData, TrackData}
+import com.amplify.api.services.external.spotify.Converters.{playlistToPlaylistData, trackItemToTrackData}
+import com.amplify.api.services.external.spotify.Dtos.{Playlist, Playlists, TrackItem}
 import com.amplify.api.services.external.spotify.JsonConverters._
+import com.amplify.api.utils.Pagination
 import javax.inject.Inject
 import play.api.libs.ws.WSClient
 import scala.concurrent.{ExecutionContext, Future}
 
 class SpotifyContentProvider @Inject()(
-    val ws: WSClient,
-    val envConfig: EnvConfig)(
-    implicit val ec: ExecutionContext) extends ContentProviderStrategy with SpotifyBaseClient {
+    override val ws: WSClient,
+    override val envConfig: EnvConfig)(
+    override implicit val ec: ExecutionContext)
+  extends ContentProviderStrategy with SpotifyBaseProvider with Pagination {
 
-  override def fetchUser(implicit token: AuthToken): Future[UserData] = {
-    spotifyGet[SpotifyUser]("/me").map(userToUserData)
-  }
+  override val itemsField = "items"
+  override val totalField = "total"
+  override val nextField = "next"
+  override val paginationOffsetHeader = "offset"
 
   override def fetchPlaylists(implicit token: AuthToken): Future[Seq[PlaylistData]] = {
-    spotifyGet[Playlists]("/me/playlists").map(_.items.map(playlistToPlaylistData))
+    apiGet[Playlists]("/me/playlists").map(_.items.map(playlistToPlaylistData))
   }
 
   override def fetchPlaylist(
       userIdentifier: Identifier,
       playlistIdentifier: Identifier)(
       implicit authToken: AuthToken): Future[PlaylistData] = {
-    val playlist = spotifyGet[Playlist](s"/users/$userIdentifier/playlists/$playlistIdentifier")
+    val playlist = apiGet[Playlist](s"/users/$userIdentifier/playlists/$playlistIdentifier")
     playlist.map(playlistToPlaylistData)
   }
 

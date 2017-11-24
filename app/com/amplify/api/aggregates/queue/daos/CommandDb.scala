@@ -1,4 +1,4 @@
-package com.amplify.api.aggregates.queue
+package com.amplify.api.aggregates.queue.daos
 
 import com.amplify.api.aggregates.queue.CommandType.QueueCommandType
 import com.amplify.api.domain.models.ContentProviderIdentifier

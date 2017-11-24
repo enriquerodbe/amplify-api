@@ -1,4 +1,4 @@
-package com.amplify.api.aggregates.queue
+package com.amplify.api.aggregates.queue.daos
 
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider

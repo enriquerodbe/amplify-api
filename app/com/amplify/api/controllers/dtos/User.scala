@@ -8,7 +8,7 @@ object User {
 
   case class UserResponse(name: String, identifier: String)
   def authenticatedUserToUserResponse(authUser: AuthenticatedUser): UserResponse = {
-    UserResponse(authUser.name, authUser.identifier)
+    UserResponse(authUser.name, authUser.identifier.toString)
   }
   implicit val userResponseWrites: Writes[UserResponse] = {
     JsonNaming.snakecase(Json.writes[UserResponse])

@@ -11,5 +11,9 @@ class EnvConfig @Inject()(configuration: Configuration) {
 
   val spotifyUrl = getString("spotify.web_api.url")
 
-  val defaultAskTimeout = Timeout(2000.millis)
+  val defaultAskTimeout = Timeout(3.seconds)
+
+  val firebasePrivateKey = getString("google.firebase.private_key")
+
+  val firebaseSendEndpoint = getString("google.firebase.send_endpoint")
 }

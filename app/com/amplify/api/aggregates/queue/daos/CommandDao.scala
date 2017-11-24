@@ -1,4 +1,4 @@
-package com.amplify.api.aggregates.queue
+package com.amplify.api.aggregates.queue.daos
 
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future

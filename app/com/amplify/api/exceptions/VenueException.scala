@@ -1,7 +1,7 @@
 package com.amplify.api.exceptions
 
 import com.amplify.api.domain.models.primitives.{Id, Uid}
-import com.amplify.api.domain.models.{ContentProviderIdentifier, Venue}
+import com.amplify.api.domain.models.{AuthProviderIdentifier, Venue}
 
 trait VenueException
 
@@ -11,7 +11,7 @@ case class UserAlreadyHasVenue(venue: Venue)
     s"User already registered a venue: ${venue.name}")
     with VenueException
 
-case class VenueNotFoundByUserIdentifier(userIdentifier: ContentProviderIdentifier)
+case class VenueNotFoundByUserIdentifier(userIdentifier: AuthProviderIdentifier)
   extends UnauthorizedException(
       AppExceptionCode.VenueNotFound,
       s"Venue not found for user identifier $userIdentifier")

@@ -8,6 +8,7 @@ object CommandType extends Enumeration {
   SetCurrentPlaylist,
   StartPlayback,
   PausePlayback,
-  SkipCurrentTrack
+  SkipCurrentTrack,
+  AddTrack
   = Value
 }

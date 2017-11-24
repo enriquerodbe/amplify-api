@@ -1,6 +1,6 @@
 package com.amplify.api.it.fixtures
 
-import com.amplify.api.aggregates.queue.{CommandDb, CommandsTable}
+import com.amplify.api.aggregates.queue.daos.{CommandDb, CommandsTable}
 import com.amplify.api.domain.models.primitives.Id
 
 trait QueueCommandDbFixture extends BaseDbFixture with CommandsTable {
