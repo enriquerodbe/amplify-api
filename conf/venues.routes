@@ -248,7 +248,6 @@ GET    /me    com.amplify.api.controllers.VenueCrudController.retrieveCurrent
 #  - name: token
 #    in: body
 #    required: true
-#    type: string
 #    schema:
 #      $ref: '#/definitions/com.amplify.api.controllers.dtos.FcmToken.FcmTokenRequest'
 ###
