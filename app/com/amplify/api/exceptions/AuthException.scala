@@ -5,7 +5,7 @@ sealed trait AuthException
 case object UserAuthTokenNotFound
   extends UnauthorizedException(
     AppExceptionCode.UserAuthTokenNotFound,
-    s"User authentication token not found")
+    "User authentication token not found")
     with AuthException
 
 case class WrongAuthorizationHeader(header: String)
@@ -20,5 +20,5 @@ case class UnsupportedAuthProvider(authProviderName: String)
     with AuthException
 
 case object MissingAuthTokenHeader
-  extends BadRequestException(AppExceptionCode.MissingAuthTokenHeader, s"Missing auth-token header")
+  extends BadRequestException(AppExceptionCode.MissingAuthTokenHeader, "Missing auth-token header")
     with AuthException

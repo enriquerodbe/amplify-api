@@ -1,7 +1,7 @@
 package com.amplify.api.daos.schema
 
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
-import com.amplify.api.domain.models.primitives.{Id, Identifier, Name, Uid}
+import com.amplify.api.domain.models.primitives._
 import com.amplify.api.domain.models.{ContentProviderIdentifier, ContentProviderType}
 import java.sql.Timestamp
 import java.time.Instant
@@ -19,6 +19,9 @@ trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
   implicit val nameType =
     MappedColumnType.base[Name, String](_.value, Name.apply)
+
+  implicit val tokenType =
+    MappedColumnType.base[Token, String](_.value, Token.apply)
 
   implicit val identifierType =
     MappedColumnType.base[Identifier, String](_.value, Identifier.apply)

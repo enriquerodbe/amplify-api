@@ -10,7 +10,7 @@ trait VenueDbFixture extends BaseDbFixture with CommonData with VenuesTable with
   import profile.api._
 
   val aliceUserDb = UserDb(aliceUserDbId, "Alice Cooper", Spotify → aliceSpotifyId)
-  val aliceVenueDb = VenueDb(aliceVenueDbId, "Alice's Bar", aliceUserDb.id, aliceVenueUid)
+  val aliceVenueDb = VenueDb(aliceVenueDbId, "Alice's Bar", aliceUserDb.id, aliceVenueUid, None)
   val bobUserDb = UserDb(bobUserDbId, "Bob Marley", Spotify → bobSpotifyId)
 
   def insertUser(user: UserDb): Id = {
@@ -25,6 +25,9 @@ trait VenueDbFixture extends BaseDbFixture with CommonData with VenuesTable with
   }
   def findVenues(name: String): Seq[VenueDb] = {
     db.run(venuesTable.filter(_.name === Name(name)).result).await()
+  }
+  def getVenue(id: Id): VenueDb = {
+    db.run(venuesTable.filter(_.id === id).result.head).await()
   }
 
   insertUser(aliceUserDb)

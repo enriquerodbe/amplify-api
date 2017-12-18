@@ -18,6 +18,6 @@ object VenueConverter {
   }
 
   def venueReqToVenueDb(venueReq: VenueRequest, userId: Id): VenueDb = {
-    VenueDb(name = venueReq.name, userId = userId, uid = Uid())
+    VenueDb(name = venueReq.name, userId = userId, uid = Uid(), fcmToken = None)
   }
 }

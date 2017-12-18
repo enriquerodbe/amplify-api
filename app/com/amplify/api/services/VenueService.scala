@@ -2,6 +2,7 @@ package com.amplify.api.services
 
 import com.amplify.api.controllers.dtos.Venue.VenueRequest
 import com.amplify.api.domain.models._
+import com.amplify.api.domain.models.primitives.Token
 import com.amplify.api.services.external.models.UserData
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
@@ -28,4 +29,6 @@ trait VenueService {
       identifier: ContentProviderIdentifier): Future[Playlist]
 
   def retrieveAll(): Future[Seq[Venue]]
+
+  def setFcmToken(venue: AuthenticatedVenue, token: Token): Future[Unit]
 }

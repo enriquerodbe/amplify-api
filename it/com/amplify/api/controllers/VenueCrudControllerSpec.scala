@@ -5,7 +5,8 @@ import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveMaterialized
 import com.amplify.api.aggregates.queue.{CommandType, EventType}
 import com.amplify.api.domain.models.ContentProviderType.Spotify
 import com.amplify.api.domain.models._
-import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
+import com.amplify.api.domain.models.primitives.Token
+import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse, VenueNotFoundByUserIdentifier}
 import com.amplify.api.it.fixtures.{QueueCommandDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import org.mockito.Mockito.when
@@ -243,6 +244,22 @@ class VenueCrudControllerSpec
         (venue \ "name").as[String] mustEqual aliceVenueDb.name.toString
         (venue \ "uid").as[String] must have size 8
       }
+    }
+  }
+
+  class SetFcmFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+    extends VenueDbFixture
+
+  "setFcmToken" should {
+    "respond No content" in new SetFcmFixture {
+      val response = controller.setFcmToken()(setFcmTokenRequest("test-token").withAliceToken)
+
+      status(response) mustBe NO_CONTENT
+    }
+    "update token" in new SetFcmFixture {
+      val response =
+        controller.setFcmToken()(setFcmTokenRequest("test-token").withAliceToken).await()
+      getVenue(aliceVenueDbId).fcmToken must be(Some(Token("test-token")))
     }
   }
 }

@@ -12,6 +12,7 @@ CREATE TABLE "venues" (
   "name" VARCHAR(255) NOT NULL,
   "user_id" BIGINT NOT NULL,
   "uid" CHAR(8) NOT NULL,
+  "fcm_token" VARCHAR(255),
   UNIQUE KEY "unique_user_id" ("user_id"));
 
 CREATE TABLE "queue_commands" (
