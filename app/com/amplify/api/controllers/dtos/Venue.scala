@@ -18,9 +18,4 @@ object Venue {
   implicit val venueRequestReads: Reads[VenueRequest] = {
     JsonNaming.snakecase(Json.reads[VenueRequest])
   }
-
-  case class AddTrackRequest(trackIdentifier: String)
-  implicit val addTrackRequestReads: Reads[AddTrackRequest] = {
-    JsonNaming.snakecase(Json.reads[AddTrackRequest])
-  }
 }

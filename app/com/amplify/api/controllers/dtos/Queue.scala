@@ -10,15 +10,13 @@ object Queue {
   case class QueueTrackResponse(
       name: String,
       priority: String,
-      contentProvider: String,
-      contentIdentifier: String,
+      identifier: String,
       album: AlbumResponse)
   def itemToQueueTrackResponse(item: QueueItem): QueueTrackResponse = {
     QueueTrackResponse(
       item.track.name,
       item.itemType.toString,
-      item.track.identifier.contentProvider.toString,
-      item.track.identifier.identifier,
+      item.track.identifier,
       albumToAlbumResponse(item.track.album))
   }
   implicit val queueTrackResponseWrites: Writes[QueueTrackResponse] = {
@@ -28,16 +26,14 @@ object Queue {
   case class CurrentTrackResponse(
       name: String,
       priority: String,
-      contentProvider: String,
-      contentIdentifier: String,
+      identifier: String,
       album: AlbumResponse,
       position: Int)
   def itemToCurrentTrackResponse(item: QueueItem, index: Int): CurrentTrackResponse = {
     CurrentTrackResponse(
       item.track.name,
       item.itemType.toString,
-      item.track.identifier.contentProvider.toString,
-      item.track.identifier.identifier,
+      item.track.identifier,
       albumToAlbumResponse(item.track.album),
       index)
   }
