@@ -274,6 +274,6 @@ PUT    /me/fcm/token    com.amplify.api.controllers.VenueCrudController.setFcmTo
 #    in: body
 #    required: true
 #    schema:
-#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.AddTrackRequest'
+#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Queue.AddTrackRequest'
 ###
 POST    /:uid/queue    com.amplify.api.controllers.VenuePlayerController.addTrack(uid: String)
