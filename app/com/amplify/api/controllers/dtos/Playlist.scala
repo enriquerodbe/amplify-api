@@ -10,14 +10,12 @@ object Playlist {
 
   case class PlaylistTrackResponse(
       name: String,
-      contentProvider: String,
-      contentIdentifier: String,
+      identifier: String,
       album: AlbumResponse)
   def trackToPlaylistTrackResponse(track: Track): PlaylistTrackResponse = {
     PlaylistTrackResponse(
       track.name,
-      track.identifier.contentProvider.toString,
-      track.identifier.identifier,
+      track.identifier,
       albumToAlbumResponse(track.album))
   }
   implicit val playlistTrackResponseWrites: Writes[PlaylistTrackResponse] = {

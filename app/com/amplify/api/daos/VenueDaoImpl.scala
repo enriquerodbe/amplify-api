@@ -38,7 +38,5 @@ class VenueDaoImpl @Inject()(
     venuesTable.filter(_.userId === userId).result.headOption
   }
 
-  override def retrieveAllVenues(): DBIO[Seq[VenueDb]] = {
-    venuesTable.result
-  }
+  override def retrieveAllVenues(): DBIO[Seq[VenueDb]] = venuesTable.result
 }
