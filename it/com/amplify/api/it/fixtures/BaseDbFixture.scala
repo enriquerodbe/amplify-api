@@ -18,9 +18,4 @@ trait BaseDbFixture { self: HasDatabaseConfigProvider[JdbcProfile] =>
 
     def await(atMost: Duration = 2.seconds): T = db.run(action).await(atMost)
   }
-
-  implicit class QuerySpecUtilities[T](query: Rep[T]) {
-
-    def await(atMost: Duration = 2.seconds): T = query.result.await(atMost)
-  }
 }

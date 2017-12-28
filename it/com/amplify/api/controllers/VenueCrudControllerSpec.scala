@@ -6,7 +6,7 @@ import com.amplify.api.aggregates.queue.{CommandType, EventType}
 import com.amplify.api.domain.models.ContentProviderType.Spotify
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.Token
-import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse, VenueNotFoundByUserIdentifier}
+import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
 import com.amplify.api.it.fixtures.{QueueCommandDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import org.mockito.Mockito.when
@@ -16,6 +16,7 @@ import play.api.libs.json.{JsArray, JsDefined}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http
+import scala.concurrent.Future
 
 class VenueCrudControllerSpec
   extends BaseIntegrationSpec with SpotifyContext with VenueRequests with Inside {
@@ -47,9 +48,9 @@ class VenueCrudControllerSpec
     }
 
     "fail" when {
-      "Spotify responds with unexpectedly" in new RetrievePlaylistsFixture {
+      "Spotify responds with unexpected response" in new RetrievePlaylistsFixture {
         when(spotifyContentProvider.fetchPlaylists(aliceAuthToken))
-          .thenThrow(classOf[UnexpectedResponse])
+          .thenReturn(Future.failed(UnexpectedResponse("Testing!")))
 
         intercept[UnexpectedResponse] {
           controller.retrievePlaylists()(FakeRequest().withAliceToken).await()
