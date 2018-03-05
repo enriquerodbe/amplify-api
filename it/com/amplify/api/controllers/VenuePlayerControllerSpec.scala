@@ -14,7 +14,7 @@ import play.api.test.Helpers._
 class VenuePlayerControllerSpec extends BaseIntegrationSpec with SpotifyContext with Inside {
 
   val controller = instanceOf[VenuePlayerController]
-  val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueDbId"
+  val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueUid"
   val commandProcessor = app.actorSystem.actorSelection(path)
 
   class PlayFixture(implicit val dbConfigProvider: DatabaseConfigProvider)

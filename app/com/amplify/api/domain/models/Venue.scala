@@ -1,47 +1,24 @@
 package com.amplify.api.domain.models
 
 import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
-import com.amplify.api.domain.models.primitives.{Id, Name, Token, Uid}
+import com.amplify.api.domain.models.primitives.{Name, Token, Uid}
 
-trait Venue {
-
-  def name: Name
-
-  def uid: Uid
-}
-
-case class UnauthenticatedVenue(
-    id: Id,
+case class Venue(
     name: Name,
     uid: Uid,
-    fcmToken: Option[Token]) extends Venue
-
-case class AuthenticatedVenue(
-    user: AuthenticatedUser,
-    unauthenticated: UnauthenticatedVenue) extends Venue {
-
-  override def name: Name = unauthenticated.name
-
-  override def uid: Uid = unauthenticated.uid
-
-  def id: Id = unauthenticated.id
+    identifier: AuthProviderIdentifier,
+    fcmToken: Option[Token]) {
 
   def contentProviders: ContentProviderType = ContentProviderType.Spotify
 }
 
-case class AuthenticatedVenueReq(venue: AuthenticatedVenue, authToken: AuthToken) extends Venue {
+case class VenueReq(venue: Venue, authToken: AuthToken) {
 
-  override def name: Name = venue.name
+  def name: Name = venue.name
 
-  override def uid: Uid = venue.uid
+  def uid: Uid = venue.uid
 
-  def user: AuthenticatedUser = venue.user
-
-  def id: Id = venue.id
-
-  def userIdentifier: AuthProviderIdentifier = user.identifier
+  def identifier: AuthProviderIdentifier = venue.identifier
 
   def contentProviders: ContentProviderType = venue.contentProviders
-
-  def unauthenticated: UnauthenticatedVenue = venue.unauthenticated
 }

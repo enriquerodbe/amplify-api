@@ -3,17 +3,15 @@ package com.amplify.api.services
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.{Name, Token, Uid}
-import com.amplify.api.exceptions.{UserAlreadyHasVenue, VenueNotFoundByUid}
+import com.amplify.api.exceptions.VenueNotFoundByUid
 import com.amplify.api.services.converters.PlaylistConverter.playlistDataToPlaylistInfo
 import com.amplify.api.services.converters.TrackConverter.trackDataToTrack
-import com.amplify.api.services.converters.UserConverter.{userDataToUserDb, userDbToAuthenticatedUser}
-import com.amplify.api.services.converters.VenueConverter.{venueDbToAuthenticatedVenue, venueDbToVenue, venueReqToVenueDb}
+import com.amplify.api.services.converters.VenueConverter.{userDataToVenueDb, venueDbToVenue}
 import com.amplify.api.services.external.ContentProviderRegistry
 import com.amplify.api.services.models.UserData
+import com.amplify.api.utils.DbioUtils.DbioT
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import slick.dbio.DBIO
-import com.amplify.api.utils.DbioUtils.DbioT
 
 class VenueServiceImpl @Inject()(
     db: DbioRunner,
@@ -22,40 +20,29 @@ class VenueServiceImpl @Inject()(
     venueDao: VenueDao)(
     implicit ec: ExecutionContext) extends VenueService {
 
-  override def retrieve(uid: Uid): Future[UnauthenticatedVenue] = {
+  override def retrieve(uid: Uid): Future[Venue] = {
     val maybeVenue = venueDao.retrieve(uid).map(_.map(venueDbToVenue))
     db.run(maybeVenue ?! VenueNotFoundByUid(uid))
   }
 
-  override def retrieveOrCreate(
-      userData: UserData,
-      name: Name): Future[AuthenticatedVenue] = {
-    val action = retrieveOrCreateUserWithVenue(userData).flatMap {
-      case (_, Some(venueDb)) ⇒ DBIO.failed(UserAlreadyHasVenue(venueDbToVenue(venueDb)))
-      case (userDb, _) ⇒
-        val venueDb = venueDao.create(venueReqToVenueDb(name, userDb.id))
-        venueDb.map(venueDbToAuthenticatedVenue(_, userDbToAuthenticatedUser(userDb)))
-    }
-
-    db.runTransactionally(action)
+  override def retrieve(identifier: AuthProviderIdentifier): Future[Option[Venue]] = {
+    db.run(venueDao.retrieve(identifier).map(_.map(venueDbToVenue)))
   }
 
-  private def retrieveOrCreateUserWithVenue(userData: UserData) = {
-    for {
-      user ← userDao.retrieveOrCreate(userDataToUserDb(userData))
-      maybeVenue ← venueDao.retrieve(user.id)
-    }
-    yield (user, maybeVenue)
+  override def retrieveOrCreate(userData: UserData, name: Name): Future[Venue] = {
+    val venueDb = userDataToVenueDb(userData, name)
+    val createdVenue = db.runTransactionally(venueDao.retrieveOrCreate(venueDb))
+    createdVenue.map(venueDbToVenue)
   }
 
-  override def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[PlaylistInfo]] = {
+  override def retrievePlaylists(venue: VenueReq): Future[Seq[PlaylistInfo]] = {
     val strategy = registry.getStrategy(venue.contentProviders)
     val eventualPlaylists = strategy.fetchPlaylists(venue.authToken)
     eventualPlaylists.map(_.map(playlistDataToPlaylistInfo))
   }
 
   override def retrievePlaylist(
-      venue: AuthenticatedVenueReq,
+      venue: VenueReq,
       identifier: ContentProviderIdentifier): Future[Playlist] = {
     val eventualPlaylistInfo = retrievePlaylistInfo(venue, identifier)
     val eventualPlaylistTracks = retrievePlaylistTracks(venue, identifier)
@@ -67,31 +54,31 @@ class VenueServiceImpl @Inject()(
   }
 
   private def retrievePlaylistInfo(
-      venue: AuthenticatedVenueReq,
+      venue: VenueReq,
       playlistIdentifier: ContentProviderIdentifier): Future[PlaylistInfo] = {
     implicit val token = venue.authToken
     val contentProvider = registry.getStrategy(playlistIdentifier.contentProvider)
-    val userIdentifier = venue.userIdentifier.identifier
+    val userIdentifier = venue.identifier.identifier
     val result = contentProvider.fetchPlaylist(userIdentifier, playlistIdentifier.identifier)
     result.map(playlistDataToPlaylistInfo)
   }
 
   private def retrievePlaylistTracks(
-      venue: AuthenticatedVenueReq,
+      venue: VenueReq,
       playlistIdentifier: ContentProviderIdentifier): Future[Seq[Track]] = {
     implicit val token = venue.authToken
     val strategy = registry.getStrategy(playlistIdentifier.contentProvider)
-    val userIdentifier = venue.userIdentifier.identifier
+    val userIdentifier = venue.identifier.identifier
     val eventualPlaylist =
       strategy.fetchPlaylistTracks(userIdentifier, playlistIdentifier.identifier)
     eventualPlaylist.map(_.map(trackDataToTrack))
   }
 
   override def retrieveAll(): Future[Seq[Venue]] = {
-    db.run(venueDao.retrieveAllVenues()).map(_.map(venueDbToVenue))
+    db.run(venueDao.retrieveAll()).map(_.map(venueDbToVenue))
   }
 
-  override def setFcmToken(venue: AuthenticatedVenue, token: Token): Future[Unit] = {
-    db.run(venueDao.updateFcmToken(venue.id, token))
+  override def setFcmToken(venue: Venue, token: Token): Future[Unit] = {
+    db.run(venueDao.updateFcmToken(venue.uid, token))
   }
 }

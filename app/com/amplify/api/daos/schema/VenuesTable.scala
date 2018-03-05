@@ -1,9 +1,11 @@
 package com.amplify.api.daos.schema
 
 import com.amplify.api.daos.models.VenueDb
-import com.amplify.api.domain.models.primitives.{Id, Name, Token, Uid}
+import com.amplify.api.domain.models.AuthProviderIdentifier
+import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
+import com.amplify.api.domain.models.primitives._
 
-trait VenuesTable extends BaseTable with UsersTable {
+trait VenuesTable extends BaseTable {
 
   import profile.api._
 
@@ -12,13 +14,17 @@ trait VenuesTable extends BaseTable with UsersTable {
   class Venues(tag: Tag) extends Table[VenueDb](tag, "venues") {
     def id = column[Id]("id", O.PrimaryKey, O.AutoInc)
     def name = column[Name]("name")
-    def userId = column[Id]("user_id")
     def uid = column[Uid]("uid")
+    def authProviderType = column[AuthProviderType]("auth_provider")
+    def authIdentifier = column[Identifier]("auth_identifier")
     def fcmToken = column[Option[Token]]("fcm_token")
 
-    def user = foreignKey("user_fk", userId, usersTable)(_.id)
+    def authProviderIdentifier =
+      (authProviderType, authIdentifier) <>
+        ((AuthProviderIdentifier.apply _).tupled, AuthProviderIdentifier.unapply)
 
-    def * = (id, name, userId, uid, fcmToken) <> (VenueDb.tupled, VenueDb.unapply)
+    def * =
+      (id, name, uid, authProviderIdentifier, fcmToken) <> (VenueDb.tupled, VenueDb.unapply)
   }
 
   lazy val venuesTable = TableQuery[Venues]

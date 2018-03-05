@@ -47,7 +47,7 @@ class VenueCrudController @Inject()(
   }
 
   def retrieveQueue() = authenticatedVenue() { request ⇒
-    venueCrudLogic.retrieveQueue(request.subject.venueReq).map { queue ⇒
+    venueCrudLogic.retrieveQueue(request.subject.venue).map { queue ⇒
       Ok(Json.toJson(queueToQueueResponse(queue)))
     }
   }

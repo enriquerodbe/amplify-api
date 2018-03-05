@@ -1,8 +1,8 @@
 package com.amplify.api.controllers.auth
 
 import be.objectify.deadbolt.scala.ActionBuilders
-import com.amplify.api.domain.models.{AuthToken, AuthenticatedUserReq}
-import com.amplify.api.exceptions.VenueNotFoundByUserIdentifier
+import com.amplify.api.controllers.auth.HandlerKeys.{UserHandlerKey, VenueHandlerKey}
+import com.amplify.api.domain.models.AuthToken
 import play.api.mvc._
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
@@ -28,13 +28,10 @@ trait AuthenticatedRequests { self: AbstractController ⇒
   def authenticatedUser[A](
       parser: BodyParser[A] = parse.anyContent)(
       block: AuthenticatedUserRequest[A] ⇒ Future[Result]): Action[A] = {
-    actionBuilder.SubjectPresentAction().defaultHandler.apply(parser) { request ⇒
+    actionBuilder.SubjectPresentAction().key(UserHandlerKey).apply(parser) { request ⇒
       request.subject match {
-        case Some(authUser: AmplifyApiUser) ⇒
-          block(AuthenticatedUserRequest[A](authUser, request))
-        case Some(authVenue: AmplifyApiVenue) ⇒
-          val userReq = AuthenticatedUserReq(authVenue.user, authVenue.venueReq.authToken)
-          block(AuthenticatedUserRequest[A](AmplifyApiUser(userReq), request))
+        case Some(user: AmplifyApiUser) ⇒
+          block(AuthenticatedUserRequest[A](user, request))
         case other ⇒
           throw new IllegalStateException(s"Expected AuthUser, got: $other")
       }
@@ -44,12 +41,10 @@ trait AuthenticatedRequests { self: AbstractController ⇒
   def authenticatedVenue[A](
       parser: BodyParser[A] = parse.anyContent)(
       block: AuthenticatedVenueRequest[A] ⇒ Future[Result]): Action[A] = {
-    actionBuilder.SubjectPresentAction().defaultHandler.apply(parser) { request ⇒
+    actionBuilder.SubjectPresentAction().key(VenueHandlerKey).apply(parser) { request ⇒
       request.subject match {
-        case Some(authUser: AmplifyApiUser) ⇒
-          throw VenueNotFoundByUserIdentifier(authUser.userReq.identifier)
-        case Some(authVenue: AmplifyApiVenue) ⇒
-          block(AuthenticatedVenueRequest[A](authVenue, request))
+        case Some(venue: AmplifyApiVenue) ⇒
+          block(AuthenticatedVenueRequest[A](venue, request))
         case other ⇒
           throw new IllegalStateException(s"Expected AuthVenue, got: $other")
       }

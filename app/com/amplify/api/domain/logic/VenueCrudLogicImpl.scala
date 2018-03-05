@@ -2,11 +2,11 @@ package com.amplify.api.domain.logic
 
 import akka.actor.ActorRef
 import akka.pattern.ask
-import com.amplify.api.aggregates.queue.CommandProcessor.SetCurrentPlaylist
-import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveCurrentPlaylist, RetrieveQueue}
+import com.amplify.api.aggregates.queue.Command.SetCurrentPlaylist
+import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveQueue, RouteCommand}
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.Token
+import com.amplify.api.domain.models.primitives.{Token, Uid}
 import com.amplify.api.services.VenueService
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,34 +20,34 @@ class VenueCrudLogicImpl @Inject()(
 
   implicit val askTimeout = envConfig.defaultAskTimeout
 
-  override def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[PlaylistInfo]] = {
+  override def retrievePlaylists(venue: VenueReq): Future[Seq[PlaylistInfo]] = {
     venueService.retrievePlaylists(venue)
   }
 
-  override def retrieveCurrentPlaylist(uid: String): Future[Option[Playlist]] = {
+  override def retrieveCurrentPlaylist(uid: Uid): Future[Option[Playlist]] = {
     for {
       venue ← venueService.retrieve(uid)
-      playlist ← (queueCommandRouter ? RetrieveCurrentPlaylist(venue)).mapTo[Option[Playlist]]
+      queue ← retrieveQueue(venue)
     }
-    yield playlist
+    yield queue.currentPlaylist
   }
 
   override def setCurrentPlaylist(
-      venueReq: AuthenticatedVenueReq,
+      venueReq: VenueReq,
       playlistIdentifier: ContentProviderIdentifier): Future[Unit] = {
     for {
       playlist ← venueService.retrievePlaylist(venueReq, playlistIdentifier)
-      unauthenticatedVenue = venueReq.unauthenticated
-      result ← (queueCommandRouter ? SetCurrentPlaylist(unauthenticatedVenue, playlist)).mapTo[Unit]
+      command = SetCurrentPlaylist(venueReq.venue, playlist)
+      result ← (queueCommandRouter ? RouteCommand(command)).mapTo[Unit]
     }
     yield result
   }
 
-  override def setFcmToken(venue: AuthenticatedVenue, token: Token): Future[Unit] = {
+  override def setFcmToken(venue: Venue, token: Token): Future[Unit] = {
     venueService.setFcmToken(venue, token)
   }
 
-  override def retrieveQueue(venue: AuthenticatedVenueReq): Future[Queue] = {
+  override def retrieveQueue(venue: Venue): Future[Queue] = {
     (queueCommandRouter ? RetrieveQueue(venue)).mapTo[Queue]
   }
 

@@ -14,10 +14,6 @@ class UserDaoImpl @Inject()(
 
   import profile.api._
 
-  override def retrieve(id: Id): DBIO[Option[UserDb]] = {
-    usersTable.filter(_.id === id).result.headOption
-  }
-
   override def retrieve(identifier: AuthProviderIdentifier): DBIO[Option[UserDb]] = {
     val query = usersTable.filter { user ⇒
       user.authIdentifier === identifier.identifier &&

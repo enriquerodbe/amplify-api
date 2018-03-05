@@ -19,15 +19,15 @@ class VenuePlayerController @Inject()(
     implicit ec: ExecutionContext) extends AbstractController(cc) with AuthenticatedRequests {
 
   def play() = authenticatedVenue(parse.empty) { request ⇒
-    venuePlayerLogic.play(request.subject.venueReq).map(_ ⇒ NoContent)
+    venuePlayerLogic.play(request.subject.venue).map(_ ⇒ NoContent)
   }
 
   def pause() = authenticatedVenue(parse.empty) { request ⇒
-    venuePlayerLogic.pause(request.subject.venueReq).map(_ ⇒ NoContent)
+    venuePlayerLogic.pause(request.subject.venue).map(_ ⇒ NoContent)
   }
 
   def skip() = authenticatedVenue(parse.empty) { request ⇒
-    venuePlayerLogic.skip(request.subject.venueReq).map(_ ⇒ NoContent)
+    venuePlayerLogic.skip(request.subject.venue).map(_ ⇒ NoContent)
   }
 
   def addTrack(uid: String) = authenticatedUser(parse.json[AddTrackRequest]) { request ⇒

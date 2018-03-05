@@ -17,11 +17,11 @@ trait UsersTable extends BaseTable {
     def authProviderType = column[AuthProviderType]("auth_provider")
     def authIdentifier = column[Identifier]("auth_identifier")
 
-    def contentProviderIdentifier =
+    def authProviderIdentifier =
       (authProviderType, authIdentifier) <>
         ((AuthProviderIdentifier.apply _).tupled, AuthProviderIdentifier.unapply)
 
-    def * = (id, name, contentProviderIdentifier) <> (UserDb.tupled, UserDb.unapply)
+    def * = (id, name, authProviderIdentifier) <> (UserDb.tupled, UserDb.unapply)
   }
 
   lazy val usersTable = TableQuery[Users]

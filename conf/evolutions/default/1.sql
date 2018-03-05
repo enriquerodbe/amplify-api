@@ -5,15 +5,16 @@ CREATE TABLE "users" (
   "name" VARCHAR(255) NOT NULL,
   "auth_provider" VARCHAR(255) NOT NULL,
   "auth_identifier" VARCHAR(255) NOT NULL,
-  UNIQUE KEY "auth_provider_identifier" ("auth_provider", "auth_identifier"));
+  UNIQUE KEY "users_auth_provider_identifier" ("auth_provider", "auth_identifier"));
 
 CREATE TABLE "venues" (
   "id" BIGINT IDENTITY NOT NULL,
   "name" VARCHAR(255) NOT NULL,
-  "user_id" BIGINT NOT NULL,
   "uid" CHAR(8) NOT NULL,
+  "auth_provider" VARCHAR(255) NOT NULL,
+  "auth_identifier" VARCHAR(255) NOT NULL,
   "fcm_token" VARCHAR(255),
-  UNIQUE KEY "unique_user_id" ("user_id"));
+  UNIQUE KEY "venues_auth_provider_identifier" ("auth_provider", "auth_identifier"));
 
 CREATE TABLE "queue_commands" (
   "id" BIGINT IDENTITY NOT NULL,

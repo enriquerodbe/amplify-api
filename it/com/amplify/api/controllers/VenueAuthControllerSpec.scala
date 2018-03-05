@@ -1,6 +1,6 @@
 package com.amplify.api.controllers
 
-import com.amplify.api.exceptions.{BadRequestException, MissingAuthTokenHeader, UserAlreadyHasVenue, UserAuthTokenNotFound}
+import com.amplify.api.exceptions.{BadRequestException, MissingAuthTokenHeader, UserAuthTokenNotFound}
 import com.amplify.api.it.fixtures.{SpotifyContext, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import play.api.db.slick.DatabaseConfigProvider
@@ -41,13 +41,12 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with SpotifyContext wi
       findUsers(aliceUserData.name).headOption mustBe defined
     }
 
-    "retrieve user if it already exists" in new SignUpFixture {
+    "create venue if user already exists" in new SignUpFixture {
       val userId = insertUser(bobUserDb)
 
       controller.signUp()(venueRequest("Test bar").withBobToken).await()
 
-      val venue = findVenues("Test bar").headOption
-      venue.map(_.userId) must be(Some(userId))
+      findVenues("Test bar").headOption mustBe defined
     }
 
     "fail" when {
@@ -66,13 +65,6 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with SpotifyContext wi
       "venue without name provided" in {
         val response = controller.signUp()(venueRequest(null).withBobToken)
         intercept[Exception](status(response))
-      }
-
-      "user already has a venue" in new SignUpFixture {
-        controller.signUp()(venueRequest("Test venue").withBobToken).await()
-        intercept[UserAlreadyHasVenue] {
-          controller.signUp()(venueRequest("Test venue 2").withBobToken).await()
-        }
       }
     }
   }

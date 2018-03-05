@@ -1,10 +1,10 @@
 package com.amplify.api.aggregates.queue
 
 import akka.actor.Actor
-import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveMaterialized
-import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveCurrentPlaylist, RetrieveQueue}
-import com.amplify.api.domain.models.primitives.Id
-import com.amplify.api.domain.models.{AuthenticatedVenueReq, UnauthenticatedVenue}
+import com.amplify.api.aggregates.queue.CommandProcessor.{HandleCommand, RetrieveMaterialized}
+import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveQueue, RouteCommand}
+import com.amplify.api.domain.models.Venue
+import com.amplify.api.domain.models.primitives.Uid
 import javax.inject.Inject
 import play.api.libs.concurrent.InjectedActorSupport
 
@@ -12,30 +12,28 @@ class CommandRouter @Inject()(
     commandProcessorFactory: CommandProcessor.Factory) extends Actor with InjectedActorSupport {
 
   override def receive: Receive = {
-    case command: CommandProcessor.Command ⇒
-      val commandProcessor = getCommandProcessor(command.venue.id)
-      commandProcessor forward command
+    case RouteCommand(command) ⇒
+      val commandProcessor = getCommandProcessor(command.venue.uid)
+      commandProcessor forward HandleCommand(command)
 
     case RetrieveQueue(venue) ⇒
-      val commandProcessor = getCommandProcessor(venue.id)
+      val commandProcessor = getCommandProcessor(venue.uid)
       commandProcessor forward RetrieveMaterialized
-
-    case RetrieveCurrentPlaylist(venue) ⇒
-      val commandProcessor = getCommandProcessor(venue.id)
-      commandProcessor forward CommandProcessor.RetrieveCurrentPlaylist
   }
 
-  private def getCommandProcessor(venueId: Id) = {
-    val name = createCommandProcessorName(venueId)
+  private def getCommandProcessor(venueUid: Uid) = {
+    val name = createCommandProcessorName(venueUid)
     context.child(name).getOrElse(injectedChild(commandProcessorFactory(), name))
   }
 
-  private def createCommandProcessorName(venueId: Id) = s"queue-command-processor-$venueId"
+  private def createCommandProcessorName(venueUid: Uid) = s"queue-command-processor-$venueUid"
 }
 
 object CommandRouter {
 
-  case class RetrieveQueue(venue: AuthenticatedVenueReq)
+  sealed trait CommandRouterProtocol
 
-  case class RetrieveCurrentPlaylist(venue: UnauthenticatedVenue)
+  case class RouteCommand(command: Command) extends CommandRouterProtocol
+
+  case class RetrieveQueue(venue: Venue) extends CommandRouterProtocol
 }

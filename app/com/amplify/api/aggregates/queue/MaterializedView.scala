@@ -29,9 +29,11 @@ class MaterializedView extends Actor {
 
 object MaterializedView {
 
-  case class SetState(queue: Queue)
+  sealed trait MaterializedViewProtocol
 
-  case object Materialize
+  case class SetState(queue: Queue) extends MaterializedViewProtocol
 
-  case class EventsBatch(events: Seq[Event])
+  case object Materialize extends MaterializedViewProtocol
+
+  case class EventsBatch(events: Seq[Event]) extends MaterializedViewProtocol
 }

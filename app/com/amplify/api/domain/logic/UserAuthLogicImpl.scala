@@ -1,6 +1,6 @@
 package com.amplify.api.domain.logic
 
-import com.amplify.api.domain.models.{AuthToken, AuthenticatedUser, UnauthenticatedVenue}
+import com.amplify.api.domain.models.{AuthToken, User}
 import com.amplify.api.services.{AuthenticationService, UserService}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -10,7 +10,7 @@ class UserAuthLogicImpl @Inject()(
     userService: UserService)(
     implicit ec: ExecutionContext) extends UserAuthLogic {
 
-  override def signUp(implicit authToken: AuthToken): Future[AuthenticatedUser] = {
+  override def signUp(implicit authToken: AuthToken): Future[User] = {
     for {
       userData ← authService.fetchUser
       user ← userService.retrieveOrCreate(userData)
@@ -18,12 +18,11 @@ class UserAuthLogicImpl @Inject()(
     yield user
   }
 
-  override def login(
-      implicit authToken: AuthToken): Future[(AuthenticatedUser, Option[UnauthenticatedVenue])] = {
+  override def login(implicit authToken: AuthToken): Future[Option[User]] = {
     for {
       userData ← authService.fetchUser
-      userAndVenue ← userService.retrieve(userData.identifier)
+      maybeUser ← userService.retrieve(userData.identifier)
     }
-    yield userAndVenue
+    yield maybeUser
   }
 }

@@ -32,9 +32,7 @@ object Event {
 
     override def eventType: QueueEventType = EventType.VenueTrackAdded
 
-    override def contentIdentifier: Option[ContentProviderIdentifier] = {
-      Some(track.identifier)
-    }
+    override def contentIdentifier: Option[ContentProviderIdentifier] = Some(track.identifier)
   }
 
   case object TrackFinished extends Event {

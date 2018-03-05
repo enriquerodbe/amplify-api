@@ -22,7 +22,7 @@ class VenueCrudControllerSpec
   extends BaseIntegrationSpec with SpotifyContext with VenueRequests with Inside {
 
   val controller = instanceOf[VenueCrudController]
-  val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueDbId"
+  val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueUid"
   val commandProcessor = app.actorSystem.actorSelection(path)
 
   class RetrievePlaylistsFixture(implicit val dbConfigProvider: DatabaseConfigProvider)

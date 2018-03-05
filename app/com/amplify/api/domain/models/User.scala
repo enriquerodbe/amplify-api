@@ -1,17 +1,12 @@
 package com.amplify.api.domain.models
 
-import com.amplify.api.domain.models.primitives.{Id, Name}
+import com.amplify.api.domain.models.primitives.Name
 
-sealed trait User {
+case class User(name: Name, identifier: AuthProviderIdentifier)
 
-  def name: Name
-}
+case class UserReq(user: User, authToken: AuthToken) {
 
-case class AuthenticatedUser(id: Id, name: Name, identifier: AuthProviderIdentifier) extends User
-
-case class AuthenticatedUserReq(user: AuthenticatedUser, authToken: AuthToken) extends User {
-
-  override def name: Name = user.name
+  def name: Name = user.name
 
   def identifier: AuthProviderIdentifier = user.identifier
 }

@@ -1,20 +1,23 @@
 package com.amplify.api.daos
 
 import com.amplify.api.daos.models.VenueDb
-import com.amplify.api.domain.models.primitives.{Id, Token, Uid}
+import com.amplify.api.domain.models.AuthProviderIdentifier
+import com.amplify.api.domain.models.primitives.{Token, Uid}
 import com.google.inject.ImplementedBy
 import slick.dbio.DBIO
 
 @ImplementedBy(classOf[VenueDaoImpl])
 trait VenueDao {
 
+  def retrieveAll(): DBIO[Seq[VenueDb]]
+
   def retrieve(uid: Uid): DBIO[Option[VenueDb]]
+
+  def retrieve(identifier: AuthProviderIdentifier): DBIO[Option[VenueDb]]
 
   def create(venueDb: VenueDb): DBIO[VenueDb]
 
-  def updateFcmToken(id: Id, token: Token): DBIO[Unit]
+  def retrieveOrCreate(venueDb: VenueDb): DBIO[VenueDb]
 
-  def retrieve(userId: Id): DBIO[Option[VenueDb]]
-
-  def retrieveAllVenues(): DBIO[Seq[VenueDb]]
+  def updateFcmToken(uid: Uid, token: Token): DBIO[Unit]
 }

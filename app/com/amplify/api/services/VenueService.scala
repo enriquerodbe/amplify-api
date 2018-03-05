@@ -9,17 +9,19 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[VenueServiceImpl])
 trait VenueService {
 
-  def retrieve(uid: Uid): Future[UnauthenticatedVenue]
+  def retrieve(uid: Uid): Future[Venue]
 
-  def retrieveOrCreate(userData: UserData, name: Name): Future[AuthenticatedVenue]
+  def retrieve(identifier: AuthProviderIdentifier): Future[Option[Venue]]
 
-  def retrievePlaylists(venue: AuthenticatedVenueReq): Future[Seq[PlaylistInfo]]
+  def retrieveOrCreate(userData: UserData, name: Name): Future[Venue]
+
+  def retrievePlaylists(venue: VenueReq): Future[Seq[PlaylistInfo]]
 
   def retrievePlaylist(
-      venue: AuthenticatedVenueReq,
+      venue: VenueReq,
       identifier: ContentProviderIdentifier): Future[Playlist]
 
   def retrieveAll(): Future[Seq[Venue]]
 
-  def setFcmToken(venue: AuthenticatedVenue, token: Token): Future[Unit]
+  def setFcmToken(venue: Venue, token: Token): Future[Unit]
 }

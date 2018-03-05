@@ -1,24 +1,24 @@
 package com.amplify.api.domain.logic
 
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.Token
+import com.amplify.api.domain.models.primitives.{Token, Uid}
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
 
 @ImplementedBy(classOf[VenueCrudLogicImpl])
 trait VenueCrudLogic {
 
-  def retrievePlaylists(user: AuthenticatedVenueReq): Future[Seq[PlaylistInfo]]
+  def retrievePlaylists(user: VenueReq): Future[Seq[PlaylistInfo]]
 
-  def retrieveCurrentPlaylist(uid: String): Future[Option[Playlist]]
+  def retrieveCurrentPlaylist(uid: Uid): Future[Option[Playlist]]
 
   def setCurrentPlaylist(
-      venue: AuthenticatedVenueReq,
+      venue: VenueReq,
       playlistIdentifier: ContentProviderIdentifier): Future[Unit]
 
-  def setFcmToken(venue: AuthenticatedVenue, token: Token): Future[Unit]
+  def setFcmToken(venue: Venue, token: Token): Future[Unit]
 
-  def retrieveQueue(venue: AuthenticatedVenueReq): Future[Queue]
+  def retrieveQueue(venue: Venue): Future[Queue]
 
   def retrieveAll(): Future[Seq[Venue]]
 }
