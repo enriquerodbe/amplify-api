@@ -5,10 +5,9 @@ version := "1.0-SNAPSHOT"
 scalaVersion := "2.12.4"
 
 lazy val dependencies = Seq(
-  "com.typesafe.play" %% "play-ws" % "2.6.10",
   "com.typesafe.play" %% "play-slick" % "3.0.3",
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
-  "com.h2database" % "h2" % "1.4.196",
+  "org.postgresql" % "postgresql" % "42.2.2",
   "be.objectify" %% "deadbolt-scala" % "2.6.1",
   "com.iheart" %% "play-swagger" % "0.7.3",
   "org.webjars" % "swagger-ui" % "3.8.0",

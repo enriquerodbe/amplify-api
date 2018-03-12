@@ -1,37 +1,32 @@
 package com.amplify.api.aggregates.queue.daos
 
-import com.amplify.api.aggregates.queue.CommandType
-import com.amplify.api.aggregates.queue.CommandType.QueueCommandType
 import com.amplify.api.daos.schema.BaseTable
-import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
-import com.amplify.api.domain.models.primitives.{Id, Identifier}
+import com.amplify.api.domain.models.primitives.Id
 import java.time.Instant
+import play.api.libs.json.Json
 
 trait CommandsTable extends BaseTable {
 
   import profile.api._
 
-  implicit val queueCommandTypeType =
-    MappedColumnType.base[QueueCommandType, Int](_.id, CommandType.apply)
+  private implicit val commandDbDataColumnType = MappedColumnType.base[CommandDbData, String](
+    v ⇒ Json.stringify(CommandDbDataSerializer.serialize(v)),
+    v ⇒ CommandDbDataSerializer.deserialize(Json.parse(v))
+  )
 
   // scalastyle:off public.methods.have.type
   // scalastyle:off method.name
   class QueueCommands(tag: Tag) extends Table[CommandDb](tag, "queue_commands") {
     def id = column[Id]("id", O.PrimaryKey, O.AutoInc)
     def venueId = column[Id]("venue_id")
-    def userId = column[Option[Id]]("user_id")
-    def queueCommandType = column[QueueCommandType]("queue_command_type")
-    def contentProvider = column[Option[ContentProviderType]]("content_provider")
-    def contentProviderIdentifier = column[Option[Identifier]]("content_identifier")
+    def data = column[CommandDbData]("data")
     def createdAt = column[Instant]("created_at")
 
-    def contentIdentifier =
-      (contentProvider, contentProviderIdentifier) <>
-        (mapOptionalContentProviderIdentifier, unmapOptionalContentProviderIdentifier)
-
-    def * = (id, venueId, userId, queueCommandType, contentIdentifier, createdAt) <>
-      (CommandDb.tupled, CommandDb.unapply)
+    def * = (id, venueId, data, createdAt) <> (CommandDb.tupled, CommandDb.unapply)
   }
 
   lazy val queueCommandsTable = TableQuery[QueueCommands]
+
+  lazy val insertCommandQuery =
+    queueCommandsTable returning queueCommandsTable.map(_.id) into ((obj, id) ⇒ obj.copy(id = id))
 }

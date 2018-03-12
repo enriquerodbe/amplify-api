@@ -7,7 +7,7 @@ import com.amplify.api.domain.models._
 
 class MaterializedView extends Actor {
 
-  private var queue = Queue()
+  private var queue = Queue.empty
 
   override def receive: Receive = {
     case EventsBatch(events) ⇒ queue = events.foldLeft(queue)(process)

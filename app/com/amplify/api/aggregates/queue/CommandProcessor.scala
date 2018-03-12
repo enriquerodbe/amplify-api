@@ -11,20 +11,17 @@ import com.amplify.api.aggregates.queue.MaterializedView.{EventsBatch, Materiali
 import com.amplify.api.aggregates.queue.PushNotificationGateway.NotifyEvents
 import com.amplify.api.aggregates.queue.daos.{CommandDao, EventDao}
 import com.amplify.api.configuration.EnvConfig
-import com.amplify.api.daos.models.{UserDb, VenueDb}
-import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
+import com.amplify.api.daos.{DbioRunner, VenueDao}
 import com.amplify.api.exceptions.VenueNotFoundByUid
 import com.amplify.api.utils.DbioUtils.DbioT
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
-import slick.dbio.DBIO
+import scala.concurrent.ExecutionContext
 
 class CommandProcessor @Inject()(
     db: DbioRunner,
     envConfig: EnvConfig,
     @Named("push-notification-gateway") pushNotificationGateway: ActorRef,
     venueDao: VenueDao,
-    userDao: UserDao,
     commandDao: CommandDao,
     eventDao: EventDao)(
     implicit ec: ExecutionContext) extends Actor {
@@ -46,28 +43,19 @@ class CommandProcessor @Inject()(
   }
 
   private def handleCommand(command: Command) = {
-    for {
-      (venue, maybeUser) ← retrieveVenueAndUser(command)
-      commandDb ← commandDao.create(commandToCommandDb(command, venue.id, maybeUser.map(_.id)))
-      events = createEvents(command)
-      _ ← eventDao.create(events.map(queueEventToQueueEventDb(commandDb, _)))
-    }
-    yield {
-      materializedView ! EventsBatch(events)
-      pushNotificationGateway ! NotifyEvents(command.venue, events)
-    }
-  }
-
-  private def retrieveVenueAndUser(command: Command): Future[(VenueDb, Option[UserDb])] = {
-    val action =
+    val actions =
       for {
-        venueDb ← venueDao.retrieve(command.venue.uid) ?! VenueNotFoundByUid(command.venue.uid)
-        maybeIdentifier = command.maybeUser.map(_.identifier)
-        userDb ← maybeIdentifier.map(userDao.retrieve).getOrElse(DBIO.successful(None))
+        venue ← venueDao.retrieve(command.venue.uid) ?! VenueNotFoundByUid(command.venue.uid)
+        commandDb ← commandDao.create(commandToCommandDb(command, venue.id))
+        events = createEvents(command)
+        _ ← eventDao.create(events.map(queueEventToQueueEventDb(commandDb, _)))
       }
-      yield venueDb → userDb
+      yield {
+        materializedView ! EventsBatch(events)
+        pushNotificationGateway ! NotifyEvents(command.venue, events)
+      }
 
-    db.run(action)
+    db.runTransactionally(actions)
   }
 
   private def createEvents(command: Command): Seq[Event] = command match {

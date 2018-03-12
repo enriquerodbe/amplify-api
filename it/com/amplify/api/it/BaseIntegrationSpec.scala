@@ -41,7 +41,7 @@ trait BaseIntegrationSpec
   }
 
   override def beforeEach(): Unit = {
-    app.actorSystem.actorSelection(s"/user/queue-command-router/*") ! SetState(Queue())
+    app.actorSystem.actorSelection(s"/user/queue-command-router/*") ! SetState(Queue.empty)
     Evolutions.applyEvolutions(database)
   }
 

@@ -1,8 +1,8 @@
-package com.amplify.api.aggregates.queue
+package com.amplify.api.aggregates.queue.daos
 
 object CommandType extends Enumeration {
 
-  type QueueCommandType = Value
+  type CommandType = Value
 
   val
   SetCurrentPlaylist,

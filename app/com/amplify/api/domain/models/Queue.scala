@@ -55,7 +55,6 @@ case class Queue(
 
 object Queue {
 
-  def apply(): Queue = {
+  val empty: Queue =
     Queue(currentPlaylist = None, pastItems = Nil, currentItem = None, futureItems = Nil)
-  }
 }

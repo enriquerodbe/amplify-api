@@ -31,16 +31,16 @@ class VenueDaoImpl @Inject()(
     query.result.headOption
   }
 
-  override def create(venueDb: VenueDb): DBIO[VenueDb] = {
-    (venuesTable returning venuesTable.map(_.id) into ((obj, id) ⇒ obj.copy(id = id))) += venueDb
-  }
-
   override def retrieveOrCreate(venueDb: VenueDb): DBIO[VenueDb] = {
     val maybeExistingVenue = retrieve(venueDb.identifier)
     maybeExistingVenue.flatMap {
       case Some(venue) ⇒ DBIO.successful(venue)
       case _ ⇒ create(venueDb)
     }
+  }
+
+  private def create(venueDb: VenueDb): DBIO[VenueDb] = {
+    (venuesTable returning venuesTable.map(_.id) into ((obj, id) ⇒ obj.copy(id = id))) += venueDb
   }
 
   override def updateFcmToken(uid: Uid, token: Token): DBIO[Unit] = {

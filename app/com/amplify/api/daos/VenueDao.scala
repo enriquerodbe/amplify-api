@@ -15,8 +15,6 @@ trait VenueDao {
 
   def retrieve(identifier: AuthProviderIdentifier): DBIO[Option[VenueDb]]
 
-  def create(venueDb: VenueDb): DBIO[VenueDb]
-
   def retrieveOrCreate(venueDb: VenueDb): DBIO[VenueDb]
 
   def updateFcmToken(uid: Uid, token: Token): DBIO[Unit]

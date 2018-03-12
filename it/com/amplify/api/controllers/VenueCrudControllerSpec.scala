@@ -2,10 +2,12 @@ package com.amplify.api.controllers
 
 import akka.pattern.ask
 import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveMaterialized
-import com.amplify.api.aggregates.queue.{CommandType, EventType}
+import com.amplify.api.aggregates.queue.daos.CommandDbData.SetCurrentPlaylist
+import com.amplify.api.aggregates.queue.daos.EventDbData.{CurrentPlaylistSet, VenueTrackAdded, VenueTracksRemoved}
+import com.amplify.api.aggregates.queue.daos.{CommandDb, EventDb}
 import com.amplify.api.domain.models.ContentProviderType.Spotify
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.Token
+import com.amplify.api.domain.models.primitives.{Id, Token, Uid}
 import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
 import com.amplify.api.it.fixtures.{QueueCommandDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
@@ -75,33 +77,29 @@ class VenueCrudControllerSpec
 
       val queueCommands = findQueueCommands(aliceVenueDbId)
 
-      queueCommands must have size 1
-      queueCommands.head must have(
-        'queueCommandType (CommandType.SetCurrentPlaylist),
-        'contentIdentifier (Some(ContentProviderIdentifier(Spotify, alicePlaylistIdentifier)))
-      )
+      val contentIdentifier = ContentProviderIdentifier(Spotify, alicePlaylistIdentifier)
+      val command = SetCurrentPlaylist(Uid(aliceVenueUid), contentIdentifier)
+      queueCommands must matchPattern {
+        case Seq(CommandDb(_, Id(`aliceVenueDbId`), `command`, _)) ⇒
+      }
     }
     "create queue events" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
 
       val queueCommands = findQueueCommands(aliceVenueDbId)
-      val queueEvents = findQueueEvents(queueCommands.head.id)
+      val commandId = queueCommands.head.id
+      val queueEvents = findQueueEvents(commandId)
 
-      queueEvents must have size 4
-      queueEvents(0) must have ('queueEventType (EventType.VenueTracksRemoved))
-      queueEvents(1) must have(
-        'queueEventType (EventType.VenueTrackAdded),
-        'contentIdentifier (Some(poisonTrackData.identifier))
-      )
-      queueEvents(2) must have(
-        'queueEventType (EventType.VenueTrackAdded),
-        'contentIdentifier (Some(bedOfNailsTrackData.identifier))
-      )
-      queueEvents(3) must have(
-        'queueEventType (EventType.CurrentPlaylistSet),
-        'contentIdentifier (Some(ContentProviderIdentifier(Spotify, alicePlaylistIdentifier)))
-      )
+      val event0 = VenueTracksRemoved
+      val event1 = VenueTrackAdded(poisonTrackData.identifier)
+      val event2 = VenueTrackAdded(bedOfNailsTrackData.identifier)
+      val event3 = CurrentPlaylistSet(ContentProviderIdentifier(Spotify, alicePlaylistIdentifier))
+
+      queueEvents(0) must matchPattern { case EventDb(_, `commandId`, `event0`, _) ⇒ }
+      queueEvents(1) must matchPattern { case EventDb(_, `commandId`, `event1`, _) ⇒ }
+      queueEvents(2) must matchPattern { case EventDb(_, `commandId`, `event2`, _) ⇒ }
+      queueEvents(3) must matchPattern { case EventDb(_, `commandId`, `event3`, _) ⇒ }
     }
     "update queue current playlist" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(

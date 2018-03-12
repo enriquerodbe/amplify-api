@@ -1,16 +1,15 @@
-package com.amplify.api.aggregates.queue
+package com.amplify.api.aggregates.queue.daos
 
 object EventType extends Enumeration {
 
-  type QueueEventType = Value
+  type EventType = Value
 
   val
     VenueTracksRemoved,
     VenueTrackAdded,
-    AllTracksRemoved,
     TrackFinished,
     CurrentPlaylistSet,
     UserTrackAdded,
-    CurrentTrackSkipped
+    TrackSkipped
   = Value
 }
