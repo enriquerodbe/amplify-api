@@ -1,8 +1,7 @@
 package com.amplify.api.it
 
-import com.amplify.api.aggregates.queue.MaterializedView.SetState
+import com.amplify.api.aggregates.queue.CommandProcessor.SetState
 import com.amplify.api.domain.models.Queue
-import com.amplify.api.aggregates.queue.services.external.firebase.FirebaseNotificationProvider
 import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
 import org.mockito.Mockito.{RETURNS_SMART_NULLS, withSettings}
 import org.scalatest.BeforeAndAfterEach
@@ -27,16 +26,13 @@ trait BaseIntegrationSpec
     mock[SpotifyContentProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
   val spotifyAuthProvider =
     mock[SpotifyAuthProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
-  val firebaseNotificationProvider =
-    mock[FirebaseNotificationProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
   implicit val dbConfig = instanceOf[DatabaseConfigProvider]
   val database = instanceOf[DBApi].database("default")
 
   override def fakeApplication(): Application = {
     new GuiceApplicationBuilder().overrides(
       bind[SpotifyContentProvider].toInstance(spotifyContentProvider),
-      bind[SpotifyAuthProvider].toInstance(spotifyAuthProvider),
-      bind[FirebaseNotificationProvider].toInstance(firebaseNotificationProvider))
+      bind[SpotifyAuthProvider].toInstance(spotifyAuthProvider))
       .build()
   }
 

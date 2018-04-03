@@ -7,7 +7,7 @@ object User extends DtosDefinition {
 
   case class UserResponse(name: String, identifier: String)
   def authenticatedUserToUserResponse(authUser: ModelUser): UserResponse = {
-    UserResponse(authUser.name, authUser.identifier.toString)
+    UserResponse(authUser.name.value, authUser.identifier.toString)
   }
   implicit val userResponseWrites: Writes[UserResponse] = Json.writes[UserResponse]
 }

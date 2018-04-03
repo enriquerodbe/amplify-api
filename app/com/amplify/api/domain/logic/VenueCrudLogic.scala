@@ -1,7 +1,7 @@
 package com.amplify.api.domain.logic
 
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.{Token, Uid}
+import com.amplify.api.domain.models.primitives.Uid
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
 
@@ -15,8 +15,6 @@ trait VenueCrudLogic {
   def setCurrentPlaylist(
       venue: VenueReq,
       playlistIdentifier: ContentProviderIdentifier): Future[Unit]
-
-  def setFcmToken(venue: Venue, token: Token): Future[Unit]
 
   def retrieveQueue(venue: Venue): Future[Queue]
 

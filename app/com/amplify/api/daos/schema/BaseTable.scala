@@ -20,9 +20,6 @@ trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
   implicit val nameType =
     MappedColumnType.base[Name, String](_.value, Name.apply)
 
-  implicit val tokenType =
-    MappedColumnType.base[Token, String](_.value, Token.apply)
-
   implicit val identifierType =
     MappedColumnType.base[Identifier, String](_.value, Identifier.apply)
 

@@ -2,7 +2,7 @@ package com.amplify.api.services
 
 import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.{Name, Token, Uid}
+import com.amplify.api.domain.models.primitives.{Name, Uid}
 import com.amplify.api.exceptions.VenueNotFoundByUid
 import com.amplify.api.services.converters.PlaylistConverter.playlistDataToPlaylistInfo
 import com.amplify.api.services.converters.TrackConverter.trackDataToTrack
@@ -76,9 +76,5 @@ class VenueServiceImpl @Inject()(
 
   override def retrieveAll(): Future[Seq[Venue]] = {
     db.run(venueDao.retrieveAll()).map(_.map(venueDbToVenue))
-  }
-
-  override def setFcmToken(venue: Venue, token: Token): Future[Unit] = {
-    db.run(venueDao.updateFcmToken(venue.uid, token))
   }
 }

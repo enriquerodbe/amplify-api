@@ -7,11 +7,12 @@ scalaVersion := "2.12.4"
 lazy val dependencies = Seq(
   "com.typesafe.play" %% "play-slick" % "3.0.3",
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
+  "com.typesafe.akka" %% "akka-persistence" % "2.5.8",
+  "com.github.dnvriend" %% "akka-persistence-jdbc" % "3.3.0",
   "org.postgresql" % "postgresql" % "42.2.2",
   "be.objectify" %% "deadbolt-scala" % "2.6.1",
   "com.iheart" %% "play-swagger" % "0.7.3",
   "org.webjars" % "swagger-ui" % "3.8.0",
-  "com.google.api-client" % "google-api-client" % "1.23.0",
   guice,
   ws,
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "it,test",
@@ -44,3 +45,9 @@ lazy val testScalastyle = taskKey[Unit]("testScalastyle")
 testScalastyle := scalastyle.in(Test).toTask("").value
 (test in Test) := (test in Test).dependsOn(testScalastyle).value
 scalastyleFailOnError := true
+
+PB.targets in Compile := Seq(
+  scalapb.gen(flatPackage = true) -> (sourceManaged in Compile).value
+)
+PB.protoSources in Compile :=
+  Seq(file("app/com/amplify/api/aggregates/queue/serialization/protobuf"))

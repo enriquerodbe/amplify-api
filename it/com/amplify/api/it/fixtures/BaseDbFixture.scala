@@ -5,7 +5,7 @@ import scala.concurrent.duration.{Duration, DurationInt}
 import scala.concurrent.{Await, Future}
 import slick.jdbc.JdbcProfile
 
-trait BaseDbFixture { self: HasDatabaseConfigProvider[JdbcProfile] =>
+trait BaseDbFixture { self: HasDatabaseConfigProvider[JdbcProfile] ⇒
 
   import profile.api._
 

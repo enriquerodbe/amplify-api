@@ -6,7 +6,7 @@ import com.amplify.api.aggregates.queue.Command.SetCurrentPlaylist
 import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveQueue, RouteCommand}
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.{Token, Uid}
+import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.services.VenueService
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,10 +41,6 @@ class VenueCrudLogicImpl @Inject()(
       result ← (queueCommandRouter ? RouteCommand(command)).mapTo[Unit]
     }
     yield result
-  }
-
-  override def setFcmToken(venue: Venue, token: Token): Future[Unit] = {
-    venueService.setFcmToken(venue, token)
   }
 
   override def retrieveQueue(venue: Venue): Future[Queue] = {

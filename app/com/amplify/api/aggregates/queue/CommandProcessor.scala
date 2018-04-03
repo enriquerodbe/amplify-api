@@ -1,61 +1,47 @@
 package com.amplify.api.aggregates.queue
 
-import akka.actor.{Actor, ActorRef, Props}
-import akka.pattern.pipe
+import akka.actor.Actor
+import akka.persistence.PersistentActor
 import com.amplify.api.aggregates.queue.Command._
-import com.amplify.api.aggregates.queue.CommandConverter.commandToCommandDb
 import com.amplify.api.aggregates.queue.CommandProcessor._
 import com.amplify.api.aggregates.queue.Event._
-import com.amplify.api.aggregates.queue.EventConverter.queueEventToQueueEventDb
-import com.amplify.api.aggregates.queue.MaterializedView.{EventsBatch, Materialize, SetState}
-import com.amplify.api.aggregates.queue.PushNotificationGateway.NotifyEvents
-import com.amplify.api.aggregates.queue.daos.{CommandDao, EventDao}
 import com.amplify.api.configuration.EnvConfig
-import com.amplify.api.daos.{DbioRunner, VenueDao}
-import com.amplify.api.exceptions.VenueNotFoundByUid
-import com.amplify.api.utils.DbioUtils.DbioT
-import javax.inject.{Inject, Named}
+import com.amplify.api.daos.DbioRunner
+import com.amplify.api.domain.models.Queue
+import com.amplify.api.domain.models.primitives.Uid
+import com.google.inject.assistedinject.Assisted
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class CommandProcessor @Inject()(
     db: DbioRunner,
     envConfig: EnvConfig,
-    @Named("push-notification-gateway") pushNotificationGateway: ActorRef,
-    venueDao: VenueDao,
-    commandDao: CommandDao,
-    eventDao: EventDao)(
-    implicit ec: ExecutionContext) extends Actor {
+    @Assisted venueUid: Uid)(
+    implicit ec: ExecutionContext) extends PersistentActor {
 
-  val materializedView = context.actorOf(Props[MaterializedView])
+  override val persistenceId: String = venueUid.value
+
+  private var queue = Queue.empty
 
   implicit val askTimeout = envConfig.defaultAskTimeout
 
-  override def receive: Receive = {
+  override def receiveCommand: Receive = {
     case HandleCommand(command) ⇒
-      val result = handleCommand(command)
-      result pipeTo sender()
+      val events = createEvents(command)
+      persistAll(events.toList) { event ⇒
+        queue = process(queue, event)
+        context.system.eventStream.publish(event)
+        val unit = ()
+        sender() ! unit
+      }
 
-    case RetrieveMaterialized ⇒
-      materializedView forward Materialize
+    case RetrieveState ⇒ sender() ! queue
 
-    case setState: SetState ⇒
-      materializedView forward setState
+    case SetState(newQueue) ⇒ queue = newQueue
   }
 
-  private def handleCommand(command: Command) = {
-    val actions =
-      for {
-        venue ← venueDao.retrieve(command.venue.uid) ?! VenueNotFoundByUid(command.venue.uid)
-        commandDb ← commandDao.create(commandToCommandDb(command, venue.id))
-        events = createEvents(command)
-        _ ← eventDao.create(events.map(queueEventToQueueEventDb(commandDb, _)))
-      }
-      yield {
-        materializedView ! EventsBatch(events)
-        pushNotificationGateway ! NotifyEvents(command.venue, events)
-      }
-
-    db.runTransactionally(actions)
+  override def receiveRecover: Receive = {
+    case event: Event ⇒ queue = process(queue, event)
   }
 
   private def createEvents(command: Command): Seq[Event] = command match {
@@ -66,23 +52,31 @@ class CommandProcessor @Inject()(
     case SkipCurrentTrack(_) ⇒
       Seq(CurrentTrackSkipped)
 
-    case StartPlayback(_) | PausePlayback(_) ⇒
-      Seq.empty[Event]
-
     case AddTrack(_, user, trackIdentifier) ⇒
       Seq(UserTrackAdded(user, trackIdentifier))
+  }
+
+  private def process(queue: Queue, event: Event): Queue = event match {
+    case VenueTracksRemoved ⇒ queue.removeVenueTracks()
+    case VenueTrackAdded(track) ⇒ queue.addVenueTrack(track)
+    case CurrentPlaylistSet(playlist) ⇒ queue.setCurrentPlaylist(playlist)
+    case TrackFinished ⇒ queue.finishCurrentTrack()
+    case UserTrackAdded(_, identifier) ⇒ queue.addUserTrack(identifier)
+    case CurrentTrackSkipped ⇒ queue.skipCurrentTrack()
   }
 }
 
 object CommandProcessor {
 
   trait Factory {
-    def apply(): Actor
+    def apply(venueUid: Uid): Actor
   }
 
   sealed trait CommandProcessorProtocol
 
-  case object RetrieveMaterialized extends CommandProcessorProtocol
-
   case class HandleCommand(command: Command) extends CommandProcessorProtocol
+
+  case object RetrieveState extends CommandProcessorProtocol
+
+  case class SetState(queue: Queue) extends CommandProcessorProtocol
 }

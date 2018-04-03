@@ -13,8 +13,8 @@ object Playlist extends DtosDefinition {
       album: AlbumResponse)
   def trackToPlaylistTrackResponse(track: Track): PlaylistTrackResponse = {
     PlaylistTrackResponse(
-      track.name,
-      track.identifier,
+      track.name.value,
+      track.identifier.toString,
       albumToAlbumResponse(track.album))
   }
   implicit val playlistTrackResponseWrites: Writes[PlaylistTrackResponse] = {
@@ -24,8 +24,8 @@ object Playlist extends DtosDefinition {
   case class PlaylistInfoResponse(name: String, identifier: String, images: Seq[ImageResponse])
   def playlistInfoToPlaylistInfoResponse(info: PlaylistInfo): PlaylistInfoResponse = {
     PlaylistInfoResponse(
-      info.name,
-      info.identifier,
+      info.name.value,
+      info.identifier.toString,
       info.images.map(imageToImageResponse))
   }
   implicit val playlistInfoResponseWrites: Writes[PlaylistInfoResponse] = {

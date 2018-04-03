@@ -13,25 +13,34 @@ CREATE TABLE "venues" (
   "uid" CHAR(8) NOT NULL UNIQUE,
   "auth_provider" SMALLINT NOT NULL,
   "auth_identifier" VARCHAR(255) NOT NULL,
-  "fcm_token" VARCHAR(255),
   UNIQUE ("auth_provider", "auth_identifier"));
 
-CREATE TABLE "queue_commands" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "venue_id" BIGINT NOT NULL,
-  "data" TEXT NOT NULL,
-  "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE "venues_journal" (
+  "ordering" BIGSERIAL,
+  "persistence_id" VARCHAR(255) NOT NULL,
+  "sequence_number" BIGINT NOT NULL,
+  "deleted" BOOLEAN DEFAULT FALSE,
+  "tags" VARCHAR(255) DEFAULT NULL,
+  "message" BYTEA NOT NULL,
+  "time" TIMESTAMP NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (persistence_id, sequence_number)
+);
 
-CREATE TABLE "queue_events" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "queue_command_id" BIGINT NOT NULL,
-  "data" TEXT NOT NULL,
-  "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE UNIQUE INDEX "venues_journal_ordering_idx" ON "venues_journal" ("ordering");
+
+CREATE TABLE "venues_snapshot" (
+  "persistence_id" VARCHAR(255) NOT NULL,
+  "sequence_number" BIGINT NOT NULL,
+  "created" BIGINT NOT NULL,
+  "snapshot" BYTEA NOT NULL,
+  "time" TIMESTAMP NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (persistence_id, sequence_number)
+);
 
 
 # --- !Downs
 
-DROP TABLE IF EXISTS "users";
-DROP TABLE IF EXISTS "venues";
-DROP TABLE IF EXISTS "queue_commands";
-DROP TABLE IF EXISTS "queue_events";
+DROP TABLE "users";
+DROP TABLE "venues";
+DROP TABLE "venues_journal";
+DROP TABLE "venues_snapshot";

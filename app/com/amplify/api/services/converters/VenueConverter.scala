@@ -8,14 +8,14 @@ import com.amplify.api.services.models.UserData
 object VenueConverter {
 
   def venueDbToVenue(venueDb: VenueDb): Venue = {
-    Venue(venueDb.name, venueDb.uid, venueDb.identifier, venueDb.fcmToken)
+    Venue(venueDb.name, venueDb.uid, venueDb.identifier)
   }
 
   def venueReqToVenueDb(name: Name, identifier: AuthProviderIdentifier): VenueDb = {
-    VenueDb(name = name, uid = Uid(), identifier = identifier, fcmToken = None)
+    VenueDb(name = name, uid = Uid(), identifier = identifier)
   }
 
   def userDataToVenueDb(userData: UserData, name: Name): VenueDb = {
-    VenueDb(name = name, uid = Uid(), identifier = userData.identifier, fcmToken = None)
+    VenueDb(name = name, uid = Uid(), identifier = userData.identifier)
   }
 }

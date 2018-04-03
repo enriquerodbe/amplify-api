@@ -94,7 +94,7 @@ trait OAuthClient {
   protected def validate[T](json: JsValue)(implicit reads: Reads[T]): Future[T] = {
     json.validate[T].asEither match {
       case Left(errors) =>
-        val errorsString = errors.map(e => s"${e._1}: ${e._2.map(_.message)}").mkString(", ")
+        val errorsString = errors.map(e ⇒ s"${e._1}: ${e._2.map(_.message)}").mkString(", ")
         Future.failed(InvalidJsonException(s"$errorsString json: ${json.toString()}"))
       case Right(t) =>
         Future.successful(t)

@@ -7,7 +7,7 @@ object Venue extends DtosDefinition {
 
   case class VenueResponse(name: String, uid: String)
   def venueToVenueResponse(venue: VenueModel): VenueResponse = {
-    VenueResponse(venue.name, venue.uid)
+    VenueResponse(venue.name.value, venue.uid.value)
   }
   implicit val venueResponseWrites: Writes[VenueResponse] = Json.writes[VenueResponse]
 

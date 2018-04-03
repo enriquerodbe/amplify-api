@@ -5,15 +5,9 @@ import javax.inject.Inject
 import play.api.Configuration
 import scala.concurrent.duration.DurationDouble
 
-class EnvConfig @Inject()(configuration: Configuration) {
+class EnvConfig @Inject()(config: Configuration) {
 
-  private def getString(keyName: String): String = configuration.get[String](keyName)
-
-  val spotifyUrl = getString("spotify.web_api.url")
+  val spotifyUrl = config.get[String]("spotify.web_api.url")
 
   val defaultAskTimeout = Timeout(3.seconds)
-
-  val firebasePrivateKey = getString("google.firebase.private_key")
-
-  val firebaseSendEndpoint = getString("google.firebase.send_endpoint")
 }

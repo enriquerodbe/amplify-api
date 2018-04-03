@@ -29,9 +29,7 @@ object ContentProviderIdentifier {
     }
   }
 
-  implicit def toString(id: ContentProviderIdentifier): String = id.toString
-
   implicit def fromTuple(tuple: (ContentProviderType, String)): ContentProviderIdentifier = {
-    apply(tuple._1, tuple._2)
+    apply(tuple._1, Identifier(tuple._2))
   }
 }

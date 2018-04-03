@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package com.amplify.api.aggregates.queue.serialization;
+
+message Identifier {
+    string value = 1;
+}
+
+message Name {
+    string value = 1;
+}
+
+message Token {
+    string value = 1;
+}
+
+message Uid {
+    string value = 1;
+}
+
+message Id {
+    int64 value = 1;
+}

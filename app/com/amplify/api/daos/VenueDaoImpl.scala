@@ -3,8 +3,7 @@ package com.amplify.api.daos
 import com.amplify.api.daos.models.VenueDb
 import com.amplify.api.daos.schema.VenuesTable
 import com.amplify.api.domain.models.AuthProviderIdentifier
-import com.amplify.api.domain.models.primitives.{Token, Uid}
-import com.amplify.api.exceptions.VenueNotFoundByUid
+import com.amplify.api.domain.models.primitives.Uid
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import scala.concurrent.ExecutionContext
@@ -41,16 +40,5 @@ class VenueDaoImpl @Inject()(
 
   private def create(venueDb: VenueDb): DBIO[VenueDb] = {
     (venuesTable returning venuesTable.map(_.id) into ((obj, id) ⇒ obj.copy(id = id))) += venueDb
-  }
-
-  override def updateFcmToken(uid: Uid, token: Token): DBIO[Unit] = {
-    venuesTable
-      .filter(_.uid === uid)
-      .map(_.fcmToken)
-      .update(Some(token))
-      .flatMap {
-        case n if n == 1 ⇒ DBIO.successful(())
-        case _ ⇒ DBIO.failed(VenueNotFoundByUid(uid))
-      }
   }
 }

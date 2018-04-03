@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package com.amplify.api.aggregates.queue.serialization;
+
+import "primitives.proto";
+
+enum ContentProviderType {
+    CONTENT_UNKNOWN = 0;
+    CONTENT_SPOTIFY = 1;
+}
+
+message ContentProviderIdentifier {
+    ContentProviderType contentProvider = 1;
+    Identifier identifier = 2;
+}
+
+enum AuthProviderType {
+    AUTH_UNKNOWN = 0;
+    AUTH_SPOTIFY = 1;
+}
+
+message AuthProviderIdentifier {
+    AuthProviderType authProvider = 1;
+    Identifier identifier = 2;
+}
+
+message User {
+    Name name = 1;
+    AuthProviderIdentifier identifier = 2;
+}
+
+message Image {
+    string url = 1;
+    int32 height = 2;
+    int32 width = 3;
+}
+
+message PlaylistInfo {
+    Name name = 1;
+    ContentProviderIdentifier identifier = 2;
+    repeated Image images = 3;
+}
+
+message Artist {
+    Name name = 1;
+}
+
+message Album {
+    Name name = 1;
+    repeated Artist artists = 2;
+    repeated Image images = 3;
+}
+
+message Track {
+    Name name = 1;
+    ContentProviderIdentifier identifier = 2;
+    Album album = 3;
+}
+
+message Playlist {
+    PlaylistInfo playlistInfo = 1;
+    repeated Track tracks = 2;
+}
+
+message CurrentPlaylistSet {
+    Playlist playlist = 1;
+}
+
+message VenueTracksRemoved {}
+
+message VenueTrackAdded {
+    Track track = 1;
+}
+
+message TrackFinished {}
+
+message UserTrackAdded {
+    User user = 1;
+    ContentProviderIdentifier trackIdentifier = 2;
+}
+
+message CurrentTrackSkipped {}

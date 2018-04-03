@@ -1,15 +1,11 @@
 package com.amplify.api.controllers
 
 import akka.pattern.ask
-import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveMaterialized
-import com.amplify.api.aggregates.queue.daos.CommandDbData.SetCurrentPlaylist
-import com.amplify.api.aggregates.queue.daos.EventDbData.{CurrentPlaylistSet, VenueTrackAdded, VenueTracksRemoved}
-import com.amplify.api.aggregates.queue.daos.{CommandDb, EventDb}
+import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveState
 import com.amplify.api.domain.models.ContentProviderType.Spotify
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.{Id, Token, Uid}
 import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
-import com.amplify.api.it.fixtures.{QueueCommandDbFixture, QueueEventDbFixture, SpotifyContext, VenueDbFixture}
+import com.amplify.api.it.fixtures.{SpotifyContext, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import org.mockito.Mockito.when
 import org.scalatest.Inside
@@ -62,50 +58,20 @@ class VenueCrudControllerSpec
   }
 
   class SetCurrentPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends VenueDbFixture with QueueCommandDbFixture with QueueEventDbFixture
+    extends VenueDbFixture
 
   "setCurrentPlaylist" should {
     "respond No content" in new SetCurrentPlaylistFixture {
       val response = controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier).withAliceToken)
+        playlistRequest(alicePlaylistData.identifier.toString).withAliceToken)
 
       status(response) mustEqual NO_CONTENT
     }
-    "create queue command" in new SetCurrentPlaylistFixture {
-      controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
-
-      val queueCommands = findQueueCommands(aliceVenueDbId)
-
-      val contentIdentifier = ContentProviderIdentifier(Spotify, alicePlaylistIdentifier)
-      val command = SetCurrentPlaylist(Uid(aliceVenueUid), contentIdentifier)
-      queueCommands must matchPattern {
-        case Seq(CommandDb(_, Id(`aliceVenueDbId`), `command`, _)) ⇒
-      }
-    }
-    "create queue events" in new SetCurrentPlaylistFixture {
-      controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
-
-      val queueCommands = findQueueCommands(aliceVenueDbId)
-      val commandId = queueCommands.head.id
-      val queueEvents = findQueueEvents(commandId)
-
-      val event0 = VenueTracksRemoved
-      val event1 = VenueTrackAdded(poisonTrackData.identifier)
-      val event2 = VenueTrackAdded(bedOfNailsTrackData.identifier)
-      val event3 = CurrentPlaylistSet(ContentProviderIdentifier(Spotify, alicePlaylistIdentifier))
-
-      queueEvents(0) must matchPattern { case EventDb(_, `commandId`, `event0`, _) ⇒ }
-      queueEvents(1) must matchPattern { case EventDb(_, `commandId`, `event1`, _) ⇒ }
-      queueEvents(2) must matchPattern { case EventDb(_, `commandId`, `event2`, _) ⇒ }
-      queueEvents(3) must matchPattern { case EventDb(_, `commandId`, `event3`, _) ⇒ }
-    }
     "update queue current playlist" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
+        playlistRequest(alicePlaylistData.identifier.toString).withAliceToken).await()
 
-      val queue = (commandProcessor ? RetrieveMaterialized).mapTo[Queue].await()
+      val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
 
       inside(queue.currentPlaylist) { case Some(Playlist(playlistInfo, tracks)) ⇒
         playlistInfo must have(
@@ -149,9 +115,9 @@ class VenueCrudControllerSpec
     }
     "update queue current track" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
+        playlistRequest(alicePlaylistData.identifier.toString).withAliceToken).await()
 
-      val queue = (commandProcessor ? RetrieveMaterialized).mapTo[Queue].await()
+      val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
 
       inside(queue.currentItem) { case Some(QueueItem(track, itemType)) ⇒
         itemType mustEqual QueueItemType.Venue
@@ -163,9 +129,9 @@ class VenueCrudControllerSpec
     }
     "update queue items" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier).withAliceToken).await()
+        playlistRequest(alicePlaylistData.identifier.toString).withAliceToken).await()
 
-      val queue = (commandProcessor ? RetrieveMaterialized).mapTo[Queue].await()
+      val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
 
       for (item ← queue.allItems) item must have ('itemType (QueueItemType.Venue))
       queue.allItems.map(_.track) must contain theSameElementsAs queue.currentPlaylist.get.tracks
@@ -243,22 +209,6 @@ class VenueCrudControllerSpec
         (venue \ "name").as[String] mustEqual aliceVenueDb.name.toString
         (venue \ "uid").as[String] must have size 8
       }
-    }
-  }
-
-  class SetFcmFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends VenueDbFixture
-
-  "setFcmToken" should {
-    "respond No content" in new SetFcmFixture {
-      val response = controller.setFcmToken()(setFcmTokenRequest("test-token").withAliceToken)
-
-      status(response) mustBe NO_CONTENT
-    }
-    "update token" in new SetFcmFixture {
-      val response =
-        controller.setFcmToken()(setFcmTokenRequest("test-token").withAliceToken).await()
-      getVenue(aliceVenueDbId).fcmToken must be(Some(Token("test-token")))
     }
   }
 }

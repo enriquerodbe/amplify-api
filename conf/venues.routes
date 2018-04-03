@@ -229,31 +229,6 @@ GET    /    com.amplify.api.controllers.VenueCrudController.retrieveAll
 GET    /me    com.amplify.api.controllers.VenueCrudController.retrieveCurrent
 
 ###
-#  summary: Set the FCM token of the authenticated venue
-#  responses:
-#    204:
-#      description: success
-#  parameters:
-#  - name: Auth-provider
-#    description: Name of the OAuth authorization server
-#    in: header
-#    required: false
-#    type: string
-#    default: spotify
-#  - name: Authorization
-#    description: Access token issued by the authorization server
-#    in: header
-#    required: true
-#    type: string
-#  - name: token
-#    in: body
-#    required: true
-#    schema:
-#      $ref: '#/definitions/com.amplify.api.controllers.dtos.FcmToken.FcmTokenRequest'
-###
-PUT    /me/fcm/token    com.amplify.api.controllers.VenueCrudController.setFcmToken
-
-###
 #  summary: Add a track to a venue's queue
 #  responses:
 #    204:

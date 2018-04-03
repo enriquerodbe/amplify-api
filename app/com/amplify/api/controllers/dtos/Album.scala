@@ -10,7 +10,7 @@ object Album extends DtosDefinition {
   case class AlbumResponse(name: String, artists: Seq[ArtistResponse], images: Seq[ImageResponse])
   def albumToAlbumResponse(album: ModelAlbum): AlbumResponse = {
     AlbumResponse(
-      album.name,
+      album.name.value,
       album.artists.map(artistToArtistResponse),
       album.images.map(imageToImageResponse))
   }

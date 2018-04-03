@@ -1,7 +1,5 @@
 package com.amplify.api.domain.models.primitives
 
-import scala.language.implicitConversions
-
 case class Identifier(value: String) extends AnyVal {
 
   override def toString: String = value
@@ -9,7 +7,8 @@ case class Identifier(value: String) extends AnyVal {
 
 object Identifier {
 
-  implicit def identifierToString(identifier: Identifier): String = identifier.value
-
-  implicit def stringToIdentifier(value: String): Identifier = Identifier(value)
+  def apply(value: String): Identifier = {
+    require(value != null && value.trim.nonEmpty, "Empty identifier")
+    new Identifier(value)
+  }
 }

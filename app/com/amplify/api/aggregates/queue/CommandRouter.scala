@@ -1,7 +1,7 @@
 package com.amplify.api.aggregates.queue
 
 import akka.actor.Actor
-import com.amplify.api.aggregates.queue.CommandProcessor.{HandleCommand, RetrieveMaterialized}
+import com.amplify.api.aggregates.queue.CommandProcessor.{HandleCommand, RetrieveState}
 import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveQueue, RouteCommand}
 import com.amplify.api.domain.models.Venue
 import com.amplify.api.domain.models.primitives.Uid
@@ -18,12 +18,15 @@ class CommandRouter @Inject()(
 
     case RetrieveQueue(venue) ⇒
       val commandProcessor = getCommandProcessor(venue.uid)
-      commandProcessor forward RetrieveMaterialized
+      commandProcessor forward RetrieveState
   }
 
   private def getCommandProcessor(venueUid: Uid) = {
     val name = createCommandProcessorName(venueUid)
-    context.child(name).getOrElse(injectedChild(commandProcessorFactory(), name))
+    val maybeActorRef = context.child(name)
+    maybeActorRef.getOrElse {
+      injectedChild(commandProcessorFactory(venueUid), name, _.withMailbox("stash-mailbox"))
+    }
   }
 
   private def createCommandProcessorName(venueUid: Uid) = s"queue-command-processor-$venueUid"

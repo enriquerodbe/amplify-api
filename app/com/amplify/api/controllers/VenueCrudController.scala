@@ -2,13 +2,12 @@ package com.amplify.api.controllers
 
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.AuthenticatedRequests
-import com.amplify.api.controllers.dtos.FcmToken.FcmTokenRequest
 import com.amplify.api.controllers.dtos.Playlist.{PlaylistRequest, playlistInfoToPlaylistInfoResponse, playlistToPlaylistResponse}
 import com.amplify.api.controllers.dtos.Queue.queueToQueueResponse
 import com.amplify.api.controllers.dtos.Venue.venueToVenueResponse
 import com.amplify.api.domain.logic.{VenueCrudLogic, VenuePlayerLogic}
 import com.amplify.api.domain.models.ContentProviderIdentifier
-import com.amplify.api.domain.models.primitives.Token
+import com.amplify.api.domain.models.primitives.Uid
 import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -31,7 +30,8 @@ class VenueCrudController @Inject()(
   }
 
   def retrieveCurrentPlaylist(uid: String) = authenticatedUser() { _ ⇒
-    venueCrudLogic.retrieveCurrentPlaylist(uid).map {
+    val venueUid = Uid(uid)
+    venueCrudLogic.retrieveCurrentPlaylist(venueUid).map {
       case Some(playlist) ⇒ Ok(Json.toJson(playlistToPlaylistResponse(playlist)))
       case _ ⇒ NoContent
     }
@@ -61,9 +61,5 @@ class VenueCrudController @Inject()(
     venueCrudLogic.retrieveAll().map { venues ⇒
       Ok(Json.toJson(venues.map(venueToVenueResponse)))
     }
-  }
-
-  def setFcmToken() = authenticatedVenue(parse.json[FcmTokenRequest]) { request ⇒
-    venueCrudLogic.setFcmToken(request.subject.venue, Token(request.body.token)).map(_ ⇒ NoContent)
   }
 }

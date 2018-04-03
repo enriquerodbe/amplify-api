@@ -63,8 +63,10 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with SpotifyContext wi
       }
 
       "venue without name provided" in {
-        val response = controller.signUp()(venueRequest(null).withBobToken)
-        intercept[Exception](status(response))
+        intercept[Exception] {
+          val response = controller.signUp()(venueRequest(null).withBobToken)
+          status(response)
+        }
       }
     }
   }

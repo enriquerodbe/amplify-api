@@ -29,9 +29,7 @@ object AuthProviderIdentifier {
     }
   }
 
-  implicit def toString(id: AuthProviderIdentifier): String = id.toString
-
   implicit def fromTuple(tuple: (AuthProviderType, String)): AuthProviderIdentifier = {
-    apply(tuple._1, tuple._2)
+    apply(tuple._1, Identifier(tuple._2))
   }
 }

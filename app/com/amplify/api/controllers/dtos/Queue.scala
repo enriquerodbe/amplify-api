@@ -13,9 +13,9 @@ object Queue extends DtosDefinition {
       album: AlbumResponse)
   def itemToQueueTrackResponse(item: QueueItem): QueueTrackResponse = {
     QueueTrackResponse(
-      item.track.name,
+      item.track.name.value,
       item.itemType.toString,
-      item.track.identifier,
+      item.track.identifier.toString,
       albumToAlbumResponse(item.track.album))
   }
   implicit val queueTrackResponseWrites: Writes[QueueTrackResponse] = {
@@ -30,9 +30,9 @@ object Queue extends DtosDefinition {
       position: Int)
   def itemToCurrentTrackResponse(item: QueueItem, index: Int): CurrentTrackResponse = {
     CurrentTrackResponse(
-      item.track.name,
+      item.track.name.value,
       item.itemType.toString,
-      item.track.identifier,
+      item.track.identifier.toString,
       albumToAlbumResponse(item.track.album),
       index)
   }

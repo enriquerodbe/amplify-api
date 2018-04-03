@@ -5,6 +5,7 @@ import com.amplify.api.controllers.auth.{AuthHeadersUtil, AuthenticatedRequests}
 import com.amplify.api.controllers.dtos.Queue.AddTrackRequest
 import com.amplify.api.domain.logic.VenuePlayerLogic
 import com.amplify.api.domain.models.ContentProviderIdentifier
+import com.amplify.api.domain.models.primitives.Uid
 import javax.inject.Inject
 import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,7 +34,7 @@ class VenuePlayerController @Inject()(
   def addTrack(uid: String) = authenticatedUser(parse.json[AddTrackRequest]) { request ⇒
     ContentProviderIdentifier.fromString(request.body.identifier) match {
       case Success(identifier) ⇒
-        venuePlayerLogic.addTrack(uid, request.subject.user, identifier).map(_ ⇒ NoContent)
+        venuePlayerLogic.addTrack(Uid(uid), request.subject.user, identifier).map(_ ⇒ NoContent)
       case Failure(ex) ⇒
         Future.failed(ex)
     }

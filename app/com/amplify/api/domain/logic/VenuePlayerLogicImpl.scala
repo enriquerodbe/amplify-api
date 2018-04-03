@@ -2,7 +2,7 @@ package com.amplify.api.domain.logic
 
 import akka.actor.ActorRef
 import akka.pattern.ask
-import com.amplify.api.aggregates.queue.Command.{AddTrack, PausePlayback, SkipCurrentTrack, StartPlayback}
+import com.amplify.api.aggregates.queue.Command.{AddTrack, SkipCurrentTrack}
 import com.amplify.api.aggregates.queue.CommandRouter.RouteCommand
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models.primitives.Uid
@@ -20,11 +20,11 @@ class VenuePlayerLogicImpl @Inject()(
   implicit val askTimeout = envConfig.defaultAskTimeout
 
   override def play(venue: Venue): Future[Unit] = {
-    (queueCommandRouter ? RouteCommand(StartPlayback(venue))).mapTo[Unit]
+    Future.successful(())
   }
 
   override def pause(venue: Venue): Future[Unit] = {
-    (queueCommandRouter ? RouteCommand(PausePlayback(venue))).mapTo[Unit]
+    Future.successful(())
   }
 
   override def skip(venue: Venue): Future[Unit] = {
