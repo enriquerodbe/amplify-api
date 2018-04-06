@@ -1,0 +1,19 @@
+version: '2'
+services:
+  app:
+    image: amplify-api
+    ports:
+    - "9000:9000"
+    environment:
+      - DB_HOST=amplify-api-db
+      - DB_PORT=5432
+    depends_on:
+    - amplify-api-db
+  amplify-api-db:
+    image: postgres
+    ports:
+     - "5433:5432"
+    environment:
+     - POSTGRES_PASSWORD=amplify_api
+     - POSTGRES_USER=amplify_api
+     - POSTGRES_DB=amplify_api_dev
