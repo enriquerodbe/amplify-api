@@ -3,7 +3,8 @@ package com.amplify.api.controllers.dtos
 import com.amplify.api.controllers.dtos.Album.{AlbumResponse, albumToAlbumResponse}
 import com.amplify.api.controllers.dtos.Image.{ImageResponse, imageToImageResponse}
 import com.amplify.api.domain.models.{PlaylistInfo, Track, Playlist ⇒ ModelPlaylist}
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.Reads._
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
 object Playlist extends DtosDefinition {
 
@@ -41,5 +42,7 @@ object Playlist extends DtosDefinition {
   implicit val playlistResponseWrites: Writes[PlaylistResponse] = Json.writes[PlaylistResponse]
 
   case class PlaylistRequest(identifier: String)
-  implicit val playlistRequestReads: Reads[PlaylistRequest] = Json.reads[PlaylistRequest]
+  implicit val playlistRequestReads: Reads[PlaylistRequest] = {
+    (JsPath \ "identifier").read[String](minLength[String](1)).map(PlaylistRequest)
+  }
 }
