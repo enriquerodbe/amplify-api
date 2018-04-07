@@ -2,9 +2,9 @@ package com.amplify.api.controllers
 
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.AuthenticatedRequests
+import com.amplify.api.controllers.dtos.SuccessfulResponse
 import com.amplify.api.controllers.dtos.User._
 import javax.inject.Inject
-import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.Future
 
@@ -15,6 +15,6 @@ class UserCrudController @Inject()(
 
   def retrieveCurrent() = authenticatedUser() { request ⇒
     val response = authenticatedUserToUserResponse(request.subject.user)
-    Future.successful(Ok(Json.toJson(response)))
+    Future.successful(SuccessfulResponse(response))
   }
 }

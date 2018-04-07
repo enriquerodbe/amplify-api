@@ -1,13 +1,14 @@
 package com.amplify.api.exceptions
 
-import com.amplify.api.controllers.dtos.ErrorResponse
+import com.amplify.api.controllers.dtos.AmplifyApiResponse._
+import com.amplify.api.controllers.dtos.{ClientErrorResponse, ServerErrorResponse}
 import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
-import play.api.http.DefaultHttpErrorHandler
+import play.api.http.HttpErrorHandler
 import play.api.libs.json.Json
 import play.api.mvc.{RequestHeader, Result, Results}
 import play.api.routing.Router
-import play.api.{Configuration, Environment, OptionalSourceMapper, UsefulException}
+import play.api.{Configuration, Environment, Logger, OptionalSourceMapper}
 import play.mvc.Http
 import scala.concurrent.Future
 
@@ -17,34 +18,30 @@ class ErrorHandler @Inject()(
     config: Configuration,
     sourceMapper: OptionalSourceMapper,
     router: Provider[Router])
-  extends DefaultHttpErrorHandler(env, config, sourceMapper, router) with Results {
+  extends HttpErrorHandler with Results {
 
-  override def onProdServerError(
+  private val logger = Logger(classOf[ErrorHandler])
+
+  override def onClientError(
       request: RequestHeader,
-      exception: UsefulException): Future[Result] = {
-    onError(request, exception.cause, s"[${exception.id}] ${exception.title}")
+      statusCode: Int,
+      message: String): Future[Result] = {
+    Future.successful(ClientErrorResponse(AppExceptionCode.BadRequest, message))
   }
 
-  override protected def onDevServerError(
-      request: RequestHeader,
-      exception: UsefulException): Future[Result] = {
-    val unexpectedMessage = s"[${exception.id}] ${exception.title}: ${exception.description}"
-    onError(request, exception.cause, unexpectedMessage)
-  }
-
-  private def onError(
-      request: RequestHeader,
-      exception: Throwable,
-      unexpectedMessage: String) = exception match {
-    case ex: UnauthorizedException ⇒
-      val response = Unauthorized(Json.toJson(ErrorResponse(ex.code, ex.message)))
-      Future.successful(response.withHeaders(Http.HeaderNames.WWW_AUTHENTICATE → "Bearer"))
-    case ex: BadRequestException ⇒
-      Future.successful(BadRequest(Json.toJson(ErrorResponse(ex.code, ex.message))))
-    case ex: InternalException ⇒
-      Future.successful(InternalServerError(Json.toJson(ErrorResponse(ex.code, ex.message))))
-    case _ ⇒
-      val body = Json.toJson(ErrorResponse(AppExceptionCode.Unexpected, unexpectedMessage))
-      Future.successful(InternalServerError(body))
+  override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
+    logger.error(s"Server error occurred: ${exception.getMessage}", exception)
+    lazy val errorMsg = "Internal server error"
+    exception match {
+      case ex: UnauthorizedException ⇒
+        val response = Unauthorized(Json.toJson(ClientErrorResponse(ex.code, ex.message)))
+        Future.successful(response.withHeaders(Http.HeaderNames.WWW_AUTHENTICATE → "Bearer"))
+      case ex: BadRequestException ⇒
+        Future.successful(BadRequest(Json.toJson(ClientErrorResponse(ex.code, ex.message))))
+      case ex: InternalException ⇒
+        Future.successful(ServerErrorResponse(ex.code, errorMsg))
+      case _ ⇒
+        Future.successful(ServerErrorResponse(message = errorMsg))
+    }
   }
 }

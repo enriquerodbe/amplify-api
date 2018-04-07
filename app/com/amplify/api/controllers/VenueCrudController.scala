@@ -4,12 +4,12 @@ import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.AuthenticatedRequests
 import com.amplify.api.controllers.dtos.Playlist.{PlaylistRequest, playlistInfoToPlaylistInfoResponse, playlistToPlaylistResponse}
 import com.amplify.api.controllers.dtos.Queue.queueToQueueResponse
+import com.amplify.api.controllers.dtos.SuccessfulResponse
 import com.amplify.api.controllers.dtos.Venue.venueToVenueResponse
 import com.amplify.api.domain.logic.{VenueCrudLogic, VenuePlayerLogic}
 import com.amplify.api.domain.models.ContentProviderIdentifier
 import com.amplify.api.domain.models.primitives.Uid
 import javax.inject.Inject
-import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -25,14 +25,14 @@ class VenueCrudController @Inject()(
   def retrievePlaylists() = authenticatedVenue() { request ⇒
     val eventualPlaylists = venueCrudLogic.retrievePlaylists(request.subject.venueReq)
     eventualPlaylists.map { playlists =>
-      Ok(Json.toJson(playlists.map(playlistInfoToPlaylistInfoResponse)))
+      SuccessfulResponse(playlists.map(playlistInfoToPlaylistInfoResponse))
     }
   }
 
   def retrieveCurrentPlaylist(uid: String) = authenticatedUser() { _ ⇒
     val venueUid = Uid(uid)
     venueCrudLogic.retrieveCurrentPlaylist(venueUid).map {
-      case Some(playlist) ⇒ Ok(Json.toJson(playlistToPlaylistResponse(playlist)))
+      case Some(playlist) ⇒ SuccessfulResponse(playlistToPlaylistResponse(playlist))
       case _ ⇒ NoContent
     }
   }
@@ -48,18 +48,16 @@ class VenueCrudController @Inject()(
 
   def retrieveQueue() = authenticatedVenue() { request ⇒
     venueCrudLogic.retrieveQueue(request.subject.venue).map { queue ⇒
-      Ok(Json.toJson(queueToQueueResponse(queue)))
+      SuccessfulResponse(queueToQueueResponse(queue))
     }
   }
 
   def retrieveCurrent() = authenticatedVenue() { request ⇒
     val response = venueToVenueResponse(request.subject.venue)
-    Future.successful(Ok(Json.toJson(response)))
+    Future.successful(SuccessfulResponse(response))
   }
 
   def retrieveAll() = authenticatedUser() { _ ⇒
-    venueCrudLogic.retrieveAll().map { venues ⇒
-      Ok(Json.toJson(venues.map(venueToVenueResponse)))
-    }
+    venueCrudLogic.retrieveAll().map(venues ⇒ SuccessfulResponse(venues.map(venueToVenueResponse)))
   }
 }

@@ -24,6 +24,7 @@ object AppExceptionCode extends Enumeration {
 
   val
     Unexpected,
+    BadRequest,
     UnsupportedAuthProvider,
     UserAuthTokenNotFound,
     WrongAuthorizationHeader,
