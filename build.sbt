@@ -1,5 +1,4 @@
 name := "amplify-api"
-
 version := "1.0-SNAPSHOT"
 
 scalaVersion := "2.12.4"
@@ -45,6 +44,10 @@ lazy val testScalastyle = taskKey[Unit]("testScalastyle")
 testScalastyle := scalastyle.in(Test).toTask("").value
 (test in Test) := (test in Test).dependsOn(testScalastyle).value
 scalastyleFailOnError := true
+
+sources in (Compile, doc) := Seq.empty
+publishArtifact in (Compile, packageDoc) := false
+topLevelDirectory := None
 
 PB.targets in Compile := Seq(
   scalapb.gen(flatPackage = true) -> (sourceManaged in Compile).value
