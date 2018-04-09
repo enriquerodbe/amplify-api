@@ -252,3 +252,6 @@ GET    /me    com.amplify.api.controllers.VenueCrudController.retrieveCurrent
 #      $ref: '#/definitions/com.amplify.api.controllers.dtos.Queue.AddTrackRequest'
 ###
 POST    /:uid/queue    com.amplify.api.controllers.VenuePlayerController.addTrack(uid: String)
+
+### NoDocs ###
+GET /ws com.amplify.api.controllers.WebSocketController.connect

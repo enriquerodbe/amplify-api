@@ -24,7 +24,7 @@ abstract class AbstractDeadboltHandler(
   }
 
   override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] = {
-    authHeadersUtil.getAuthToken(request) match {
+    authHeadersUtil.getAuthTokenFromHeaders(request) match {
       case Success(authToken) ⇒ login(authToken)
       case Failure(ex) ⇒ Future.failed(ex)
     }

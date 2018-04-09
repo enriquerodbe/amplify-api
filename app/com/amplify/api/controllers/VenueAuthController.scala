@@ -20,7 +20,7 @@ class VenueAuthController @Inject()(
     implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def signUp = Action.async(parse.json[VenueRequest]) { request ⇒
-    authHeadersUtil.getAuthToken(request) match {
+    authHeadersUtil.getAuthTokenFromHeaders(request) match {
       case Success(authToken) ⇒
         val venueName = Name(request.body.name)
         val eventualVenue = venueAuthLogic.signUp(authToken, venueName)

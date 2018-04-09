@@ -28,11 +28,13 @@ class CommandProcessor @Inject()(
   override def receiveCommand: Receive = {
     case HandleCommand(command) ⇒
       val events = createEvents(command)
+      val last = events.lastOption
       persistAll(events.toList) { event ⇒
         queue = process(queue, event)
-        context.system.eventStream.publish(event)
-        val unit = ()
-        sender() ! unit
+        if (last.contains(event)) {
+          context.system.eventStream.publish(QueueUpdated(venueUid, queue))
+          sender().!(())
+        }
       }
 
     case RetrieveState ⇒ sender() ! queue

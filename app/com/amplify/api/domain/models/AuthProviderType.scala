@@ -7,7 +7,6 @@ object AuthProviderType extends Enumeration {
   type AuthProviderType = Value
 
   val Spotify = Value(1, "spotify")
-  val Firebase = Value(2, "firebase")
 
   val default = Spotify
 
