@@ -9,6 +9,7 @@ services:
       - DB_PORT=5432
       - DB_USER=amplify_api
       - DB_PASSWORD=amplify_api
+      - APPLICATION_SECRET=secret
     depends_on:
     - amplify-api-db
   amplify-api-db:

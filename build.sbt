@@ -1,6 +1,5 @@
 name := "amplify-api"
 version := "1.0-SNAPSHOT"
-
 scalaVersion := "2.12.4"
 
 lazy val dependencies = Seq(
@@ -26,12 +25,6 @@ lazy val `amplify-api` = (project in file("."))
 
 fork in IntegrationTest := true
 javaOptions in IntegrationTest += "-Dconfig.file=it/conf/application.test.conf"
-
-// Scoverage
-// This makes heroku deploy fail
-//coverageEnabled := true
-//coverageMinimum := 80
-//coverageFailOnMinimum := true
 
 // Swagger
 swaggerDomainNameSpaces := Seq("com.amplify.api.controllers.dtos")
