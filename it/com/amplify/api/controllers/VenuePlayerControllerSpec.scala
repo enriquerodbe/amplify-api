@@ -56,4 +56,25 @@ class VenuePlayerControllerSpec extends BaseIntegrationSpec with SpotifyContext 
       )
     }
   }
+
+  class FinishFixture(implicit val dbConfigProvider: DatabaseConfigProvider) extends VenueDbFixture
+
+  "finish" should {
+    "respond No content" in new FinishFixture {
+      val response = controller.finish()(FakeRequest().withBody(()).withAliceToken)
+
+      status(response) mustBe NO_CONTENT
+    }
+    "update queue current track" in new FinishFixture {
+      controller.finish()(FakeRequest().withBody(()).withAliceToken).await()
+
+      val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
+
+      queue must have(
+        'currentItem (None),
+        'futureItems (Nil),
+        'pastItems (Nil)
+      )
+    }
+  }
 }

@@ -21,17 +21,17 @@ class CommandProcessor @Inject()(
 
   override val persistenceId: String = venueUid.value
 
-  private var queue = Queue.empty
-
   implicit val askTimeout = envConfig.defaultAskTimeout
+
+  private var queue = Queue.empty
 
   override def receiveCommand: Receive = {
     case HandleCommand(command) ⇒
       val events = createEvents(command)
       val last = events.lastOption
       persistAll(events.toList) { event ⇒
-        queue = process(queue, event)
         if (last.contains(event)) {
+          queue = events.foldLeft(queue)(process)
           context.system.eventStream.publish(QueueUpdated(venueUid, queue))
           sender().!(())
         }
@@ -51,11 +51,11 @@ class CommandProcessor @Inject()(
       val tracksEvents = playlist.tracks.map(VenueTrackAdded)
       VenueTracksRemoved +: tracksEvents :+ CurrentPlaylistSet(playlist)
 
-    case SkipCurrentTrack(_) ⇒
-      Seq(CurrentTrackSkipped)
+    case SkipCurrentTrack(_) ⇒ Seq(CurrentTrackSkipped)
 
-    case AddTrack(_, user, trackIdentifier) ⇒
-      Seq(UserTrackAdded(user, trackIdentifier))
+    case FinishCurrentTrack(_) ⇒ Seq(TrackFinished)
+
+    case AddTrack(_, user, trackIdentifier) ⇒ Seq(UserTrackAdded(user, trackIdentifier))
   }
 
   private def process(queue: Queue, event: Event): Queue = event match {

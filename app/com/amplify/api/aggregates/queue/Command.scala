@@ -13,6 +13,8 @@ object Command {
 
   case class SkipCurrentTrack(venue: Venue) extends Command
 
+  case class FinishCurrentTrack(venue: Venue) extends Command
+
   case class AddTrack(
       venue: Venue,
       user: User,

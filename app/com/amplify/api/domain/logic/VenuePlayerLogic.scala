@@ -14,5 +14,7 @@ trait VenuePlayerLogic {
 
   def skip(venue: Venue): Future[Unit]
 
+  def finish(venue: Venue): Future[Unit]
+
   def addTrack(venueUid: Uid, user: User, trackIdentifier: ContentProviderIdentifier): Future[Unit]
 }

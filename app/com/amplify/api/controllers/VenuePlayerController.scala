@@ -31,6 +31,10 @@ class VenuePlayerController @Inject()(
     venuePlayerLogic.skip(request.subject.venue).map(_ ⇒ NoContent)
   }
 
+  def finish() = authenticatedVenue(parse.empty) { request ⇒
+    venuePlayerLogic.finish(request.subject.venue).map(_ ⇒ NoContent)
+  }
+
   def addTrack(uid: String) = authenticatedUser(parse.json[AddTrackRequest]) { request ⇒
     ContentProviderIdentifier.fromString(request.body.identifier) match {
       case Success(identifier) ⇒

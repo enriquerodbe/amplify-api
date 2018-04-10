@@ -182,6 +182,28 @@ PUT    /me/queue/pause    com.amplify.api.controllers.VenuePlayerController.paus
 ###
 PUT    /me/queue/skip    com.amplify.api.controllers.VenuePlayerController.skip
 
+
+###
+#  summary: Finish playing the current track of the authenticated venue
+#  responses:
+#    204:
+#      description: success
+#  parameters:
+#  - name: Auth-provider
+#    description: Name of the OAuth authorization server
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: Authorization
+#    description: Access token issued by the authorization server
+#    in: header
+#    required: true
+#    type: string
+###
+PUT    /me/queue/finish    com.amplify.api.controllers.VenuePlayerController.finish
+
+
 ###
 #  summary: Retrieve all registered venues
 #  responses:
