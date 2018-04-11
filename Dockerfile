@@ -8,5 +8,5 @@ RUN apk add --no-cache bash
 COPY --from=dist /app /app
 WORKDIR /app
 ENV HTTP_PORT 9000
-CMD bin/amplify-api -Dpidfile.path=/dev/null -Dhttp.port=${HTTP_PORT}
+CMD ["bin/amplify-api", "-Dpidfile.path=/dev/null", "-Dhttp.port=${HTTP_PORT}"]
 EXPOSE $HTTP_PORT

@@ -1,7 +1,25 @@
-image: bitbucketpipelines/scala-sbt:scala-2.12
+image: enriquerodbe/sbt-play:1.1.2_2.6.13
 
 pipelines:
   default:
     - step:
         script:
           - sbt test
+          - sbt it:test
+          - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+          - docker build -t amplifyuy/amplify-api:latest .
+          - docker push amplifyuy/amplify-api:latest
+        services:
+          - postgres
+
+definitions:
+  services:
+    postgres:
+      image: postgres
+      environment:
+        POSTGRES_DB: 'amplify_api_test'
+        POSTGRES_USER: 'amplify'
+        POSTGRES_PASSWORD: 'amplify'
+
+options:
+  docker: true
