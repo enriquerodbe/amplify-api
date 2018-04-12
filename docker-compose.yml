@@ -1,7 +1,7 @@
 version: '2'
 services:
   app:
-    image: amplify-api
+    image: amplifyuy/amplify-api
     ports:
     - "9000:9000"
     environment:
