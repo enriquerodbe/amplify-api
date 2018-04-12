@@ -8,10 +8,6 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[VenuePlayerLogicImpl])
 trait VenuePlayerLogic {
 
-  def play(venue: Venue): Future[Unit]
-
-  def pause(venue: Venue): Future[Unit]
-
   def skip(venue: Venue): Future[Unit]
 
   def finish(venue: Venue): Future[Unit]

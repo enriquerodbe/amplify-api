@@ -19,14 +19,6 @@ class VenuePlayerLogicImpl @Inject()(
 
   implicit val askTimeout = envConfig.defaultAskTimeout
 
-  override def play(venue: Venue): Future[Unit] = {
-    Future.successful(())
-  }
-
-  override def pause(venue: Venue): Future[Unit] = {
-    Future.successful(())
-  }
-
   override def skip(venue: Venue): Future[Unit] = {
     (queueCommandRouter ? RouteCommand(SkipCurrentTrack(venue))).mapTo[Unit]
   }

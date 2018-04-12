@@ -16,26 +16,6 @@ class VenuePlayerControllerSpec extends BaseIntegrationSpec with SpotifyContext 
   val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueUid"
   val commandProcessor = app.actorSystem.actorSelection(path)
 
-  class PlayFixture(implicit val dbConfigProvider: DatabaseConfigProvider) extends VenueDbFixture
-
-  "play" should {
-    "respond No content" in new PlayFixture {
-      val response = controller.play()(FakeRequest().withBody(()).withAliceToken)
-
-      status(response) mustBe NO_CONTENT
-    }
-  }
-
-  class PauseFixture(implicit val dbConfigProvider: DatabaseConfigProvider) extends VenueDbFixture
-
-  "pause" should {
-    "respond No content" in new PauseFixture {
-      val response = controller.pause()(FakeRequest().withBody(()).withAliceToken)
-
-      status(response) mustBe NO_CONTENT
-    }
-  }
-
   class SkipFixture(implicit val dbConfigProvider: DatabaseConfigProvider) extends VenueDbFixture
 
   "skip" should {
