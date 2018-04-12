@@ -1,5 +1,5 @@
 name := "amplify-api"
-version := "1.0-SNAPSHOT"
+version := sys.props.getOrElse("amplify.api.version", "1.0-SNAPSHOT")
 scalaVersion := "2.12.4"
 
 lazy val dependencies = Seq(
@@ -23,6 +23,7 @@ lazy val `amplify-api` = (project in file("."))
   .settings(scalaSource in IntegrationTest := baseDirectory.value / "it")
   .enablePlugins(PlayScala, SwaggerPlugin)
 
+// Integration tests
 fork in IntegrationTest := true
 javaOptions in IntegrationTest += "-Dconfig.file=it/conf/application.test.conf"
 
@@ -38,10 +39,12 @@ testScalastyle := scalastyle.in(Test).toTask("").value
 (test in Test) := (test in Test).dependsOn(testScalastyle).value
 scalastyleFailOnError := true
 
+// Dist files
 sources in (Compile, doc) := Seq.empty
 publishArtifact in (Compile, packageDoc) := false
 topLevelDirectory := None
 
+// ScalaPB
 PB.targets in Compile := Seq(
   scalapb.gen(flatPackage = true) -> (sourceManaged in Compile).value
 )
