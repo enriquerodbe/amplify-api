@@ -2,11 +2,9 @@ package com.amplify.api.services.external.spotify
 
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models.AuthToken
-import com.amplify.api.domain.models.primitives.Identifier
-import com.amplify.api.services.external._
-import com.amplify.api.services.models.{PlaylistData, TrackData}
-import com.amplify.api.services.external.spotify.Converters.{playlistToPlaylistData, trackItemToTrackData}
-import com.amplify.api.services.external.spotify.Dtos.{Playlist, Playlists, TrackItem}
+import com.amplify.api.domain.models.Spotify.PlaylistUri
+import com.amplify.api.exceptions.{ExternalResourceNotFound, RequestedResourceNotFound}
+import com.amplify.api.services.external.spotify.Dtos.{Playlist, TrackItem}
 import com.amplify.api.services.external.spotify.JsonConverters._
 import com.amplify.api.utils.Pagination
 import javax.inject.Inject
@@ -17,32 +15,36 @@ class SpotifyContentProvider @Inject()(
     override val ws: WSClient,
     override val envConfig: EnvConfig)(
     override implicit val ec: ExecutionContext)
-  extends ContentProviderStrategy with SpotifyBaseProvider with Pagination {
+  extends SpotifyBaseProvider with Pagination {
 
   override val itemsField = "items"
   override val totalField = "total"
   override val nextField = "next"
   override val paginationOffsetHeader = "offset"
 
-  override def fetchPlaylists(implicit token: AuthToken): Future[Seq[PlaylistData]] = {
-    apiGet[Playlists]("/me/playlists").map(_.items.map(playlistToPlaylistData))
+  def fetchPlaylists(implicit token: AuthToken): Future[Seq[Playlist]] = {
+    paginatedFetch[Playlist]("/me/playlists")
   }
 
-  override def fetchPlaylist(
-      userIdentifier: Identifier,
-      playlistIdentifier: Identifier)(
-      implicit authToken: AuthToken): Future[PlaylistData] = {
-    val playlist = apiGet[Playlist](s"/users/$userIdentifier/playlists/$playlistIdentifier")
-    playlist.map(playlistToPlaylistData)
+  def fetchPlaylist(
+      uri: PlaylistUri)(
+      implicit authToken: AuthToken): Future[Playlist] = {
+    apiGet[Playlist](s"/users/${uri.owner}/playlists/${uri.id}")
+      .recoverWith {
+        case ExternalResourceNotFound ⇒
+          Future.failed(RequestedResourceNotFound(uri.toString))
+      }
   }
 
-  override def fetchPlaylistTracks(
-      userIdentifier: Identifier,
-      playlistIdentifier: Identifier)(
-      implicit token: AuthToken): Future[Seq[TrackData]] = {
-    val path = s"/users/$userIdentifier/playlists/$playlistIdentifier/tracks"
+  def fetchPlaylistTracks(
+      uri: PlaylistUri)(
+      implicit token: AuthToken): Future[Seq[TrackItem]] = {
+    val path = s"/users/${uri.owner}/playlists/${uri.id}/tracks"
     val query = Map("fields" → "next,total,items(track(id,name,album))")
-    val eventualItems = paginatedFetch[TrackItem](path, query, Seq.empty, 0)
-    eventualItems.map(_.map(trackItemToTrackData))
+    paginatedFetch[TrackItem](path, query)
+      .recoverWith {
+        case ExternalResourceNotFound ⇒
+          Future.failed(RequestedResourceNotFound(uri.toString))
+      }
   }
 }

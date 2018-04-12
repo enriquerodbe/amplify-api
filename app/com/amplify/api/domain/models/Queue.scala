@@ -31,7 +31,7 @@ case class Queue(
     )
   }
 
-  def addUserTrack(identifier: ContentProviderIdentifier): Queue = {
+  def addUserTrack(identifier: TrackIdentifier): Queue = {
     val result = findTrack(identifier).map { track ⇒
       val userItems = futureItems.takeWhile(_.itemType == QueueItemType.User)
       val newItem = QueueItem(track, QueueItemType.User)
@@ -43,7 +43,7 @@ case class Queue(
     result.getOrElse(this)
   }
 
-  def findTrack(identifier: ContentProviderIdentifier): Option[Track] = {
+  def findTrack(identifier: TrackIdentifier): Option[Track] = {
     currentPlaylist match {
       case Some(playlist) ⇒ playlist.findTrack(identifier)
       case _ ⇒ None

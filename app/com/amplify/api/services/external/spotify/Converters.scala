@@ -1,31 +1,37 @@
 package com.amplify.api.services.external.spotify
 
+import com.amplify.api.domain.models
 import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
-import com.amplify.api.domain.models.ContentProviderType.Spotify
+import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
 import com.amplify.api.domain.models.primitives.Name
-import com.amplify.api.services.models._
 import com.amplify.api.services.external.spotify.Dtos._
+import com.amplify.api.services.models._
 
 object Converters {
 
   def userToUserData(user: User): UserData = UserData(AuthSpotify → user.id, Name(user.displayName))
 
-  def imageToImageData(image: Image): ImageData = ImageData(image.url, image.height, image.width)
+  def toModelImage(image: Image): models.Image = models.Image(image.url, image.height, image.width)
 
-  def playlistToPlaylistData(playlist: Playlist): PlaylistData = {
-    PlaylistData(Spotify → playlist.id, Name(playlist.name), playlist.images.map(imageToImageData))
+  def toModelPlaylist(playlist: Playlist): models.PlaylistInfo = {
+    models.PlaylistInfo(
+      Name(playlist.name),
+      PlaylistUri(playlist.owner.id, playlist.id),
+      playlist.images.map(toModelImage))
   }
 
-  def trackItemToTrackData(trackItem: TrackItem): TrackData = {
-    val trackIdentifier = Spotify → trackItem.track.id
-    TrackData(trackIdentifier, Name(trackItem.track.name), albumToAlbumData(trackItem.track.album))
+  def toModelTrack(trackItem: TrackItem): models.Track = {
+    models.Track(
+      Name(trackItem.track.name),
+      TrackUri(trackItem.track.id),
+      toModelAlbum(trackItem.track.album))
   }
 
-  def albumToAlbumData(album: Album): AlbumData = {
-    val artists = album.artists.map(artistToArtistData)
-    val albums = album.images.map(imageToImageData)
-    AlbumData(Name(album.name), artists, albums)
+  def toModelAlbum(album: Album): models.Album = {
+    val artists = album.artists.map(toModelArtist)
+    val images = album.images.map(toModelImage)
+    models.Album(Name(album.name), artists, images)
   }
 
-  def artistToArtistData(artist: Artist): ArtistData = ArtistData(Name(artist.name))
+  def toModelArtist(artist: Artist): models.Artist = models.Artist(Name(artist.name))
 }

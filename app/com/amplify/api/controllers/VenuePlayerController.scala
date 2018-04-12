@@ -4,8 +4,9 @@ import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.{AuthHeadersUtil, AuthenticatedRequests}
 import com.amplify.api.controllers.dtos.Queue.AddTrackRequest
 import com.amplify.api.domain.logic.VenuePlayerLogic
-import com.amplify.api.domain.models.ContentProviderIdentifier
+import com.amplify.api.domain.models.{ContentIdentifier, TrackIdentifier}
 import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.exceptions.InvalidProviderIdentifier
 import javax.inject.Inject
 import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,9 +37,11 @@ class VenuePlayerController @Inject()(
   }
 
   def addTrack(uid: String) = authenticatedUser(parse.json[AddTrackRequest]) { request ⇒
-    ContentProviderIdentifier.fromString(request.body.identifier) match {
-      case Success(identifier) ⇒
+    ContentIdentifier.fromString(request.body.identifier) match {
+      case Success(identifier: TrackIdentifier) ⇒
         venuePlayerLogic.addTrack(Uid(uid), request.subject.user, identifier).map(_ ⇒ NoContent)
+      case Success(otherIdentifier) ⇒
+        Future.failed(InvalidProviderIdentifier(otherIdentifier.toString))
       case Failure(ex) ⇒
         Future.failed(ex)
     }

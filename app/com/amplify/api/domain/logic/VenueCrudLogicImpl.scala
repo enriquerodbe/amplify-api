@@ -34,7 +34,7 @@ class VenueCrudLogicImpl @Inject()(
 
   override def setCurrentPlaylist(
       venueReq: VenueReq,
-      playlistIdentifier: ContentProviderIdentifier): Future[Unit] = {
+      playlistIdentifier: PlaylistIdentifier): Future[Unit] = {
     for {
       playlist ← venueService.retrievePlaylist(venueReq, playlistIdentifier)
       command = SetCurrentPlaylist(venueReq.venue, playlist)

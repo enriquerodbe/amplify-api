@@ -4,13 +4,17 @@ package com.amplify.api.aggregates.queue.serialization;
 
 import "primitives.proto";
 
-enum ContentProviderType {
-    CONTENT_UNKNOWN = 0;
-    CONTENT_SPOTIFY = 1;
+enum ContentProvider {
+    CONTENT_PROVIDER_SPOTIFY = 0;
 }
 
-message ContentProviderIdentifier {
-    ContentProviderType contentProvider = 1;
+message PlaylistIdentifier {
+    ContentProvider contentProvider = 1;
+    Identifier identifier = 2;
+}
+
+message TrackIdentifier {
+    ContentProvider contentProvider = 1;
     Identifier identifier = 2;
 }
 
@@ -37,7 +41,7 @@ message Image {
 
 message PlaylistInfo {
     Name name = 1;
-    ContentProviderIdentifier identifier = 2;
+    PlaylistIdentifier identifier = 2;
     repeated Image images = 3;
 }
 
@@ -53,7 +57,7 @@ message Album {
 
 message Track {
     Name name = 1;
-    ContentProviderIdentifier identifier = 2;
+    TrackIdentifier identifier = 2;
     Album album = 3;
 }
 
@@ -76,7 +80,7 @@ message TrackFinished {}
 
 message UserTrackAdded {
     User user = 1;
-    ContentProviderIdentifier trackIdentifier = 2;
+    TrackIdentifier trackIdentifier = 2;
 }
 
 message CurrentTrackSkipped {}

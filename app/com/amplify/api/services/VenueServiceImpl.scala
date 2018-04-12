@@ -4,10 +4,8 @@ import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.{Name, Uid}
 import com.amplify.api.exceptions.VenueNotFoundByUid
-import com.amplify.api.services.converters.PlaylistConverter.playlistDataToPlaylistInfo
-import com.amplify.api.services.converters.TrackConverter.trackDataToTrack
 import com.amplify.api.services.converters.VenueConverter.{userDataToVenueDb, venueDbToVenue}
-import com.amplify.api.services.external.ContentProviderRegistry
+import com.amplify.api.services.external.ContentService
 import com.amplify.api.services.models.UserData
 import com.amplify.api.utils.DbioUtils.DbioT
 import javax.inject.Inject
@@ -15,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class VenueServiceImpl @Inject()(
     db: DbioRunner,
-    registry: ContentProviderRegistry,
+    contentService: ContentService,
     userDao: UserDao,
     venueDao: VenueDao)(
     implicit ec: ExecutionContext) extends VenueService {
@@ -36,14 +34,13 @@ class VenueServiceImpl @Inject()(
   }
 
   override def retrievePlaylists(venue: VenueReq): Future[Seq[PlaylistInfo]] = {
-    val strategy = registry.getStrategy(venue.contentProviders)
-    val eventualPlaylists = strategy.fetchPlaylists(venue.authToken)
-    eventualPlaylists.map(_.map(playlistDataToPlaylistInfo))
+    implicit val token = venue.authToken
+    contentService.fetchPlaylists(venue.contentProviders)
   }
 
   override def retrievePlaylist(
       venue: VenueReq,
-      identifier: ContentProviderIdentifier): Future[Playlist] = {
+      identifier: PlaylistIdentifier): Future[Playlist] = {
     val eventualPlaylistInfo = retrievePlaylistInfo(venue, identifier)
     val eventualPlaylistTracks = retrievePlaylistTracks(venue, identifier)
     for {
@@ -55,23 +52,16 @@ class VenueServiceImpl @Inject()(
 
   private def retrievePlaylistInfo(
       venue: VenueReq,
-      playlistIdentifier: ContentProviderIdentifier): Future[PlaylistInfo] = {
+      playlistIdentifier: PlaylistIdentifier): Future[PlaylistInfo] = {
     implicit val token = venue.authToken
-    val contentProvider = registry.getStrategy(playlistIdentifier.contentProvider)
-    val userIdentifier = venue.identifier.identifier
-    val result = contentProvider.fetchPlaylist(userIdentifier, playlistIdentifier.identifier)
-    result.map(playlistDataToPlaylistInfo)
+    contentService.fetchPlaylist(playlistIdentifier)
   }
 
   private def retrievePlaylistTracks(
       venue: VenueReq,
-      playlistIdentifier: ContentProviderIdentifier): Future[Seq[Track]] = {
+      playlistIdentifier: PlaylistIdentifier): Future[Seq[Track]] = {
     implicit val token = venue.authToken
-    val strategy = registry.getStrategy(playlistIdentifier.contentProvider)
-    val userIdentifier = venue.identifier.identifier
-    val eventualPlaylist =
-      strategy.fetchPlaylistTracks(userIdentifier, playlistIdentifier.identifier)
-    eventualPlaylist.map(_.map(trackDataToTrack))
+    contentService.fetchPlaylistTracks(playlistIdentifier)
   }
 
   override def retrieveAll(): Future[Seq[Venue]] = {

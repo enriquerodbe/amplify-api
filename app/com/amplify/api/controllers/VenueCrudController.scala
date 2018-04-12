@@ -7,8 +7,9 @@ import com.amplify.api.controllers.dtos.Queue.queueToQueueResponse
 import com.amplify.api.controllers.dtos.SuccessfulResponse
 import com.amplify.api.controllers.dtos.Venue.venueToVenueResponse
 import com.amplify.api.domain.logic.{VenueCrudLogic, VenuePlayerLogic}
-import com.amplify.api.domain.models.ContentProviderIdentifier
 import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.models.{ContentIdentifier, PlaylistIdentifier}
+import com.amplify.api.exceptions.InvalidProviderIdentifier
 import javax.inject.Inject
 import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,9 +39,11 @@ class VenueCrudController @Inject()(
   }
 
   def setCurrentPlaylist() = authenticatedVenue(parse.json[PlaylistRequest]) { request ⇒
-    ContentProviderIdentifier.fromString(request.body.identifier) match {
-      case Success(identifier) ⇒
+    ContentIdentifier.fromString(request.body.identifier) match {
+      case Success(identifier: PlaylistIdentifier) ⇒
         venueCrudLogic.setCurrentPlaylist(request.subject.venueReq, identifier).map(_ ⇒ NoContent)
+      case Success(otherIdentifier) ⇒
+        Future.failed(InvalidProviderIdentifier(otherIdentifier.toString))
       case Failure(ex) ⇒
         Future.failed(ex)
     }

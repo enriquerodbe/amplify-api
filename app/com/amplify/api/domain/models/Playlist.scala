@@ -4,9 +4,9 @@ import com.amplify.api.domain.models.primitives.Name
 
 case class Playlist(info: PlaylistInfo, tracks: Seq[Track]) {
 
-  def findTrack(identifier: ContentProviderIdentifier): Option[Track] = {
+  def findTrack(identifier: TrackIdentifier): Option[Track] = {
     tracks.find(_.identifier == identifier)
   }
 }
 
-case class PlaylistInfo(name: Name, identifier: ContentProviderIdentifier, images: Seq[Image])
+case class PlaylistInfo(name: Name, identifier: PlaylistIdentifier, images: Seq[Image])

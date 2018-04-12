@@ -9,7 +9,7 @@ import scala.util.{Failure, Success, Try}
 case class AuthProviderIdentifier(authProvider: AuthProviderType, identifier: Identifier) {
 
   override def toString: String = {
-    s"$authProvider${ContentProviderIdentifier.SEPARATOR}$identifier"
+    s"$authProvider${AuthProviderIdentifier.SEPARATOR}$identifier"
   }
 }
 

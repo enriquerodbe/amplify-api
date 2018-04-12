@@ -11,3 +11,9 @@ case object ExternalResourceNotFound
     AppExceptionCode.ExternalResourceNotFound,
     "External resource not found")
     with ExternalServiceException
+
+case class RequestedResourceNotFound(resource: String)
+  extends BadRequestException(
+      AppExceptionCode.ExternalResourceNotFound,
+      s"External resource not found: $resource")
+    with ExternalServiceException

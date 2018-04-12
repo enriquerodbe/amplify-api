@@ -1,7 +1,10 @@
 package com.amplify.api.aggregates.queue.serialization
 
 import com.amplify.api.aggregates.queue.Event
+import com.amplify.api.aggregates.queue.serialization.ContentProvider.CONTENT_PROVIDER_SPOTIFY
 import com.amplify.api.domain.models
+import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
+import com.amplify.api.exceptions.InvalidProviderIdentifier
 import scalapb.GeneratedMessage
 
 object ProtobufConverter {
@@ -27,11 +30,14 @@ object ProtobufConverter {
     Playlist(playlistInfo, tracks)
   }
 
-  private def toProtobuf(
-      contentIdentifier: models.ContentProviderIdentifier): ContentProviderIdentifier = {
-    val provider = ContentProviderType.fromValue(contentIdentifier.contentProvider.id)
-    val identifier = Some(Identifier(contentIdentifier.identifier.value))
-    ContentProviderIdentifier(provider, identifier)
+  private def toProtobuf(contentIdentifier: models.PlaylistIdentifier): PlaylistIdentifier = {
+    val provider = ContentProvider.fromValue(contentIdentifier.contentProvider.id)
+    PlaylistIdentifier(provider, Some(Identifier(contentIdentifier.identifier.value)))
+  }
+
+  private def toProtobuf(contentIdentifier: models.TrackIdentifier): TrackIdentifier = {
+    val provider = ContentProvider.fromValue(contentIdentifier.contentProvider.id)
+    TrackIdentifier(provider, Some(Identifier(contentIdentifier.identifier.value)))
   }
 
   private def toProtobuf(
@@ -84,11 +90,22 @@ object ProtobufConverter {
     models.PlaylistInfo(name, identifier, info.images.map(fromProtobuf))
   }
 
-  private def fromProtobuf(
-      identifier: ContentProviderIdentifier): models.ContentProviderIdentifier = {
-    val provider = models.ContentProviderType(identifier.contentProvider.value)
-    val id = models.primitives.Identifier(identifier.getIdentifier.value)
-    models.ContentProviderIdentifier(provider, id)
+  private def fromProtobuf(contentIdentifier: PlaylistIdentifier): models.PlaylistIdentifier = {
+    contentIdentifier.contentProvider match {
+      case CONTENT_PROVIDER_SPOTIFY ⇒
+        PlaylistUri.fromString(contentIdentifier.getIdentifier.value).get
+      case _ ⇒
+        throw InvalidProviderIdentifier(contentIdentifier.getIdentifier.value)
+    }
+  }
+
+  private def fromProtobuf(contentIdentifier: TrackIdentifier): models.TrackIdentifier = {
+    contentIdentifier.contentProvider match {
+      case CONTENT_PROVIDER_SPOTIFY ⇒
+        TrackUri(contentIdentifier.getIdentifier.value)
+      case _ ⇒
+        throw InvalidProviderIdentifier(contentIdentifier.getIdentifier.value)
+    }
   }
 
   private def fromProtobuf(

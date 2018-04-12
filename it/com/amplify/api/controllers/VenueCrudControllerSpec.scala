@@ -2,7 +2,8 @@ package com.amplify.api.controllers
 
 import akka.pattern.ask
 import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveState
-import com.amplify.api.domain.models.ContentProviderType.Spotify
+import com.amplify.api.domain.models.ContentProvider.Spotify
+import com.amplify.api.domain.models.Spotify.TrackUri
 import com.amplify.api.domain.models._
 import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
 import com.amplify.api.it.fixtures.{SpotifyContext, VenueDbFixture}
@@ -37,8 +38,8 @@ class VenueCrudControllerSpec
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response).head
-      (jsonResponse \ "name").as[String] mustEqual alicePlaylistData.name.toString
-      (jsonResponse \ "identifier").as[String] mustEqual alicePlaylistData.identifier.toString
+      (jsonResponse \ "name").as[String] mustEqual alicePlaylist.name.toString
+      (jsonResponse \ "identifier").as[String] mustEqual alicePlaylistUri.toString
       val image = (jsonResponse \ "images").head
       (image \ "url").as[String] mustEqual alicePlaylistImages.head.url
       (image \ "height").as[Int] mustEqual alicePlaylistImages.head.height.get
@@ -63,24 +64,24 @@ class VenueCrudControllerSpec
   "setCurrentPlaylist" should {
     "respond No content" in new SetCurrentPlaylistFixture {
       val response = controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier.toString).withAliceToken)
+        playlistRequest(alicePlaylistUri.toString).withAliceToken)
 
       status(response) mustEqual NO_CONTENT
     }
     "update queue current playlist" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier.toString).withAliceToken).await()
+        playlistRequest(alicePlaylistUri.toString).withAliceToken).await()
 
       val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
 
       inside(queue.currentPlaylist) { case Some(Playlist(playlistInfo, tracks)) ⇒
         playlistInfo must have(
-          'name (alicePlaylistData.name.toString),
-          'identifier (alicePlaylistData.identifier)
+          'name (alicePlaylist.name),
+          'identifier (alicePlaylistUri)
         )
-        playlistInfo.images must have size alicePlaylistData.images.size
+        playlistInfo.images must have size alicePlaylist.images.size
         for (i ← playlistInfo.images.indices) {
-          val playlistImage = alicePlaylistData.images(i)
+          val playlistImage = alicePlaylist.images(i)
           playlistInfo.images(i) must have(
             'url (playlistImage.url),
             'width (playlistImage.width),
@@ -92,22 +93,22 @@ class VenueCrudControllerSpec
         for (trackIndex ← tracks.indices) {
           val playlistTrack = alicePlaylistTracks(trackIndex)
           tracks(trackIndex) must have(
-            'name (playlistTrack.name.toString),
-            'identifier (playlistTrack.identifier)
+            'name (playlistTrack.track.name),
+            'identifier (TrackUri(playlistTrack.track.id))
           )
-          tracks(trackIndex).album must have('name (playlistTrack.album.name.toString))
-          tracks(trackIndex).album.artists must have size playlistTrack.album.artists.size
+          tracks(trackIndex).album must have('name (playlistTrack.track.album.name))
+          tracks(trackIndex).album.artists must have size playlistTrack.track.album.artists.size
           for (artistIndex ← tracks(trackIndex).album.artists.indices) {
             tracks(trackIndex).album.artists(artistIndex) must have(
-              'name (playlistTrack.album.artists(artistIndex).name.toString)
+              'name (playlistTrack.track.album.artists(artistIndex).name)
             )
           }
-          tracks(trackIndex).album.images must have size playlistTrack.album.images.size
+          tracks(trackIndex).album.images must have size playlistTrack.track.album.images.size
           for (imageIndex ← tracks(trackIndex).album.images.indices) {
             tracks(trackIndex).album.images(imageIndex) must have(
-              'url (playlistTrack.album.images(imageIndex).url),
-              'width (playlistTrack.album.images(imageIndex).width),
-              'height (playlistTrack.album.images(imageIndex).height)
+              'url (playlistTrack.track.album.images(imageIndex).url),
+              'width (playlistTrack.track.album.images(imageIndex).width),
+              'height (playlistTrack.track.album.images(imageIndex).height)
             )
           }
         }
@@ -115,21 +116,21 @@ class VenueCrudControllerSpec
     }
     "update queue current track" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier.toString).withAliceToken).await()
+        playlistRequest(alicePlaylistUri.toString).withAliceToken).await()
 
       val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
 
       inside(queue.currentItem) { case Some(QueueItem(track, itemType)) ⇒
         itemType mustEqual QueueItemType.Venue
         track must have(
-          'name (alicePlaylistTracks.head.name.toString),
-          'identifier (alicePlaylistTracks.head.identifier)
+          'name (alicePlaylistTracks.head.track.name.toString),
+          'identifier (TrackUri(alicePlaylistTracks.head.track.id))
         )
       }
     }
     "update queue items" in new SetCurrentPlaylistFixture {
       controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistData.identifier.toString).withAliceToken).await()
+        playlistRequest(alicePlaylistUri.toString).withAliceToken).await()
 
       val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
 

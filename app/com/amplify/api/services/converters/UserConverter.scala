@@ -7,9 +7,7 @@ import com.amplify.api.services.models.UserData
 object UserConverter {
 
   def userDataToUserDb(userData: UserData): UserDb = {
-    UserDb(
-      name = userData.name,
-      authIdentifier = userData.identifier)
+    UserDb(name = userData.name, authIdentifier = userData.identifier)
   }
 
   def userDbToUser(userDb: UserDb): User = {

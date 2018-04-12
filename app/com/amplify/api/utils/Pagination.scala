@@ -22,9 +22,9 @@ trait Pagination { self: OAuthClient ⇒
 
   def paginatedFetch[T: Format](
       path: String,
-      query: Map[String, String],
-      acc: Seq[T],
-      offset: Int)(
+      query: Map[String, String] = Map.empty,
+      acc: Seq[T] = Seq.empty,
+      offset: Int = 0)(
       implicit token: AuthToken): Future[Seq[T]] = {
     fetchPage[T](path, query, offset).flatMap { page ⇒
       val items = acc ++ page.items

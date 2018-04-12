@@ -1,11 +1,11 @@
 package com.amplify.api.domain.models
 
-import com.amplify.api.domain.models.ContentProviderType.ContentProviderType
+import com.amplify.api.domain.models.ContentProvider.ContentProvider
 import com.amplify.api.domain.models.primitives.{Name, Uid}
 
 case class Venue(name: Name, uid: Uid, identifier: AuthProviderIdentifier) {
 
-  def contentProviders: ContentProviderType = ContentProviderType.Spotify
+  def contentProviders: ContentProvider = ContentProvider.Spotify
 }
 
 case class VenueReq(venue: Venue, authToken: AuthToken) {
@@ -16,5 +16,5 @@ case class VenueReq(venue: Venue, authToken: AuthToken) {
 
   def identifier: AuthProviderIdentifier = venue.identifier
 
-  def contentProviders: ContentProviderType = venue.contentProviders
+  def contentProviders: ContentProvider = venue.contentProviders
 }
