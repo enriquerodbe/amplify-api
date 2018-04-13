@@ -6,12 +6,12 @@ services:
     - "9000:9000"
     environment:
       - DB_HOST=amplify-api-db
-      - DB_PORT=5432
-      - DB_USER=amplify_api
-      - DB_PASSWORD=amplify_api
       - APPLICATION_SECRET=secret
-      - CORS_ALLOWED_ORIGINS_0=*
-      - CORS_ALLOWED_HEADERS_0=*
+      - CORS_ALLOWED_ORIGINS_0=localhost:8081
+      - CORS_ALLOWED_HEADERS_0=Origin
+      - CORS_ALLOWED_HEADERS_1=Content-Type
+      - CORS_ALLOWED_HEADERS_2=X-Auth-Token
+      - CORS_ALLOWED_HEADERS_3=Authorization
     depends_on:
     - amplify-api-db
   amplify-api-db:
@@ -19,6 +19,6 @@ services:
     ports:
      - "5433:5432"
     environment:
-     - POSTGRES_PASSWORD=amplify_api
-     - POSTGRES_USER=amplify_api
+     - POSTGRES_PASSWORD=amplify
+     - POSTGRES_USER=amplify
      - POSTGRES_DB=amplify_api_dev
