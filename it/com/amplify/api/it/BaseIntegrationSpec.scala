@@ -1,7 +1,11 @@
 package com.amplify.api.it
 
+import akka.pattern.ask
+import akka.util.Timeout
 import com.amplify.api.aggregates.queue.CommandProcessor.SetState
+import com.amplify.api.controllers.VenueCrudController
 import com.amplify.api.domain.models.Queue
+import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
 import org.mockito.Mockito.{RETURNS_SMART_NULLS, withSettings}
 import org.scalatest.BeforeAndAfterEach
@@ -15,6 +19,9 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Results
+import play.api.test.FakeRequest
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 import scala.reflect.ClassTag
 
 trait BaseIntegrationSpec
@@ -42,4 +49,17 @@ trait BaseIntegrationSpec
   }
 
   override def afterEach(): Unit = Evolutions.cleanupEvolutions(database)
+
+  protected def findCommandProcessor(venueUid: Uid) = {
+    val path = s"/user/queue-command-router/queue-command-processor-$venueUid"
+    app.actorSystem.actorSelection(path)
+  }
+
+  protected def initQueue(venueUid: Uid, queue: Queue) = {
+    implicit val timeout = Timeout(2.seconds)
+    Await.ready(instanceOf[VenueCrudController]
+      .retrieveCurrentPlaylist(venueUid.value)(FakeRequest()), timeout.duration)
+    val processor = findCommandProcessor(venueUid)
+    Await.ready((processor ? SetState(queue)).mapTo[Unit], timeout.duration)
+  }
 }

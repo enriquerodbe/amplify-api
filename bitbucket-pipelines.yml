@@ -6,6 +6,7 @@ pipelines:
         script:
           - sbt test
           - sbt it:test
+          - sbt coverageReport
           - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
           - docker build --build-arg version=$BITBUCKET_BUILD_NUMBER -t amplifyuy/amplify-api:$BITBUCKET_BUILD_NUMBER .
           - docker push amplifyuy/amplify-api:$BITBUCKET_BUILD_NUMBER

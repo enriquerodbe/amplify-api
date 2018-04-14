@@ -39,7 +39,9 @@ class CommandProcessor @Inject()(
 
     case RetrieveState ⇒ sender() ! queue
 
-    case SetState(newQueue) ⇒ queue = newQueue
+    case SetState(newQueue) ⇒
+      queue = newQueue
+      sender().!(())
   }
 
   override def receiveRecover: Receive = {

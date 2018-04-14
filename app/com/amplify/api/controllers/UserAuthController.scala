@@ -1,6 +1,5 @@
 package com.amplify.api.controllers
 
-import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.AuthHeadersUtil
 import com.amplify.api.controllers.dtos.SuccessfulResponse
 import com.amplify.api.controllers.dtos.User.authenticatedUserToUserResponse
@@ -14,17 +13,14 @@ import scala.util.{Failure, Success}
 class UserAuthController @Inject()(
     cc: ControllerComponents,
     userAuthLogic: UserAuthLogic,
-    authHeadersUtil: AuthHeadersUtil,
-    actionBuilder: ActionBuilders)(
+    authHeadersUtil: AuthHeadersUtil)(
     implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def signUp = Action.async(parse.empty) { request ⇒
     authHeadersUtil.getAuthTokenFromHeaders(request) match {
       case Success(authToken) ⇒
         val eventualUser = userAuthLogic.signUp(authToken)
-        eventualUser.map { user ⇒
-          SuccessfulResponse(authenticatedUserToUserResponse(user))
-        }
+        eventualUser.map(user ⇒ SuccessfulResponse(authenticatedUserToUserResponse(user)))
       case Failure(exception) ⇒
         Future.failed(exception)
     }

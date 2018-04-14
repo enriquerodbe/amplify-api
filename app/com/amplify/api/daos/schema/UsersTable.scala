@@ -25,4 +25,6 @@ trait UsersTable extends BaseTable {
   }
 
   lazy val usersTable = TableQuery[Users]
+  lazy val insertUsersQuery =
+    usersTable.returning(usersTable.map(_.id)).into((obj, id) ⇒ obj.copy(id = id))
 }

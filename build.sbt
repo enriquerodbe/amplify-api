@@ -23,12 +23,18 @@ lazy val `amplify-api` = (project in file("."))
   .settings(scalaSource in IntegrationTest := baseDirectory.value / "it")
   .enablePlugins(PlayScala, SwaggerPlugin)
 
+// Swagger
+swaggerDomainNameSpaces := Seq("com.amplify.api.controllers.dtos")
+
 // Integration tests
 fork in IntegrationTest := true
 javaOptions in IntegrationTest += "-Dconfig.file=it/conf/application.test.conf"
 
-// Swagger
-swaggerDomainNameSpaces := Seq("com.amplify.api.controllers.dtos")
+// Scoverage
+coverageEnabled := true
+coverageMinimum := 61
+coverageFailOnMinimum := true
+coverageExcludedPackages := "<empty>;com.amplify.api.aggregates.queue.serialization"
 
 // Scalastyle
 lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")

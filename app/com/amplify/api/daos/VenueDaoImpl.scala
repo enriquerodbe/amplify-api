@@ -15,8 +15,6 @@ class VenueDaoImpl @Inject()(
 
   import profile.api._
 
-  override def retrieveAll(): DBIO[Seq[VenueDb]] = venuesTable.result
-
   override def retrieve(uid: Uid): DBIO[Option[VenueDb]] = {
     venuesTable.filter(_.uid === uid).result.headOption
   }
@@ -38,7 +36,5 @@ class VenueDaoImpl @Inject()(
     }
   }
 
-  private def create(venueDb: VenueDb): DBIO[VenueDb] = {
-    (venuesTable returning venuesTable.map(_.id) into ((obj, id) ⇒ obj.copy(id = id))) += venueDb
-  }
+  private def create(venueDb: VenueDb): DBIO[VenueDb] = insertVenuesQuery += venueDb
 }

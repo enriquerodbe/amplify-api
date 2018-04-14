@@ -26,4 +26,6 @@ trait VenuesTable extends BaseTable {
   }
 
   lazy val venuesTable = TableQuery[Venues]
+  lazy val insertVenuesQuery =
+    venuesTable.returning(venuesTable.map(_.id)).into((obj, id) ⇒ obj.copy(id = id))
 }

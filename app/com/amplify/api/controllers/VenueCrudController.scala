@@ -59,8 +59,4 @@ class VenueCrudController @Inject()(
     val response = venueToVenueResponse(request.subject.venue)
     Future.successful(SuccessfulResponse(response))
   }
-
-  def retrieveAll() = authenticatedUser() { _ ⇒
-    venueCrudLogic.retrieveAll().map(venues ⇒ SuccessfulResponse(venues.map(venueToVenueResponse)))
-  }
 }

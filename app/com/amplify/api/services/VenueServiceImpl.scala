@@ -63,8 +63,4 @@ class VenueServiceImpl @Inject()(
     implicit val token = venue.authToken
     contentService.fetchPlaylistTracks(playlistIdentifier)
   }
-
-  override def retrieveAll(): Future[Seq[Venue]] = {
-    db.run(venueDao.retrieveAll()).map(_.map(venueDbToVenue))
-  }
 }

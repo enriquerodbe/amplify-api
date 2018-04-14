@@ -30,7 +30,5 @@ class UserDaoImpl @Inject()(
     }
   }
 
-  private def create(user: UserDb): DBIO[UserDb] = {
-    (usersTable returning usersTable.map(_.id) into ((obj, id) ⇒ obj.copy(id = id))) += user
-  }
+  private def create(user: UserDb): DBIO[UserDb] = insertUsersQuery += user
 }

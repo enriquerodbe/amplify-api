@@ -46,6 +46,4 @@ class VenueCrudLogicImpl @Inject()(
   override def retrieveQueue(venue: Venue): Future[Queue] = {
     (queueCommandRouter ? RetrieveQueue(venue)).mapTo[Queue]
   }
-
-  override def retrieveAll(): Future[Seq[Venue]] = venueService.retrieveAll()
 }

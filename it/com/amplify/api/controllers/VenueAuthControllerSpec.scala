@@ -15,38 +15,23 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with SpotifyContext wi
   "signUp" should {
     "respond OK" in {
       val response = controller.signUp()(venueRequest("Test venue").withBobToken)
-
       status(response) mustEqual OK
     }
     "respond with name" in {
       val response = contentAsJson(controller.signUp()(venueRequest("Test venue").withBobToken))
-
       (response \ "name").as[String] mustEqual "Test venue"
     }
     "respond with uid" in {
       val response = contentAsJson(controller.signUp()(venueRequest("Test venue").withBobToken))
-
       (response \ "uid").as[String] must have size 8
     }
-
     "create venue" in new SignUpFixture {
       controller.signUp()(venueRequest("Test venue").withBobToken).await()
-
       findVenues("Test venue").headOption mustBe defined
     }
-
-    "create user" in new SignUpFixture {
-      controller.signUp()(venueRequest("Test venue").withBobToken).await()
-
-      findUsers(aliceUserData.name).headOption mustBe defined
-    }
-
-    "create venue if user already exists" in new SignUpFixture {
-      val userId = insertUser(bobUserDb)
-
-      controller.signUp()(venueRequest("Test bar").withBobToken).await()
-
-      findVenues("Test bar").headOption mustBe defined
+    "retrieve venue if it already exists" in new SignUpFixture {
+      controller.signUp()(venueRequest("Test bar").withAliceToken).await()
+      findVenues(aliceVenueDb.name.value).headOption mustBe defined
     }
 
     "fail" when {

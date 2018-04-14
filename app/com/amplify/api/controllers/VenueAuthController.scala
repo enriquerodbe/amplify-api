@@ -1,6 +1,5 @@
 package com.amplify.api.controllers
 
-import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.AuthHeadersUtil
 import com.amplify.api.controllers.dtos.SuccessfulResponse
 import com.amplify.api.controllers.dtos.Venue._
@@ -15,8 +14,7 @@ import scala.util.{Failure, Success}
 class VenueAuthController @Inject()(
     cc: ControllerComponents,
     venueAuthLogic: VenueAuthLogic,
-    authHeadersUtil: AuthHeadersUtil,
-    actionBuilder: ActionBuilders)(
+    authHeadersUtil: AuthHeadersUtil)(
     implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def signUp = Action.async(parse.json[VenueRequest]) { request ⇒

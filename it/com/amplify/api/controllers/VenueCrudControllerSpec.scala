@@ -2,12 +2,12 @@ package com.amplify.api.controllers
 
 import akka.pattern.ask
 import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveState
-import com.amplify.api.domain.models.ContentProvider.Spotify
 import com.amplify.api.domain.models.Spotify.TrackUri
 import com.amplify.api.domain.models._
 import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
-import com.amplify.api.it.fixtures.{SpotifyContext, VenueDbFixture}
+import com.amplify.api.it.fixtures.{SpotifyContext, UserDbFixture, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
+import com.amplify.api.services.external.spotify.Converters.toModelPlaylist
 import org.mockito.Mockito.when
 import org.scalatest.Inside
 import play.api.db.slick.DatabaseConfigProvider
@@ -30,7 +30,6 @@ class VenueCrudControllerSpec
   "retrievePlaylists" should {
     "respond OK" in new RetrievePlaylistsFixture {
       val response = controller.retrievePlaylists()(FakeRequest().withAliceToken)
-
       status(response) mustEqual OK
     }
     "respond with playlists" in new RetrievePlaylistsFixture {
@@ -58,6 +57,37 @@ class VenueCrudControllerSpec
     }
   }
 
+  class RetrieveCurrentPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+    extends VenueDbFixture with UserDbFixture
+
+  "retrieveCurrentPlaylist" should {
+    "respond empty playlist" when {
+      "no playlist was set" in new RetrieveCurrentPlaylistFixture {
+        val response =
+          controller.retrieveCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
+        status(response) mustEqual NO_CONTENT
+      }
+    }
+
+    "respond with some playlist" in new RetrieveCurrentPlaylistFixture {
+      // Needed to initialize the command processor
+      val playlist = Playlist(toModelPlaylist(alicePlaylist), Seq.empty)
+      val queue = Queue.empty.copy(currentPlaylist = Some(playlist))
+      initQueue(aliceVenueUid, queue)
+
+      val response =
+        controller.retrieveCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
+
+      status(response) mustEqual OK
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      val jsonResponse = contentAsJson(response)
+      (jsonResponse \ "info" \ "name").as[String] mustEqual alicePlaylist.name
+      val playlistUri = Spotify.PlaylistUri(aliceSpotifyUser.id, alicePlaylist.id)
+      (jsonResponse \ "info" \ "identifier").as[String] mustEqual playlistUri.toString
+      (jsonResponse \ "tracks").as[JsArray].value mustBe empty
+    }
+  }
+
   class SetCurrentPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
     extends VenueDbFixture
 
@@ -65,7 +95,6 @@ class VenueCrudControllerSpec
     "respond No content" in new SetCurrentPlaylistFixture {
       val response = controller.setCurrentPlaylist()(
         playlistRequest(alicePlaylistUri.toString).withAliceToken)
-
       status(response) mustEqual NO_CONTENT
     }
     "update queue current playlist" in new SetCurrentPlaylistFixture {
@@ -160,7 +189,6 @@ class VenueCrudControllerSpec
   "retrieveQueue" should {
     "respond OK" in new RetrieveQueueFixture {
       val response = controller.retrieveQueue()(FakeRequest().withAliceToken)
-
       status(response) mustBe OK
     }
 
@@ -190,26 +218,6 @@ class VenueCrudControllerSpec
       val jsonResponse = contentAsJson(response)
       (jsonResponse \ "name").as[String] mustEqual aliceVenueDb.name.toString
       (jsonResponse \ "uid").as[String] must have size 8
-    }
-  }
-
-  class RetrieveAllFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends VenueDbFixture
-
-  "retrieveAll" should {
-    "respond OK" in new RetrieveAllFixture {
-      val response = controller.retrieveAll()(FakeRequest().withAliceToken)
-
-      status(response) mustBe OK
-    }
-    "respond with venues" in new RetrieveAllFixture {
-      val response = controller.retrieveAll()(FakeRequest().withAliceToken)
-
-      contentType(response) must contain (Http.MimeTypes.JSON)
-      inside(contentAsJson(response)) { case JsArray(Seq(venue)) ⇒
-        (venue \ "name").as[String] mustEqual aliceVenueDb.name.toString
-        (venue \ "uid").as[String] must have size 8
-      }
     }
   }
 }
