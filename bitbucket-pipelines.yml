@@ -4,31 +4,39 @@ pipelines:
   branches:
     master:
       - step:
+          name: Build and test
           caches:
             - sbt
           script:
             - sbt test
             - sbt it:test
             - sbt coverageReport
+          services:
+            - postgres
+      - step:
+          name: Build and push docker image
+          script:
             - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
             - docker build --build-arg version=latest -t amplifyuy/amplify-api:latest .
             - docker push amplifyuy/amplify-api:latest
-          services:
-            - postgres
   tags:
     '*':
       - step:
+          name: Build and test
           caches:
             - sbt
           script:
             - sbt test
             - sbt it:test
             - sbt coverageReport
+          services:
+            - postgres
+      - step:
+          name: Build and push docker image
+          script:
             - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
             - docker build --build-arg version=$BITBUCKET_TAG -t amplifyuy/amplify-api:$BITBUCKET_TAG .
             - docker push amplifyuy/amplify-api:$BITBUCKET_TAG
-          services:
-            - postgres
 
 definitions:
   services:
