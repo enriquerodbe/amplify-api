@@ -6,8 +6,8 @@ import com.amplify.api.aggregates.queue.CommandProcessor.SetState
 import com.amplify.api.controllers.VenueCrudController
 import com.amplify.api.domain.models.Queue
 import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.it.fixtures.SpotifyContext
 import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
-import org.mockito.Mockito.{RETURNS_SMART_NULLS, withSettings}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -25,14 +25,15 @@ import scala.concurrent.duration.DurationInt
 import scala.reflect.ClassTag
 
 trait BaseIntegrationSpec
-  extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar with Results with BeforeAndAfterEach {
+  extends PlaySpec
+    with SpotifyContext
+    with GuiceOneAppPerSuite
+    with MockitoSugar
+    with Results
+    with BeforeAndAfterEach {
 
   protected def instanceOf[T: ClassTag]: T = app.injector.instanceOf[T]
 
-  val spotifyContentProvider =
-    mock[SpotifyContentProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
-  val spotifyAuthProvider =
-    mock[SpotifyAuthProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
   implicit val dbConfig = instanceOf[DatabaseConfigProvider]
   val database = instanceOf[DBApi].database("default")
 

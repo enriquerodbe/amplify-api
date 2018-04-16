@@ -4,15 +4,14 @@ import akka.pattern.ask
 import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveState
 import com.amplify.api.domain.models.Spotify.TrackUri
 import com.amplify.api.domain.models.{Playlist, Queue}
-import com.amplify.api.it.fixtures.{SpotifyContext, UserDbFixture, VenueDbFixture}
+import com.amplify.api.it.fixtures.{UserDbFixture, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, UserRequests}
 import com.amplify.api.services.external.spotify.Converters.{toModelPlaylist, toModelTrack}
 import org.scalatest.Inside
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.test.Helpers._
 
-class VenuePlayerControllerSpec
-  extends BaseIntegrationSpec with SpotifyContext with Inside with UserRequests {
+class VenuePlayerControllerSpec extends BaseIntegrationSpec with Inside with UserRequests {
 
   val controller = instanceOf[VenuePlayerController]
   val commandProcessor = findCommandProcessor(aliceVenueUid)

@@ -2,20 +2,23 @@ package com.amplify.api.it.fixtures
 
 import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
 import com.amplify.api.domain.models.AuthToken
-import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
+import com.amplify.api.domain.models.Spotify.PlaylistUri
 import com.amplify.api.exceptions.UserAuthTokenNotFound
 import com.amplify.api.services.external.spotify.Dtos._
 import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
 import com.amplify.api.services.models._
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{RETURNS_SMART_NULLS, when, withSettings}
+import org.scalatest.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.mvc.Http.HeaderNames
 import scala.concurrent.Future
 
-trait SpotifyContext extends CommonData {
+trait SpotifyContext extends CommonData with MockitoSugar {
 
-  def spotifyContentProvider: SpotifyContentProvider
-  def spotifyAuthProvider: SpotifyAuthProvider
+  val spotifyContentProvider =
+    mock[SpotifyContentProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
+  val spotifyAuthProvider =
+    mock[SpotifyAuthProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
 
   val authorizationHeader = HeaderNames.AUTHORIZATION
   val aliceToken = "alice-token"

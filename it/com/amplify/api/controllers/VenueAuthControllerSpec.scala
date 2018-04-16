@@ -1,12 +1,12 @@
 package com.amplify.api.controllers
 
 import com.amplify.api.exceptions.{BadRequestException, MissingAuthTokenHeader, UserAuthTokenNotFound}
-import com.amplify.api.it.fixtures.{SpotifyContext, VenueDbFixture}
+import com.amplify.api.it.fixtures.VenueDbFixture
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.test.Helpers._
 
-class VenueAuthControllerSpec extends BaseIntegrationSpec with SpotifyContext with VenueRequests {
+class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
 
   val controller = instanceOf[VenueAuthController]
 

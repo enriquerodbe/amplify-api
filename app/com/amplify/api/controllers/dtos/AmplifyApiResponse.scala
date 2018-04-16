@@ -16,20 +16,24 @@ case class SuccessfulResponse[T](response: T) extends AmplifyApiResponse(Http.St
 sealed abstract class FailedResponse(status: Int, val code: AppExceptionCode, message: String)
   extends AmplifyApiResponse[String](status, message)
 
-case class ClientErrorResponse(override val code: AppExceptionCode, message: String)
-  extends FailedResponse(Http.Status.BAD_REQUEST, code, message)
+case class ClientErrorResponse(
+    override val code: AppExceptionCode,
+    message: String,
+    override val status: Int = Http.Status.BAD_REQUEST)
+  extends FailedResponse(status, code, message)
 
 case class ServerErrorResponse(
     override val code: AppExceptionCode = AppExceptionCode.Unexpected,
-    message: String)
-  extends FailedResponse(Http.Status.INTERNAL_SERVER_ERROR, code, message)
+    message: String,
+    override val status: Int = Http.Status.INTERNAL_SERVER_ERROR)
+  extends FailedResponse(status, code, message)
 
 object AmplifyApiResponse {
 
   implicit def amplifyApiResponseWrites[T](
       implicit writes: Writes[T]): Writes[AmplifyApiResponse[T]] = Writes {
     case SuccessfulResponse(o) ⇒ Json.toJson(o)
-    case f: FailedResponse ⇒ Json.obj("code" -> JsNumber(f.code.id), "message" -> f.details)
+    case f: FailedResponse ⇒ Json.obj("code" → JsNumber(f.code.id), "message" → f.details)
   }
 
   implicit def amplifyApiResponseToResult[T](

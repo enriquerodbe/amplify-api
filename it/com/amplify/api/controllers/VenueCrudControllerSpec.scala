@@ -5,7 +5,7 @@ import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveState
 import com.amplify.api.domain.models.Spotify.TrackUri
 import com.amplify.api.domain.models._
 import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
-import com.amplify.api.it.fixtures.{SpotifyContext, UserDbFixture, VenueDbFixture}
+import com.amplify.api.it.fixtures.{UserDbFixture, VenueDbFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import com.amplify.api.services.external.spotify.Converters.toModelPlaylist
 import org.mockito.Mockito.when
@@ -17,8 +17,7 @@ import play.api.test.Helpers._
 import play.mvc.Http
 import scala.concurrent.Future
 
-class VenueCrudControllerSpec
-  extends BaseIntegrationSpec with SpotifyContext with VenueRequests with Inside {
+class VenueCrudControllerSpec extends BaseIntegrationSpec with VenueRequests with Inside {
 
   val controller = instanceOf[VenueCrudController]
   val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueUid"

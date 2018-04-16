@@ -37,6 +37,7 @@ object AppExceptionCode extends Enumeration {
     UserAlreadyHasVenue,
     InvalidProviderIdentifier,
     VenueNotFound,
-    VenueCurrentPlaylistNotSet
+    VenueCurrentPlaylistNotSet,
+    AuthenticationFailed
   = Value
 }

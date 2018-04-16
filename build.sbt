@@ -32,9 +32,16 @@ javaOptions in IntegrationTest += "-Dconfig.file=it/conf/application.test.conf"
 
 // Scoverage
 coverageEnabled := true
-coverageMinimum := 61
+coverageMinimum := 70
 coverageFailOnMinimum := true
-coverageExcludedPackages := "<empty>;com.amplify.api.aggregates.queue.serialization"
+val coverageExcludedPackagesSeq = Seq(
+  "<empty>",
+  "Reverse.*",
+  "router",
+  "users",
+  "venues",
+  "com.amplify.api.aggregates.queue.serialization")
+coverageExcludedPackages := coverageExcludedPackagesSeq.mkString(";")
 
 // Scalastyle
 lazy val compileScalastyle = taskKey[Unit]("compileScalastyle")

@@ -1,12 +1,12 @@
 package com.amplify.api.controllers
 
 import com.amplify.api.exceptions.{BadRequestException, MissingAuthTokenHeader, UserAuthTokenNotFound}
-import com.amplify.api.it.fixtures.{SpotifyContext, UserDbFixture}
+import com.amplify.api.it.fixtures.UserDbFixture
 import com.amplify.api.it.{BaseIntegrationSpec, UserRequests}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.test.Helpers._
 
-class UserAuthControllerSpec extends BaseIntegrationSpec with SpotifyContext with UserRequests {
+class UserAuthControllerSpec extends BaseIntegrationSpec with UserRequests {
 
   val controller = instanceOf[UserAuthController]
 

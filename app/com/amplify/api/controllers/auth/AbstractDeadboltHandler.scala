@@ -2,9 +2,12 @@ package com.amplify.api.controllers.auth
 
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler}
+import com.amplify.api.controllers.dtos.ClientErrorResponse
 import com.amplify.api.domain.logic.{UserAuthLogic, VenueAuthLogic}
 import com.amplify.api.domain.models.{AuthToken, UserReq, VenueReq}
+import com.amplify.api.exceptions.AppExceptionCode
 import play.api.mvc.{Request, Result, Results}
+import play.mvc.Http
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -20,7 +23,12 @@ abstract class AbstractDeadboltHandler(
       request: Request[A]): Future[Option[DynamicResourceHandler]] = Future.successful(None)
 
   override def onAuthFailure[A](request: AuthenticatedRequest[A]): Future[Result] = {
-    Future.successful(Forbidden)
+    Future.successful {
+      ClientErrorResponse(
+        AppExceptionCode.AuthenticationFailed,
+        "Authentication failed",
+        Http.Status.FORBIDDEN)
+    }
   }
 
   override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] = {

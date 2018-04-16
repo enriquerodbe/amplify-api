@@ -4,7 +4,7 @@ pipelines:
   branches:
     master:
       - step:
-          name: Build and test
+          name: Run tests
           caches:
             - sbt
           script:
@@ -22,7 +22,7 @@ pipelines:
   tags:
     '*':
       - step:
-          name: Build and test
+          name: Run tests
           caches:
             - sbt
           script:

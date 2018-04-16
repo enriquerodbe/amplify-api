@@ -26,22 +26,24 @@ class ErrorHandler @Inject()(
       request: RequestHeader,
       statusCode: Int,
       message: String): Future[Result] = {
-    Future.successful(ClientErrorResponse(AppExceptionCode.BadRequest, message))
+    Future.successful(ClientErrorResponse(AppExceptionCode.BadRequest, message, statusCode))
   }
 
   override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
-    logger.error(s"Server error occurred: ${exception.getMessage}", exception)
-    lazy val errorMsg = "Internal server error"
     exception match {
       case ex: UnauthorizedException ⇒
         val response = Unauthorized(Json.toJson(ClientErrorResponse(ex.code, ex.message)))
         Future.successful(response.withHeaders(Http.HeaderNames.WWW_AUTHENTICATE → "Bearer"))
       case ex: BadRequestException ⇒
         Future.successful(BadRequest(Json.toJson(ClientErrorResponse(ex.code, ex.message))))
-      case ex: InternalException ⇒
-        Future.successful(ServerErrorResponse(ex.code, errorMsg))
-      case _ ⇒
-        Future.successful(ServerErrorResponse(message = errorMsg))
+      case ex ⇒
+        logger.error(s"Server error occurred: ${exception.getMessage}", exception)
+        val message = "Internal server error"
+        val response = ex match {
+          case ex: InternalException ⇒ ServerErrorResponse(ex.code, message)
+          case _ ⇒ ServerErrorResponse(message = message)
+        }
+        Future.successful(response)
     }
   }
 }
