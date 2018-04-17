@@ -4,7 +4,9 @@ import com.amplify.api.exceptions.{BadRequestException, MissingAuthTokenHeader, 
 import com.amplify.api.it.fixtures.VenueDbFixture
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.mvc.Http
 
 class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
 
@@ -53,6 +55,25 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
           status(response)
         }
       }
+    }
+  }
+
+  class RetrieveCurrentFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+    extends VenueDbFixture
+
+  "retrieveCurrent" should {
+    "respond OK" in new RetrieveCurrentFixture {
+      val response = controller.retrieveCurrent()(FakeRequest().withAliceToken)
+
+      status(response) mustBe OK
+    }
+    "respond with venue" in new RetrieveCurrentFixture {
+      val response = controller.retrieveCurrent()(FakeRequest().withAliceToken)
+
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      val jsonResponse = contentAsJson(response)
+      (jsonResponse \ "name").as[String] mustEqual aliceVenueDb.name.toString
+      (jsonResponse \ "uid").as[String] must have size 8
     }
   }
 }

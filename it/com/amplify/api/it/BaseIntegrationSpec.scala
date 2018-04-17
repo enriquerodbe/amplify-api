@@ -3,7 +3,7 @@ package com.amplify.api.it
 import akka.pattern.ask
 import akka.util.Timeout
 import com.amplify.api.aggregates.queue.CommandProcessor.SetState
-import com.amplify.api.controllers.VenueCrudController
+import com.amplify.api.controllers.VenuePlaylistController
 import com.amplify.api.domain.models.Queue
 import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.it.fixtures.SpotifyContext
@@ -58,7 +58,7 @@ trait BaseIntegrationSpec
 
   protected def initQueue(venueUid: Uid, queue: Queue) = {
     implicit val timeout = Timeout(2.seconds)
-    Await.ready(instanceOf[VenueCrudController]
+    Await.ready(instanceOf[VenuePlaylistController]
       .retrieveCurrentPlaylist(venueUid.value)(FakeRequest()), timeout.duration)
     val processor = findCommandProcessor(venueUid)
     Await.ready((processor ? SetState(queue)).mapTo[Unit], timeout.duration)

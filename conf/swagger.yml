@@ -2,8 +2,6 @@
   swagger: "2.0"
   info:
     title: "Amplify API"
-    description: "Your place. Your music."
-    version: "1.0.0"
   consumes:
     - application/json
   produces:

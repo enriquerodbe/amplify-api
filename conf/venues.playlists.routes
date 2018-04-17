@@ -1,0 +1,75 @@
+###
+#  summary: Retrieve the playlists of the authenticated venue
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        type: array
+#        items:
+#          $ref: '#/definitions/com.amplify.api.controllers.dtos.Playlist.PlaylistResponse'
+#  parameters:
+#  - name: Auth-provider
+#    description: Name of the OAuth authorization server
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: Authorization
+#    description: Access token issued by the authorization server
+#    in: header
+#    required: true
+#    type: string
+###
+GET    /me/playlists    com.amplify.api.controllers.VenuePlaylistController.retrievePlaylists
+
+###
+#  summary: Retrieve the current playlist of a venue
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        $ref: '#/definitions/com.amplify.api.controllers.dtos.Playlist.PlaylistResponse'
+#    204:
+#      description: no current playlist set
+#  parameters:
+#  - name: Auth-provider
+#    description: Name of the OAuth authorization server
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: Authorization
+#    description: Access token issued by the authorization server
+#    in: header
+#    required: true
+#    type: string
+###
+GET    /:uid/playlists/current    com.amplify.api.controllers.VenuePlaylistController.retrieveCurrentPlaylist(uid: String)
+
+###
+#  summary: Set the current playlist of allowed tracks for the authenticated venue
+#  responses:
+#    204:
+#      description: success
+#  parameters:
+#  - name: Auth-provider
+#    description: Name of the OAuth authorization server
+#    in: header
+#    required: false
+#    type: string
+#    default: spotify
+#  - name: Authorization
+#    description: Access token issued by the authorization server
+#    in: header
+#    required: true
+#    type: string
+#  - name: playlist
+#    in: body
+#    required: true
+#    schema:
+#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Playlist.PlaylistRequest'
+###
+PUT    /me/playlists/current    com.amplify.api.controllers.VenuePlaylistController.setCurrentPlaylist
+
+### NoDocs ###
+GET /ws com.amplify.api.controllers.WebSocketController.connect

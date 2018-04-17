@@ -12,11 +12,11 @@ import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VenueCrudLogicImpl @Inject()(
+class VenuePlaylistLogicImpl @Inject()(
     venueService: VenueService,
     @Named("queue-command-router") queueCommandRouter: ActorRef,
     envConfig: EnvConfig)(
-    implicit ec: ExecutionContext) extends VenueCrudLogic {
+    implicit ec: ExecutionContext) extends VenuePlaylistLogic {
 
   implicit val askTimeout = envConfig.defaultAskTimeout
 
@@ -27,7 +27,7 @@ class VenueCrudLogicImpl @Inject()(
   override def retrieveCurrentPlaylist(uid: Uid): Future[Option[Playlist]] = {
     for {
       venue ← venueService.retrieve(uid)
-      queue ← retrieveQueue(venue)
+      queue ← (queueCommandRouter ? RetrieveQueue(venue)).mapTo[Queue]
     }
     yield queue.currentPlaylist
   }
@@ -41,9 +41,5 @@ class VenueCrudLogicImpl @Inject()(
       result ← (queueCommandRouter ? RouteCommand(command)).mapTo[Unit]
     }
     yield result
-  }
-
-  override def retrieveQueue(venue: Venue): Future[Queue] = {
-    (queueCommandRouter ? RetrieveQueue(venue)).mapTo[Queue]
   }
 }

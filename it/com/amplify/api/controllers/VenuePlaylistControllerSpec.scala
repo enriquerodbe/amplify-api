@@ -17,9 +17,9 @@ import play.api.test.Helpers._
 import play.mvc.Http
 import scala.concurrent.Future
 
-class VenueCrudControllerSpec extends BaseIntegrationSpec with VenueRequests with Inside {
+class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests with Inside {
 
-  val controller = instanceOf[VenueCrudController]
+  val controller = instanceOf[VenuePlaylistController]
   val path = s"/user/queue-command-router/queue-command-processor-$aliceVenueUid"
   val commandProcessor = app.actorSystem.actorSelection(path)
 
@@ -179,44 +179,6 @@ class VenueCrudControllerSpec extends BaseIntegrationSpec with VenueRequests wit
             playlistRequest("wrong_provider:wrong_identifier").withAliceToken).await()
         }
       }
-    }
-  }
-
-  class RetrieveQueueFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends VenueDbFixture
-
-  "retrieveQueue" should {
-    "respond OK" in new RetrieveQueueFixture {
-      val response = controller.retrieveQueue()(FakeRequest().withAliceToken)
-      status(response) mustBe OK
-    }
-
-    "respond with queue" in new RetrieveQueueFixture {
-      val response = controller.retrieveQueue()(FakeRequest().withAliceToken)
-
-      contentType(response) must contain (Http.MimeTypes.JSON)
-      val jsonResponse = contentAsJson(response)
-
-      (jsonResponse \ "tracks") mustEqual JsDefined(JsArray(Seq.empty))
-    }
-  }
-
-  class RetrieveCurrentFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends VenueDbFixture
-
-  "retrieveCurrent" should {
-    "respond OK" in new RetrieveCurrentFixture {
-      val response = controller.retrieveCurrent()(FakeRequest().withAliceToken)
-
-      status(response) mustBe OK
-    }
-    "respond with venue" in new RetrieveCurrentFixture {
-      val response = controller.retrieveCurrent()(FakeRequest().withAliceToken)
-
-      contentType(response) must contain (Http.MimeTypes.JSON)
-      val jsonResponse = contentAsJson(response)
-      (jsonResponse \ "name").as[String] mustEqual aliceVenueDb.name.toString
-      (jsonResponse \ "uid").as[String] must have size 8
     }
   }
 }

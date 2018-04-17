@@ -9,11 +9,14 @@ import com.amplify.api.it.{BaseIntegrationSpec, UserRequests}
 import com.amplify.api.services.external.spotify.Converters.{toModelPlaylist, toModelTrack}
 import org.scalatest.Inside
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.{JsArray, JsDefined}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.mvc.Http
 
-class VenuePlayerControllerSpec extends BaseIntegrationSpec with Inside with UserRequests {
+class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with UserRequests {
 
-  val controller = instanceOf[VenuePlayerController]
+  val controller = instanceOf[VenueQueueController]
   val commandProcessor = findCommandProcessor(aliceVenueUid)
 
   class SkipFixture(implicit val dbConfigProvider: DatabaseConfigProvider) extends VenueDbFixture
@@ -79,6 +82,25 @@ class VenuePlayerControllerSpec extends BaseIntegrationSpec with Inside with Use
       val nextItem = queue.futureItems.head
       nextItem.isUserTrack mustBe true
       nextItem.track.identifier mustEqual trackId
+    }
+  }
+
+  class RetrieveQueueFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+    extends VenueDbFixture
+
+  "retrieveQueue" should {
+    "respond OK" in new RetrieveQueueFixture {
+      val response = controller.retrieveQueue()(FakeRequest().withAliceToken)
+      status(response) mustBe OK
+    }
+
+    "respond with queue" in new RetrieveQueueFixture {
+      val response = controller.retrieveQueue()(FakeRequest().withAliceToken)
+
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      val jsonResponse = contentAsJson(response)
+
+      (jsonResponse \ "tracks") mustEqual JsDefined(JsArray(Seq.empty))
     }
   }
 }
