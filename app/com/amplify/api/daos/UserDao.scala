@@ -9,6 +9,4 @@ import slick.dbio.DBIO
 trait UserDao {
 
   def retrieve(identifier: AuthProviderIdentifier): DBIO[Option[UserDb]]
-
-  def retrieveOrCreate(userDb: UserDb): DBIO[UserDb]
 }

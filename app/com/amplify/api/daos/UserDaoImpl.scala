@@ -5,11 +5,9 @@ import com.amplify.api.daos.schema.UsersTable
 import com.amplify.api.domain.models.AuthProviderIdentifier
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
-import scala.concurrent.ExecutionContext
 
-class UserDaoImpl @Inject()(
-    val dbConfigProvider: DatabaseConfigProvider,
-    implicit val ec: ExecutionContext) extends UserDao with UsersTable {
+class UserDaoImpl @Inject()(val dbConfigProvider: DatabaseConfigProvider)
+  extends UserDao with UsersTable {
 
   import profile.api._
 
@@ -21,14 +19,4 @@ class UserDaoImpl @Inject()(
 
     query.result.headOption
   }
-
-  override def retrieveOrCreate(userDb: UserDb): DBIO[UserDb] = {
-    val maybeExistingUser = retrieve(userDb.authIdentifier)
-    maybeExistingUser.flatMap {
-      case Some(user) ⇒ DBIO.successful(user)
-      case _ ⇒ create(userDb)
-    }
-  }
-
-  private def create(user: UserDb): DBIO[UserDb] = insertUsersQuery += user
 }
