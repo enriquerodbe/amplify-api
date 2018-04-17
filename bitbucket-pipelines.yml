@@ -8,8 +8,8 @@ pipelines:
           caches:
             - sbt
           script:
-            - sbt test
-            - sbt it:test
+            - sbt coverageOn test
+            - sbt coverageOn it:test
             - sbt coverageReport
           services:
             - postgres
@@ -26,8 +26,8 @@ pipelines:
           caches:
             - sbt
           script:
-            - sbt test
-            - sbt it:test
+            - sbt coverageOn test
+            - sbt coverageOn it:test
             - sbt coverageReport
           services:
             - postgres

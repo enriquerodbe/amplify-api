@@ -30,15 +30,14 @@ fork in IntegrationTest := true
 javaOptions in IntegrationTest += "-Dconfig.file=it/conf/application.test.conf"
 
 // Scoverage
-coverageEnabled := true
-coverageMinimum := 70
+coverageMinimum := 69
 coverageFailOnMinimum := true
-val coverageExcludedPackagesSeq = Seq(
+lazy val coverageExcludedPackagesSeq = Seq(
   "<empty>",
   "Reverse.*",
   "router",
   "users",
-  "venues",
+  "venues\\..*",
   "com.amplify.api.aggregates.queue.serialization")
 coverageExcludedPackages := coverageExcludedPackagesSeq.mkString(";")
 
