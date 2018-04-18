@@ -38,6 +38,7 @@ object AppExceptionCode extends Enumeration {
     InvalidProviderIdentifier,
     VenueNotFound,
     VenueCurrentPlaylistNotSet,
-    AuthenticationFailed
+    AuthenticationFailed,
+    InvalidCoinToken
   = Value
 }

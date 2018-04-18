@@ -2,7 +2,7 @@ package com.amplify.api.domain.models.primitives
 
 import scala.util.Random
 
-case class Uid(value: String) extends AnyVal {
+final case class Uid private (value: String) extends AnyVal {
 
   override def toString: String = value
 }
@@ -15,6 +15,7 @@ object Uid {
 
   def apply(value: String): Uid = {
     require(value != null && value.trim.nonEmpty, "Empty Uid")
+    require(value.length == DEFAULT_LENGTH, s"Uid length must be $DEFAULT_LENGTH: $value")
     new Uid(value)
   }
 }

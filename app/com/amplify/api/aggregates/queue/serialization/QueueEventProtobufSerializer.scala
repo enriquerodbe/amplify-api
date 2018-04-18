@@ -22,12 +22,12 @@ class QueueEventProtobufSerializer extends SerializerWithStringManifest {
 
   override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef = {
     val parser = manifest match {
-      case CurrentPlaylistSetManifest ⇒ CurrentPlaylistSet
-      case VenueTracksRemovedManifest ⇒ VenueTracksRemoved
-      case VenueTrackAddedManifest ⇒ VenueTrackAdded
-      case TrackFinishedManifest ⇒ TrackFinished
-      case UserTrackAddedManifest ⇒ UserTrackAdded
-      case CurrentTrackSkippedManifest ⇒ CurrentTrackSkipped
+      case CurrentPlaylistSetManifest ⇒ PbCurrentPlaylistSet
+      case VenueTracksRemovedManifest ⇒ PbVenueTracksRemoved
+      case VenueTrackAddedManifest ⇒ PbVenueTrackAdded
+      case TrackFinishedManifest ⇒ PbTrackFinished
+      case UserTrackAddedManifest ⇒ PbUserTrackAdded
+      case CurrentTrackSkippedManifest ⇒ PbCurrentTrackSkipped
     }
     ProtobufConverter.fromProtobuf(parser.parseFrom(bytes))
   }

@@ -1,7 +1,7 @@
 package com.amplify.api.controllers
 
 import com.amplify.api.exceptions.{BadRequestException, MissingAuthTokenHeader, UserAuthTokenNotFound}
-import com.amplify.api.it.fixtures.VenueDbFixture
+import com.amplify.api.it.fixtures.DbVenueFixture
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.test.FakeRequest
@@ -12,7 +12,7 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
 
   val controller = instanceOf[VenueAuthController]
 
-  class SignUpFixture(implicit val dbConfigProvider: DatabaseConfigProvider) extends VenueDbFixture
+  class SignUpFixture(implicit val dbConfigProvider: DatabaseConfigProvider) extends DbVenueFixture
 
   "signUp" should {
     "respond OK" in {
@@ -33,7 +33,7 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
     }
     "retrieve venue if it already exists" in new SignUpFixture {
       controller.signUp()(venueRequest("Test bar").withAliceToken).await()
-      findVenues(aliceVenueDb.name.value).headOption mustBe defined
+      findVenues(aliceDbVenue.name.value).headOption mustBe defined
     }
 
     "fail" when {
@@ -59,7 +59,7 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
   }
 
   class RetrieveCurrentFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends VenueDbFixture
+    extends DbVenueFixture
 
   "retrieveCurrent" should {
     "respond OK" in new RetrieveCurrentFixture {
@@ -72,7 +72,7 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response)
-      (jsonResponse \ "name").as[String] mustEqual aliceVenueDb.name.toString
+      (jsonResponse \ "name").as[String] mustEqual aliceDbVenue.name.toString
       (jsonResponse \ "uid").as[String] must have size 8
     }
   }

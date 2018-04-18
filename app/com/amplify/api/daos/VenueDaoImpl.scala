@@ -1,6 +1,6 @@
 package com.amplify.api.daos
 
-import com.amplify.api.daos.models.VenueDb
+import com.amplify.api.daos.models.DbVenue
 import com.amplify.api.daos.schema.VenuesTable
 import com.amplify.api.domain.models.AuthProviderIdentifier
 import com.amplify.api.domain.models.primitives.Uid
@@ -15,11 +15,11 @@ class VenueDaoImpl @Inject()(
 
   import profile.api._
 
-  override def retrieve(uid: Uid): DBIO[Option[VenueDb]] = {
+  override def retrieve(uid: Uid): DBIO[Option[DbVenue]] = {
     venuesTable.filter(_.uid === uid).result.headOption
   }
 
-  override def retrieve(identifier: AuthProviderIdentifier): DBIO[Option[VenueDb]] = {
+  override def retrieve(identifier: AuthProviderIdentifier): DBIO[Option[DbVenue]] = {
     val query = venuesTable.filter { venue ⇒
       venue.authIdentifier === identifier.identifier &&
         venue.authProviderType === identifier.authProvider
@@ -28,13 +28,13 @@ class VenueDaoImpl @Inject()(
     query.result.headOption
   }
 
-  override def retrieveOrCreate(venueDb: VenueDb): DBIO[VenueDb] = {
-    val maybeExistingVenue = retrieve(venueDb.identifier)
+  override def retrieveOrCreate(dbVenue: DbVenue): DBIO[DbVenue] = {
+    val maybeExistingVenue = retrieve(dbVenue.identifier)
     maybeExistingVenue.flatMap {
       case Some(venue) ⇒ DBIO.successful(venue)
-      case _ ⇒ create(venueDb)
+      case _ ⇒ create(dbVenue)
     }
   }
 
-  private def create(venueDb: VenueDb): DBIO[VenueDb] = insertVenuesQuery += venueDb
+  private def create(dbVenue: DbVenue): DBIO[DbVenue] = insertVenuesQuery += dbVenue
 }

@@ -5,7 +5,7 @@ import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveState
 import com.amplify.api.domain.models.Spotify.TrackUri
 import com.amplify.api.domain.models._
 import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
-import com.amplify.api.it.fixtures.{UserDbFixture, VenueDbFixture}
+import com.amplify.api.it.fixtures.{DbUserFixture, DbVenueFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import com.amplify.api.services.external.spotify.Converters.toModelPlaylist
 import org.mockito.Mockito.when
@@ -24,7 +24,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
   val commandProcessor = app.actorSystem.actorSelection(path)
 
   class RetrievePlaylistsFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends VenueDbFixture
+    extends DbVenueFixture
 
   "retrievePlaylists" should {
     "respond OK" in new RetrievePlaylistsFixture {
@@ -57,7 +57,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
   }
 
   class RetrieveCurrentPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends VenueDbFixture with UserDbFixture
+    extends DbVenueFixture with DbUserFixture
 
   "retrieveCurrentPlaylist" should {
     "respond empty playlist" when {
@@ -88,7 +88,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
   }
 
   class SetCurrentPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends VenueDbFixture
+    extends DbVenueFixture
 
   "setCurrentPlaylist" should {
     "respond No content" in new SetCurrentPlaylistFixture {

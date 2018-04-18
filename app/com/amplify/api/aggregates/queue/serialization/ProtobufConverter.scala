@@ -1,9 +1,11 @@
 package com.amplify.api.aggregates.queue.serialization
 
 import com.amplify.api.aggregates.queue.Event
-import com.amplify.api.aggregates.queue.serialization.ContentProvider.CONTENT_PROVIDER_SPOTIFY
+import com.amplify.api.aggregates.queue.serialization.PbContentProvider.CONTENT_PROVIDER_SPOTIFY
 import com.amplify.api.domain.models
 import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
+import com.amplify.api.domain.models._
+import com.amplify.api.domain.models.primitives.{Identifier, Name}
 import com.amplify.api.exceptions.InvalidProviderIdentifier
 import scalapb.GeneratedMessage
 
@@ -12,85 +14,87 @@ object ProtobufConverter {
   private val DEFAULT_INT = 0
 
   def toProtobuf(evt: Event): GeneratedMessage = evt match {
-    case Event.CurrentPlaylistSet(playlist) ⇒ CurrentPlaylistSet(Some(toProtobuf(playlist)))
-    case Event.VenueTracksRemoved ⇒ VenueTracksRemoved()
-    case Event.VenueTrackAdded(track) ⇒ VenueTrackAdded(Some(toProtobuf(track)))
-    case Event.TrackFinished ⇒ TrackFinished()
+    case Event.CurrentPlaylistSet(playlist) ⇒ PbCurrentPlaylistSet(Some(toProtobuf(playlist)))
+    case Event.VenueTracksRemoved ⇒ PbVenueTracksRemoved()
+    case Event.VenueTrackAdded(track) ⇒ PbVenueTrackAdded(Some(toProtobuf(track)))
+    case Event.TrackFinished ⇒ PbTrackFinished()
     case Event.UserTrackAdded(user, trackIdentifier) ⇒
-      UserTrackAdded(Some(toProtobuf(user)), Some(toProtobuf(trackIdentifier)))
-    case Event.CurrentTrackSkipped ⇒ CurrentTrackSkipped()
+      PbUserTrackAdded(Some(toProtobuf(user)), Some(toProtobuf(trackIdentifier)))
+    case Event.CurrentTrackSkipped ⇒ PbCurrentTrackSkipped()
   }
 
-  private def toProtobuf(playlist: models.Playlist): Playlist = {
-    val name = Some(Name(playlist.info.name.value))
+  private def toProtobuf(playlist: Playlist): PbPlaylist = {
+    val name = Some(PbName(playlist.info.name.value))
     val identifier = Some(toProtobuf(playlist.info.identifier))
     val images = playlist.info.images.map(toProtobuf)
-    val playlistInfo = Some(PlaylistInfo(name, identifier, images))
+    val playlistInfo = Some(PbPlaylistInfo(name, identifier, images))
     val tracks = playlist.tracks.map(toProtobuf)
-    Playlist(playlistInfo, tracks)
+    PbPlaylist(playlistInfo, tracks)
   }
 
-  private def toProtobuf(contentIdentifier: models.PlaylistIdentifier): PlaylistIdentifier = {
-    val provider = ContentProvider.fromValue(contentIdentifier.contentProvider.id)
-    PlaylistIdentifier(provider, Some(Identifier(contentIdentifier.identifier.value)))
+  private def toProtobuf(contentIdentifier: PlaylistIdentifier): PbPlaylistIdentifier = {
+    val provider = PbContentProvider.fromValue(contentIdentifier.contentProvider.id)
+    PbPlaylistIdentifier(provider, Some(PbIdentifier(contentIdentifier.identifier.value)))
   }
 
-  private def toProtobuf(contentIdentifier: models.TrackIdentifier): TrackIdentifier = {
-    val provider = ContentProvider.fromValue(contentIdentifier.contentProvider.id)
-    TrackIdentifier(provider, Some(Identifier(contentIdentifier.identifier.value)))
+  private def toProtobuf(contentIdentifier: TrackIdentifier): PbTrackIdentifier = {
+    val provider = PbContentProvider.fromValue(contentIdentifier.contentProvider.id)
+    PbTrackIdentifier(provider, Some(PbIdentifier(contentIdentifier.identifier.value)))
   }
 
   private def toProtobuf(
-      authIdentifier: models.AuthProviderIdentifier): AuthProviderIdentifier = {
-    val provider = AuthProviderType.fromValue(authIdentifier.authProvider.id)
-    val identifier = Some(Identifier(authIdentifier.identifier.value))
-    AuthProviderIdentifier(provider, identifier)
+      authIdentifier: AuthProviderIdentifier): PbAuthProviderIdentifier = {
+    val provider = PbAuthProviderType.fromValue(authIdentifier.authProvider.id)
+    val identifier = Some(PbIdentifier(authIdentifier.identifier.value))
+    PbAuthProviderIdentifier(provider, identifier)
   }
 
-  private def toProtobuf(image: models.Image): Image = {
-    Image(image.url, image.height.getOrElse(DEFAULT_INT), image.width.getOrElse(DEFAULT_INT))
+  private def toProtobuf(image: Image): PbImage = {
+    PbImage(image.url, image.height.getOrElse(DEFAULT_INT), image.width.getOrElse(DEFAULT_INT))
   }
 
-  private def toProtobuf(track: models.Track): Track = {
-    val name = Some(Name(track.name.value))
+  private def toProtobuf(track: Track): PbTrack = {
+    val name = Some(PbName(track.name.value))
     val identifier = Some(toProtobuf(track.identifier))
     val album = Some(toProtobuf(track.album))
-    Track(name, identifier, album)
+    PbTrack(name, identifier, album)
   }
 
-  private def toProtobuf(album: models.Album): Album = {
-    Album(Some(Name(album.name.value)), album.artists.map(toProtobuf), album.images.map(toProtobuf))
+  private def toProtobuf(album: Album): PbAlbum = {
+    val artists = album.artists.map(toProtobuf)
+    val albums = album.images.map(toProtobuf)
+    PbAlbum(Some(PbName(album.name.value)), artists, albums)
   }
 
-  private def toProtobuf(artist: models.Artist): Artist = {
-    Artist(Some(Name(artist.name.value)))
+  private def toProtobuf(artist: models.Artist): PbArtist = {
+    PbArtist(Some(PbName(artist.name.value)))
   }
 
-  private def toProtobuf(user: models.User): User = {
-    User(Some(Name(user.name.value)), Some(toProtobuf(user.identifier)))
+  private def toProtobuf(user: User): PbUser = {
+    PbUser(Some(PbName(user.name.value)), Some(toProtobuf(user.identifier)))
   }
 
   def fromProtobuf(message: GeneratedMessage): Event = message match {
-    case c: CurrentPlaylistSet ⇒ Event.CurrentPlaylistSet(fromProtobuf(c.getPlaylist))
-    case _: VenueTracksRemoved ⇒ Event.VenueTracksRemoved
-    case a: VenueTrackAdded ⇒ Event.VenueTrackAdded(fromProtobuf(a.getTrack))
-    case _: TrackFinished ⇒ Event.TrackFinished
-    case a: UserTrackAdded ⇒
+    case c: PbCurrentPlaylistSet ⇒ Event.CurrentPlaylistSet(fromProtobuf(c.getPlaylist))
+    case _: PbVenueTracksRemoved ⇒ Event.VenueTracksRemoved
+    case a: PbVenueTrackAdded ⇒ Event.VenueTrackAdded(fromProtobuf(a.getTrack))
+    case _: PbTrackFinished ⇒ Event.TrackFinished
+    case a: PbUserTrackAdded ⇒
       Event.UserTrackAdded(fromProtobuf(a.getUser), fromProtobuf(a.getTrackIdentifier))
-    case _: CurrentTrackSkipped ⇒ Event.CurrentTrackSkipped
+    case _: PbCurrentTrackSkipped ⇒ Event.CurrentTrackSkipped
   }
 
-  private def fromProtobuf(playlist: Playlist): models.Playlist = {
-    models.Playlist(fromProtobuf(playlist.getPlaylistInfo), playlist.tracks.map(fromProtobuf))
+  private def fromProtobuf(playlist: PbPlaylist): Playlist = {
+    Playlist(fromProtobuf(playlist.getPlaylistInfo), playlist.tracks.map(fromProtobuf))
   }
 
-  private def fromProtobuf(info: PlaylistInfo): models.PlaylistInfo = {
-    val name = models.primitives.Name(info.getName.value)
+  private def fromProtobuf(info: PbPlaylistInfo): PlaylistInfo = {
+    val name = Name(info.getName.value)
     val identifier = fromProtobuf(info.getIdentifier)
-    models.PlaylistInfo(name, identifier, info.images.map(fromProtobuf))
+    PlaylistInfo(name, identifier, info.images.map(fromProtobuf))
   }
 
-  private def fromProtobuf(contentIdentifier: PlaylistIdentifier): models.PlaylistIdentifier = {
+  private def fromProtobuf(contentIdentifier: PbPlaylistIdentifier): PlaylistIdentifier = {
     contentIdentifier.contentProvider match {
       case CONTENT_PROVIDER_SPOTIFY ⇒
         PlaylistUri.fromString(contentIdentifier.getIdentifier.value).get
@@ -99,7 +103,7 @@ object ProtobufConverter {
     }
   }
 
-  private def fromProtobuf(contentIdentifier: TrackIdentifier): models.TrackIdentifier = {
+  private def fromProtobuf(contentIdentifier: PbTrackIdentifier): TrackIdentifier = {
     contentIdentifier.contentProvider match {
       case CONTENT_PROVIDER_SPOTIFY ⇒
         TrackUri(contentIdentifier.getIdentifier.value)
@@ -109,35 +113,35 @@ object ProtobufConverter {
   }
 
   private def fromProtobuf(
-      identifier: AuthProviderIdentifier): models.AuthProviderIdentifier = {
-    val provider = models.AuthProviderType(identifier.authProvider.value)
-    val id = models.primitives.Identifier(identifier.getIdentifier.value)
-    models.AuthProviderIdentifier(provider, id)
+      identifier: PbAuthProviderIdentifier): AuthProviderIdentifier = {
+    val provider = AuthProviderType(identifier.authProvider.value)
+    val id = Identifier(identifier.getIdentifier.value)
+    AuthProviderIdentifier(provider, id)
   }
 
-  private def fromProtobuf(image: Image): models.Image = {
+  private def fromProtobuf(image: PbImage): Image = {
     val height = if (image.height == DEFAULT_INT) None else Some(image.height)
     val width = if (image.width == DEFAULT_INT) None else Some(image.width)
-    models.Image(image.url, height, width)
+    Image(image.url, height, width)
   }
 
-  private def fromProtobuf(track: Track): models.Track = {
-    val name = models.primitives.Name(track.getName.value)
-    models.Track(name, fromProtobuf(track.getIdentifier), fromProtobuf(track.getAlbum))
+  private def fromProtobuf(track: PbTrack): Track = {
+    val name = Name(track.getName.value)
+    Track(name, fromProtobuf(track.getIdentifier), fromProtobuf(track.getAlbum))
   }
 
-  private def fromProtobuf(album: Album): models.Album = {
-    val name = models.primitives.Name(album.getName.value)
+  private def fromProtobuf(album: PbAlbum): Album = {
+    val name = Name(album.getName.value)
     val artists = album.artists.map(fromProtobuf)
     val images = album.images.map(fromProtobuf)
-    models.Album(name, artists, images)
+    Album(name, artists, images)
   }
 
-  private def fromProtobuf(artist: Artist): models.Artist = {
-    models.Artist(models.primitives.Name(artist.getName.value))
+  private def fromProtobuf(artist: PbArtist): Artist = {
+    Artist(Name(artist.getName.value))
   }
 
-  private def fromProtobuf(user: User): models.User = {
-    models.User(models.primitives.Name(user.getName.value), fromProtobuf(user.getIdentifier))
+  private def fromProtobuf(user: PbUser): User = {
+    User(Name(user.getName.value), fromProtobuf(user.getIdentifier))
   }
 }

@@ -5,12 +5,12 @@ import scala.language.implicitConversions
 
 trait CommonData {
 
-  val aliceUserDbId = 1L
-  val aliceVenueDbId = 1L
+  val aliceDbUserId = 1L
+  val aliceDbVenueId = 1L
   val aliceSpotifyId = "alice-spotify-id"
   val aliceVenueUid = "Fa84A3fl"
 
-  val bobUserDbId = 2L
+  val bobDbUserId = 2L
   val bobSpotifyId = "bob-spotify-id"
 
   implicit def string2Name(str: String): Name = Name(str)

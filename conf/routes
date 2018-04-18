@@ -10,5 +10,6 @@ GET    /    controllers.Default.todo
 -> /venues  venues.auth.Routes
 -> /venues  venues.playlists.Routes
 -> /venues  venues.queue.Routes
+-> /venues  venues.coins.Routes
 
 -> /users  users.Routes

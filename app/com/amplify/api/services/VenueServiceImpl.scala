@@ -4,7 +4,7 @@ import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.{Name, Uid}
 import com.amplify.api.exceptions.VenueNotFoundByUid
-import com.amplify.api.services.converters.VenueConverter.{userDataToVenueDb, venueDbToVenue}
+import com.amplify.api.services.converters.VenueConverter.{userDataToDbVenue, dbVenueToVenue}
 import com.amplify.api.services.external.ContentService
 import com.amplify.api.services.models.UserData
 import com.amplify.api.utils.DbioUtils.DbioT
@@ -19,18 +19,18 @@ class VenueServiceImpl @Inject()(
     implicit ec: ExecutionContext) extends VenueService {
 
   override def retrieve(uid: Uid): Future[Venue] = {
-    val maybeVenue = venueDao.retrieve(uid).map(_.map(venueDbToVenue))
+    val maybeVenue = venueDao.retrieve(uid).map(_.map(dbVenueToVenue))
     db.run(maybeVenue ?! VenueNotFoundByUid(uid))
   }
 
   override def retrieve(identifier: AuthProviderIdentifier): Future[Option[Venue]] = {
-    db.run(venueDao.retrieve(identifier).map(_.map(venueDbToVenue)))
+    db.run(venueDao.retrieve(identifier).map(_.map(dbVenueToVenue)))
   }
 
   override def retrieveOrCreate(userData: UserData, name: Name): Future[Venue] = {
-    val venueDb = userDataToVenueDb(userData, name)
-    val createdVenue = db.runTransactionally(venueDao.retrieveOrCreate(venueDb))
-    createdVenue.map(venueDbToVenue)
+    val dbVenue = userDataToDbVenue(userData, name)
+    val createdVenue = db.runTransactionally(venueDao.retrieveOrCreate(dbVenue))
+    createdVenue.map(dbVenueToVenue)
   }
 
   override def retrievePlaylists(venue: VenueReq): Future[Seq[PlaylistInfo]] = {

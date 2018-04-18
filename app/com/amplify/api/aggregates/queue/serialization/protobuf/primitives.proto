@@ -2,22 +2,22 @@ syntax = "proto3";
 
 package com.amplify.api.aggregates.queue.serialization;
 
-message Identifier {
+message PbIdentifier {
     string value = 1;
 }
 
-message Name {
+message PbName {
     string value = 1;
 }
 
-message Token {
+message PbToken {
     string value = 1;
 }
 
-message Uid {
+message PbUid {
     string value = 1;
 }
 
-message Id {
+message PbId {
     int64 value = 1;
 }

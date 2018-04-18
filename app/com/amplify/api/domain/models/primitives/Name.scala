@@ -1,6 +1,6 @@
 package com.amplify.api.domain.models.primitives
 
-case class Name(value: String) extends AnyVal {
+final case class Name private (value: String) extends AnyVal {
 
   override def toString: String = value
 }

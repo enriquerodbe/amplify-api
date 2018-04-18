@@ -4,83 +4,83 @@ package com.amplify.api.aggregates.queue.serialization;
 
 import "primitives.proto";
 
-enum ContentProvider {
+enum PbContentProvider {
     CONTENT_PROVIDER_SPOTIFY = 0;
 }
 
-message PlaylistIdentifier {
-    ContentProvider contentProvider = 1;
-    Identifier identifier = 2;
+message PbPlaylistIdentifier {
+    PbContentProvider contentProvider = 1;
+    PbIdentifier identifier = 2;
 }
 
-message TrackIdentifier {
-    ContentProvider contentProvider = 1;
-    Identifier identifier = 2;
+message PbTrackIdentifier {
+    PbContentProvider contentProvider = 1;
+    PbIdentifier identifier = 2;
 }
 
-enum AuthProviderType {
+enum PbAuthProviderType {
     AUTH_UNKNOWN = 0;
     AUTH_SPOTIFY = 1;
 }
 
-message AuthProviderIdentifier {
-    AuthProviderType authProvider = 1;
-    Identifier identifier = 2;
+message PbAuthProviderIdentifier {
+    PbAuthProviderType authProvider = 1;
+    PbIdentifier identifier = 2;
 }
 
-message User {
-    Name name = 1;
-    AuthProviderIdentifier identifier = 2;
+message PbUser {
+    PbName name = 1;
+    PbAuthProviderIdentifier identifier = 2;
 }
 
-message Image {
+message PbImage {
     string url = 1;
     int32 height = 2;
     int32 width = 3;
 }
 
-message PlaylistInfo {
-    Name name = 1;
-    PlaylistIdentifier identifier = 2;
-    repeated Image images = 3;
+message PbPlaylistInfo {
+    PbName name = 1;
+    PbPlaylistIdentifier identifier = 2;
+    repeated PbImage images = 3;
 }
 
-message Artist {
-    Name name = 1;
+message PbArtist {
+    PbName name = 1;
 }
 
-message Album {
-    Name name = 1;
-    repeated Artist artists = 2;
-    repeated Image images = 3;
+message PbAlbum {
+    PbName name = 1;
+    repeated PbArtist artists = 2;
+    repeated PbImage images = 3;
 }
 
-message Track {
-    Name name = 1;
-    TrackIdentifier identifier = 2;
-    Album album = 3;
+message PbTrack {
+    PbName name = 1;
+    PbTrackIdentifier identifier = 2;
+    PbAlbum album = 3;
 }
 
-message Playlist {
-    PlaylistInfo playlistInfo = 1;
-    repeated Track tracks = 2;
+message PbPlaylist {
+    PbPlaylistInfo playlistInfo = 1;
+    repeated PbTrack tracks = 2;
 }
 
-message CurrentPlaylistSet {
-    Playlist playlist = 1;
+message PbCurrentPlaylistSet {
+    PbPlaylist playlist = 1;
 }
 
-message VenueTracksRemoved {}
+message PbVenueTracksRemoved {}
 
-message VenueTrackAdded {
-    Track track = 1;
+message PbVenueTrackAdded {
+    PbTrack track = 1;
 }
 
-message TrackFinished {}
+message PbTrackFinished {}
 
-message UserTrackAdded {
-    User user = 1;
-    TrackIdentifier trackIdentifier = 2;
+message PbUserTrackAdded {
+    PbUser user = 1;
+    PbTrackIdentifier trackIdentifier = 2;
 }
 
-message CurrentTrackSkipped {}
+message PbCurrentTrackSkipped {}

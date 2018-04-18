@@ -19,7 +19,7 @@ class CommandProcessor @Inject()(
     @Assisted venueUid: Uid)(
     implicit ec: ExecutionContext) extends PersistentActor {
 
-  override val persistenceId: String = venueUid.value
+  override val persistenceId: String = s"queue-${venueUid.value}"
 
   implicit val askTimeout = envConfig.defaultAskTimeout
 

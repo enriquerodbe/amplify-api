@@ -37,6 +37,14 @@ CREATE TABLE "venues_snapshot" (
   PRIMARY KEY (persistence_id, sequence_number)
 );
 
+CREATE TABLE "coins" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "venue_id" BIGINT NOT NULL,
+  "token" VARCHAR(255) UNIQUE,
+  "max_usages" SMALLINT,
+  "time" TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 
 # --- !Downs
 
@@ -44,3 +52,4 @@ DROP TABLE "users";
 DROP TABLE "venues";
 DROP TABLE "venues_journal";
 DROP TABLE "venues_snapshot";
+DROP TABLE "coins";
