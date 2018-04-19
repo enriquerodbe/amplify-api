@@ -15,6 +15,13 @@ lazy val dependencies = Seq(
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "it,test",
   "org.mockito" % "mockito-core" % "2.13.0" % "it,test")
 
+lazy val customDependencyOverrides = Seq(
+  "com.typesafe.akka" %% "akka-stream" % "2.5.11",
+  "com.typesafe.akka" %% "akka-actor" % "2.5.11",
+  "com.google.guava" % "guava" % "22.0"
+)
+dependencyOverrides ++= customDependencyOverrides
+
 lazy val `amplify-api` = (project in file("."))
   .settings(libraryDependencies ++= dependencies)
   .configs(IntegrationTest)
