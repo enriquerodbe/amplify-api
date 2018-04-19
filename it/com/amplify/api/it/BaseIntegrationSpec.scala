@@ -59,7 +59,7 @@ trait BaseIntegrationSpec
   protected def initQueue(venueUid: Uid, queue: Queue) = {
     implicit val timeout = Timeout(2.seconds)
     Await.ready(instanceOf[VenuePlaylistController]
-      .retrieveCurrentPlaylist(venueUid.value)(FakeRequest()), timeout.duration)
+      .retrieveVenueCurrentPlaylist(venueUid.value)(FakeRequest()), timeout.duration)
     val processor = findCommandProcessor(venueUid)
     Await.ready((processor ? SetState(queue)).mapTo[Unit], timeout.duration)
   }

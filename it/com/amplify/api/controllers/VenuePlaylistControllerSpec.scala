@@ -63,7 +63,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
     "respond empty playlist" when {
       "no playlist was set" in new RetrieveCurrentPlaylistFixture {
         val response =
-          controller.retrieveCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
+          controller.retrieveVenueCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
         status(response) mustEqual NO_CONTENT
       }
     }
@@ -75,7 +75,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
       initQueue(aliceVenueUid, queue)
 
       val response =
-        controller.retrieveCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
+        controller.retrieveVenueCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
 
       status(response) mustEqual OK
       contentType(response) must contain (Http.MimeTypes.JSON)

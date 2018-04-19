@@ -9,7 +9,7 @@ import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.domain.models.{ContentIdentifier, PlaylistIdentifier}
 import com.amplify.api.exceptions.InvalidProviderIdentifier
 import javax.inject.Inject
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.{AbstractController, ControllerComponents, Result}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -27,8 +27,15 @@ class VenuePlaylistController @Inject()(
     }
   }
 
-  def retrieveCurrentPlaylist(uid: String) = authenticatedUser() { _ ⇒
-    val venueUid = Uid(uid)
+  def retrieveCurrentPlaylist() = authenticatedVenue() { request ⇒
+    doRetrieveCurrentPlaylist(request.subject.venue.uid)
+  }
+
+  def retrieveVenueCurrentPlaylist(uid: String) = authenticatedUser() { _ ⇒
+    doRetrieveCurrentPlaylist(Uid(uid))
+  }
+
+  private def doRetrieveCurrentPlaylist(venueUid: Uid): Future[Result] = {
     venuePlaylistLogic.retrieveCurrentPlaylist(venueUid).map {
       case Some(playlist) ⇒ SuccessfulResponse(playlistToPlaylistResponse(playlist))
       case _ ⇒ NoContent
