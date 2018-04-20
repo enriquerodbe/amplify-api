@@ -9,7 +9,6 @@ lazy val dependencies = Seq(
   "com.github.dnvriend" %% "akka-persistence-jdbc" % "3.3.0",
   "org.postgresql" % "postgresql" % "42.2.2",
   "be.objectify" %% "deadbolt-scala" % "2.6.1",
-  "org.webjars" % "swagger-ui" % "3.13.3",
   guice,
   ws,
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "it,test",
