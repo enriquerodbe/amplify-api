@@ -20,7 +20,6 @@ trait SpotifyContext extends CommonData with MockitoSugar {
   val spotifyAuthProvider =
     mock[SpotifyAuthProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
 
-  val authorizationHeader = HeaderNames.AUTHORIZATION
   val aliceToken = "alice-token"
   val bobToken = "bob-token"
   val invalidToken = "invalid-token"
@@ -29,7 +28,7 @@ trait SpotifyContext extends CommonData with MockitoSugar {
   val bobAuthToken = AuthToken(AuthSpotify, bobToken)
   val invalidAuthToken = AuthToken(AuthSpotify, invalidToken)
 
-  def tokenHeader(token: String): (String, String) = authorizationHeader → s"Bearer $token"
+  def tokenHeader(token: String): (String, String) = HeaderNames.AUTHORIZATION → s"Bearer $token"
 
   implicit class FakeRequestWithAuthToken[T](fakeRequest: FakeRequest[T]) {
 

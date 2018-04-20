@@ -28,11 +28,11 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
       (response \ "uid").as[String] must have size 8
     }
     "create venue" in new SignUpFixture {
-      controller.signUp()(venueRequest("Test venue").withBobToken).await()
+      await(controller.signUp()(venueRequest("Test venue").withBobToken))
       findVenues("Test venue").headOption mustBe defined
     }
     "retrieve venue if it already exists" in new SignUpFixture {
-      controller.signUp()(venueRequest("Test bar").withAliceToken).await()
+      await(controller.signUp()(venueRequest("Test bar").withAliceToken))
       findVenues(aliceDbVenue.name.value).headOption mustBe defined
     }
 

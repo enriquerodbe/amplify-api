@@ -13,3 +13,9 @@ case class InvalidCoinToken(token: String)
       AppExceptionCode.InvalidCoinToken,
       s"Invalid coin token: $token")
     with ValidationException
+
+case class InvalidCreateCoinsRequestedNumber(max: Int, number: Int)
+  extends BadRequestException(
+    AppExceptionCode.InvalidCreateCoinsRequestedNumber,
+    s"Number must be between 1 and $max. Was: $number")
+    with ValidationException

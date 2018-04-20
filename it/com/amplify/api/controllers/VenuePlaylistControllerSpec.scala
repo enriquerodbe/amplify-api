@@ -11,7 +11,7 @@ import com.amplify.api.services.external.spotify.Converters.toModelPlaylist
 import org.mockito.Mockito.when
 import org.scalatest.Inside
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.{JsArray, JsDefined}
+import play.api.libs.json.JsArray
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http
@@ -50,9 +50,39 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
           .thenReturn(Future.failed(UnexpectedResponse("Testing!")))
 
         intercept[UnexpectedResponse] {
-          controller.retrievePlaylists()(FakeRequest().withAliceToken).await()
+          await(controller.retrievePlaylists()(FakeRequest().withAliceToken))
         }
       }
+    }
+  }
+
+  class RetrieveVenueCurrentPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+    extends DbVenueFixture with DbUserFixture
+
+  "retrieveVenueCurrentPlaylist" should {
+    "respond empty playlist" when {
+      "no playlist was set" in new RetrieveVenueCurrentPlaylistFixture {
+        val response =
+          controller.retrieveVenueCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
+        status(response) mustEqual NO_CONTENT
+      }
+    }
+
+    "respond with some playlist" in new RetrieveVenueCurrentPlaylistFixture {
+      val playlist = Playlist(toModelPlaylist(alicePlaylist), Seq.empty)
+      val queue = Queue.empty.copy(currentPlaylist = Some(playlist))
+      initQueue(aliceVenueUid, queue)
+
+      val response =
+        controller.retrieveVenueCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
+
+      status(response) mustEqual OK
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      val jsonResponse = contentAsJson(response)
+      (jsonResponse \ "info" \ "name").as[String] mustEqual alicePlaylist.name
+      val playlistUri = Spotify.PlaylistUri(aliceSpotifyUser.id, alicePlaylist.id)
+      (jsonResponse \ "info" \ "identifier").as[String] mustEqual playlistUri.toString
+      (jsonResponse \ "tracks").as[JsArray].value mustBe empty
     }
   }
 
@@ -63,19 +93,18 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
     "respond empty playlist" when {
       "no playlist was set" in new RetrieveCurrentPlaylistFixture {
         val response =
-          controller.retrieveVenueCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
+          controller.retrieveCurrentPlaylist()(FakeRequest().withAliceToken)
         status(response) mustEqual NO_CONTENT
       }
     }
 
     "respond with some playlist" in new RetrieveCurrentPlaylistFixture {
-      // Needed to initialize the command processor
       val playlist = Playlist(toModelPlaylist(alicePlaylist), Seq.empty)
       val queue = Queue.empty.copy(currentPlaylist = Some(playlist))
       initQueue(aliceVenueUid, queue)
 
       val response =
-        controller.retrieveVenueCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
+        controller.retrieveCurrentPlaylist()(FakeRequest().withAliceToken)
 
       status(response) mustEqual OK
       contentType(response) must contain (Http.MimeTypes.JSON)
@@ -97,10 +126,10 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
       status(response) mustEqual NO_CONTENT
     }
     "update queue current playlist" in new SetCurrentPlaylistFixture {
-      controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistUri.toString).withAliceToken).await()
+      await(controller.setCurrentPlaylist()(
+        playlistRequest(alicePlaylistUri.toString).withAliceToken))
 
-      val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
+      val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
       inside(queue.currentPlaylist) { case Some(Playlist(playlistInfo, tracks)) ⇒
         playlistInfo must have(
@@ -143,10 +172,10 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
       }
     }
     "update queue current track" in new SetCurrentPlaylistFixture {
-      controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistUri.toString).withAliceToken).await()
+      await(controller.setCurrentPlaylist()(
+        playlistRequest(alicePlaylistUri.toString).withAliceToken))
 
-      val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
+      val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
       inside(queue.currentItem) { case Some(QueueItem(track, itemType)) ⇒
         itemType mustEqual QueueItemType.Venue
@@ -157,10 +186,10 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
       }
     }
     "update queue items" in new SetCurrentPlaylistFixture {
-      controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistUri.toString).withAliceToken).await()
+      await(controller.setCurrentPlaylist()(
+        playlistRequest(alicePlaylistUri.toString).withAliceToken))
 
-      val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
+      val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
       for (item ← queue.allItems) item must have ('itemType (QueueItemType.Venue))
       queue.allItems.map(_.track) must contain theSameElementsAs queue.currentPlaylist.get.tracks
@@ -169,14 +198,14 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
     "fail" when {
       "invalid identifier" in new SetCurrentPlaylistFixture {
         intercept[InvalidProviderIdentifier] {
-          controller.setCurrentPlaylist()(
-            playlistRequest("wrong_identifier").withAliceToken).await()
+          await(controller.setCurrentPlaylist()(
+            playlistRequest("wrong_identifier").withAliceToken))
         }
       }
       "invalid content provider" in new SetCurrentPlaylistFixture {
         intercept[InvalidProviderIdentifier] {
-          controller.setCurrentPlaylist()(
-            playlistRequest("wrong_provider:wrong_identifier").withAliceToken).await()
+          await(controller.setCurrentPlaylist()(
+            playlistRequest("wrong_provider:wrong_identifier").withAliceToken))
         }
       }
     }

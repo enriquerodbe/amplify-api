@@ -13,10 +13,10 @@ trait DbUserFixture extends BaseDbFixture with CommonData with UsersTable {
   val bobDbUser = DbUser(bobDbUserId, "Bob Marley", Spotify → bobSpotifyId)
 
   def insertUser(user: DbUser): Id = {
-    db.run(usersTable returning usersTable.map(_.id) += user).await()
+    await(db.run(usersTable returning usersTable.map(_.id) += user))
   }
   def findUsers(name: Name): Seq[DbUser] = {
-    db.run(usersTable.filter(_.name === name).result).await()
+    await(db.run(usersTable.filter(_.name === name).result))
   }
 
   insertUser(aliceDbUser)

@@ -1,7 +1,6 @@
 package com.amplify.api.it
 
 import akka.pattern.ask
-import akka.util.Timeout
 import com.amplify.api.aggregates.queue.CommandProcessor.SetState
 import com.amplify.api.controllers.VenuePlaylistController
 import com.amplify.api.domain.models.Queue
@@ -19,9 +18,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Results
-import play.api.test.FakeRequest
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
+import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import scala.reflect.ClassTag
 
 trait BaseIntegrationSpec
@@ -30,7 +27,9 @@ trait BaseIntegrationSpec
     with GuiceOneAppPerSuite
     with MockitoSugar
     with Results
-    with BeforeAndAfterEach {
+    with BeforeAndAfterEach
+    with FutureAwaits
+    with DefaultAwaitTimeout {
 
   protected def instanceOf[T: ClassTag]: T = app.injector.instanceOf[T]
 
@@ -57,10 +56,9 @@ trait BaseIntegrationSpec
   }
 
   protected def initQueue(venueUid: Uid, queue: Queue) = {
-    implicit val timeout = Timeout(2.seconds)
-    Await.ready(instanceOf[VenuePlaylistController]
-      .retrieveVenueCurrentPlaylist(venueUid.value)(FakeRequest()), timeout.duration)
+    await(instanceOf[VenuePlaylistController]
+      .retrieveVenueCurrentPlaylist(venueUid.value)(FakeRequest().withAliceToken))
     val processor = findCommandProcessor(venueUid)
-    Await.ready((processor ? SetState(queue)).mapTo[Unit], timeout.duration)
+    await((processor ? SetState(queue)).mapTo[Unit])
   }
 }

@@ -27,9 +27,9 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
       status(response) mustBe NO_CONTENT
     }
     "update queue current track" in new SkipFixture {
-      controller.skip()(fakeRequest().withAliceToken).await()
+      await(controller.skip()(fakeRequest().withAliceToken))
 
-      val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
+      val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
       queue must have(
         'currentItem (None),
@@ -47,9 +47,9 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
       status(response) mustBe NO_CONTENT
     }
     "update queue current track" in new FinishFixture {
-      controller.finish()(fakeRequest().withAliceToken).await()
+      await(controller.finish()(fakeRequest().withAliceToken))
 
-      val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
+      val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
       queue must have(
         'currentItem (None),
@@ -75,9 +75,9 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
     "update queue next track" in new AddTrackFixture {
       val trackId = TrackUri(bedOfNailsTrack.track.id)
       val request = addTrackRequest(trackId).withAliceToken
-      controller.addTrack(aliceVenueUid)(request).await()
+      await(controller.addTrack(aliceVenueUid)(request))
 
-      val queue = (commandProcessor ? RetrieveState).mapTo[Queue].await()
+      val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
       val nextItem = queue.futureItems.head
       nextItem.isUserTrack mustBe true

@@ -9,7 +9,8 @@ class EnvConfig @Inject()(config: Configuration) {
 
   val spotifyUrl = config.get[String]("spotify.web_api.url")
 
-  val coinsDefaultMaxUsages = config.get[Int]("coins.defaults.max_usages")
+  val coinsDefaultMaxUsages = config.get[Int]("coins.default.max_usages")
+  val coinsCreateMax = config.get[Int]("coins.create.max_per_request")
 
   val defaultAskTimeout = Timeout(3.seconds)
 }

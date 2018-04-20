@@ -13,13 +13,13 @@ trait DbVenueFixture extends BaseDbFixture with CommonData with VenuesTable {
     DbVenue(aliceDbVenueId, "Alice's Bar", aliceVenueUid, Spotify → aliceSpotifyId)
 
   def insertVenue(venue: DbVenue): Id = {
-    db.run(venuesTable returning venuesTable.map(_.id) += venue).await()
+    await(db.run(venuesTable returning venuesTable.map(_.id) += venue))
   }
   def findVenues(name: String): Seq[DbVenue] = {
-    db.run(venuesTable.filter(_.name === Name(name)).result).await()
+    await(db.run(venuesTable.filter(_.name === Name(name)).result))
   }
   def getVenue(id: Id): DbVenue = {
-    db.run(venuesTable.filter(_.id === id).result.head).await()
+    await(db.run(venuesTable.filter(_.id === id).result.head))
   }
 
   insertVenue(aliceDbVenue)

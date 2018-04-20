@@ -39,6 +39,7 @@ object AppExceptionCode extends Enumeration {
     VenueNotFound,
     VenueCurrentPlaylistNotSet,
     AuthenticationFailed,
-    InvalidCoinToken
+    InvalidCoinToken,
+    InvalidCreateCoinsRequestedNumber
   = Value
 }

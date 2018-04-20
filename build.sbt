@@ -37,7 +37,7 @@ fork in IntegrationTest := true
 javaOptions in IntegrationTest += "-Dconfig.file=it/conf/application.test.conf"
 
 // Scoverage
-coverageMinimum := 63
+coverageMinimum := 72
 coverageFailOnMinimum := true
 lazy val coverageExcludedPackagesSeq = Seq(
   "<empty>",
