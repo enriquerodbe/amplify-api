@@ -1,7 +1,7 @@
 package com.amplify.api.domain.logic
 
+import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.Uid
-import com.amplify.api.domain.models.{Queue, TrackIdentifier, User, Venue}
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
 
@@ -14,5 +14,5 @@ trait VenueQueueLogic {
 
   def finish(venue: Venue): Future[Unit]
 
-  def addTrack(venueUid: Uid, user: User, trackIdentifier: TrackIdentifier): Future[Unit]
+  def addTrack(venueUid: Uid, coinToken: CoinToken, trackIdentifier: TrackIdentifier): Future[Unit]
 }

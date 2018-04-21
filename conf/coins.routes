@@ -1,0 +1,15 @@
+###
+#  summary: Retrieve the coin status
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        $ref: '#/definitions/com.amplify.api.controllers.dtos.Coin.CoinStatusResponse'
+#  parameters:
+#  - name: coin
+#    description: Coin token
+#    in: header
+#    required: true
+#    type: string
+###
+GET    /    com.amplify.api.controllers.CoinController.coinStatus()

@@ -57,7 +57,7 @@ trait BaseIntegrationSpec
 
   protected def initQueue(venueUid: Uid, queue: Queue) = {
     await(instanceOf[VenuePlaylistController]
-      .retrieveVenueCurrentPlaylist(venueUid.value)(FakeRequest().withAliceToken))
+      .retrieveVenueCurrentPlaylist(venueUid.value)(FakeRequest().withAliceToken.withValidCoin))
     val processor = findCommandProcessor(venueUid)
     await((processor ? SetState(queue)).mapTo[Unit])
   }

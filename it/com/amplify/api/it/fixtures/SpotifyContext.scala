@@ -1,5 +1,6 @@
 package com.amplify.api.it.fixtures
 
+import com.amplify.api.controllers.auth.AuthHeadersUtil
 import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
 import com.amplify.api.domain.models.AuthToken
 import com.amplify.api.domain.models.Spotify.PlaylistUri
@@ -20,17 +21,13 @@ trait SpotifyContext extends CommonData with MockitoSugar {
   val spotifyAuthProvider =
     mock[SpotifyAuthProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
 
-  val aliceToken = "alice-token"
-  val bobToken = "bob-token"
-  val invalidToken = "invalid-token"
-
   implicit val aliceAuthToken = AuthToken(AuthSpotify, aliceToken)
   val bobAuthToken = AuthToken(AuthSpotify, bobToken)
   val invalidAuthToken = AuthToken(AuthSpotify, invalidToken)
 
-  def tokenHeader(token: String): (String, String) = HeaderNames.AUTHORIZATION → s"Bearer $token"
-
   implicit class FakeRequestWithAuthToken[T](fakeRequest: FakeRequest[T]) {
+
+    def tokenHeader(token: String): (String, String) = HeaderNames.AUTHORIZATION → s"Bearer $token"
 
     def withAuthToken(token: String): FakeRequest[T] = {
       fakeRequest.withHeaders(tokenHeader(token))
@@ -39,6 +36,15 @@ trait SpotifyContext extends CommonData with MockitoSugar {
     def withAliceToken: FakeRequest[T] = withAuthToken(aliceToken)
 
     def withBobToken: FakeRequest[T] = withAuthToken(bobToken)
+  }
+
+  implicit class FakeRequestWithCoin[T](fakeRequest: FakeRequest[T]) {
+
+    def coinHeader(coin: String): (String, String) = AuthHeadersUtil.COIN_PARAM → coin
+
+    def withCoin(coin: String): FakeRequest[T] = fakeRequest.withHeaders(coinHeader(coin))
+
+    def withValidCoin: FakeRequest[T] = withCoin(s"$aliceVenueUid:$validCoinTokenStr")
   }
 
   val aliceUserData = UserData(AuthSpotify → aliceSpotifyId, "Alice")

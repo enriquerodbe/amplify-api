@@ -10,6 +10,13 @@ trait CommonData {
   val aliceSpotifyId = "alice-spotify-id"
   val aliceVenueUid = "Fa84A3fl"
 
+  val aliceToken = "alice-token"
+  val bobToken = "bob-token"
+  val invalidToken = "invalid-token"
+
+  val validDbCoinId = 1L
+  val validCoinTokenStr = "valid_coin123456"
+
   val bobDbUserId = 2L
   val bobSpotifyId = "bob-spotify-id"
 

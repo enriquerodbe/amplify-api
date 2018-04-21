@@ -12,9 +12,7 @@ trait DbVenueFixture extends BaseDbFixture with CommonData with VenuesTable {
   val aliceDbVenue =
     DbVenue(aliceDbVenueId, "Alice's Bar", aliceVenueUid, Spotify → aliceSpotifyId)
 
-  def insertVenue(venue: DbVenue): Id = {
-    await(db.run(venuesTable returning venuesTable.map(_.id) += venue))
-  }
+  def insertVenue(venue: DbVenue): DbVenue = await(db.run(insertVenuesQuery += venue))
   def findVenues(name: String): Seq[DbVenue] = {
     await(db.run(venuesTable.filter(_.name === Name(name)).result))
   }

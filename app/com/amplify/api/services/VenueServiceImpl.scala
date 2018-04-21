@@ -1,10 +1,10 @@
 package com.amplify.api.services
 
-import com.amplify.api.daos.{DbioRunner, UserDao, VenueDao}
+import com.amplify.api.daos.{DbioRunner, VenueDao}
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.{Name, Uid}
 import com.amplify.api.exceptions.VenueNotFoundByUid
-import com.amplify.api.services.converters.VenueConverter.{userDataToDbVenue, dbVenueToVenue}
+import com.amplify.api.services.converters.VenueConverter.{dbVenueToVenue, userDataToDbVenue}
 import com.amplify.api.services.external.ContentService
 import com.amplify.api.services.models.UserData
 import com.amplify.api.utils.DbioUtils.DbioT
@@ -14,7 +14,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class VenueServiceImpl @Inject()(
     db: DbioRunner,
     contentService: ContentService,
-    userDao: UserDao,
     venueDao: VenueDao)(
     implicit ec: ExecutionContext) extends VenueService {
 

@@ -1,12 +1,5 @@
 # --- !Ups
 
-CREATE TABLE "users" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "name" VARCHAR(255) NOT NULL,
-  "auth_provider" SMALLINT NOT NULL,
-  "auth_identifier" VARCHAR(255) NOT NULL,
-  UNIQUE ("auth_provider", "auth_identifier"));
-
 CREATE TABLE "venues" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" VARCHAR(255) NOT NULL,
@@ -48,7 +41,6 @@ CREATE TABLE "coins" (
 
 # --- !Downs
 
-DROP TABLE "users";
 DROP TABLE "venues";
 DROP TABLE "venues_journal";
 DROP TABLE "venues_snapshot";

@@ -5,7 +5,7 @@ import com.amplify.api.aggregates.queue.serialization.PbContentProvider.CONTENT_
 import com.amplify.api.domain.models
 import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.{Identifier, Name}
+import com.amplify.api.domain.models.primitives.{Name, Uid}
 import com.amplify.api.exceptions.InvalidProviderIdentifier
 import scalapb.GeneratedMessage
 
@@ -18,8 +18,8 @@ object ProtobufConverter {
     case Event.VenueTracksRemoved ⇒ PbVenueTracksRemoved()
     case Event.VenueTrackAdded(track) ⇒ PbVenueTrackAdded(Some(toProtobuf(track)))
     case Event.TrackFinished ⇒ PbTrackFinished()
-    case Event.UserTrackAdded(user, trackIdentifier) ⇒
-      PbUserTrackAdded(Some(toProtobuf(user)), Some(toProtobuf(trackIdentifier)))
+    case Event.UserTrackAdded(coin, trackIdentifier) ⇒
+      PbUserTrackAdded(Some(toProtobuf(coin)), Some(toProtobuf(trackIdentifier)))
     case Event.CurrentTrackSkipped ⇒ PbCurrentTrackSkipped()
   }
 
@@ -40,13 +40,6 @@ object ProtobufConverter {
   private def toProtobuf(contentIdentifier: TrackIdentifier): PbTrackIdentifier = {
     val provider = PbContentProvider.fromValue(contentIdentifier.contentProvider.id)
     PbTrackIdentifier(provider, Some(PbIdentifier(contentIdentifier.identifier.value)))
-  }
-
-  private def toProtobuf(
-      authIdentifier: AuthProviderIdentifier): PbAuthProviderIdentifier = {
-    val provider = PbAuthProviderType.fromValue(authIdentifier.authProvider.id)
-    val identifier = Some(PbIdentifier(authIdentifier.identifier.value))
-    PbAuthProviderIdentifier(provider, identifier)
   }
 
   private def toProtobuf(image: Image): PbImage = {
@@ -70,8 +63,8 @@ object ProtobufConverter {
     PbArtist(Some(PbName(artist.name.value)))
   }
 
-  private def toProtobuf(user: User): PbUser = {
-    PbUser(Some(PbName(user.name.value)), Some(toProtobuf(user.identifier)))
+  private def toProtobuf(coinToken: CoinToken): PbCoinToken = {
+    PbCoinToken(Some(PbUid(coinToken.venueUid.value)), coinToken.token)
   }
 
   def fromProtobuf(message: GeneratedMessage): Event = message match {
@@ -80,7 +73,7 @@ object ProtobufConverter {
     case a: PbVenueTrackAdded ⇒ Event.VenueTrackAdded(fromProtobuf(a.getTrack))
     case _: PbTrackFinished ⇒ Event.TrackFinished
     case a: PbUserTrackAdded ⇒
-      Event.UserTrackAdded(fromProtobuf(a.getUser), fromProtobuf(a.getTrackIdentifier))
+      Event.UserTrackAdded(fromProtobuf(a.getCoinToken), fromProtobuf(a.getTrackIdentifier))
     case _: PbCurrentTrackSkipped ⇒ Event.CurrentTrackSkipped
   }
 
@@ -105,18 +98,9 @@ object ProtobufConverter {
 
   private def fromProtobuf(contentIdentifier: PbTrackIdentifier): TrackIdentifier = {
     contentIdentifier.contentProvider match {
-      case CONTENT_PROVIDER_SPOTIFY ⇒
-        TrackUri(contentIdentifier.getIdentifier.value)
-      case _ ⇒
-        throw InvalidProviderIdentifier(contentIdentifier.getIdentifier.value)
+      case CONTENT_PROVIDER_SPOTIFY ⇒ TrackUri(contentIdentifier.getIdentifier.value)
+      case _ ⇒ throw InvalidProviderIdentifier(contentIdentifier.toString)
     }
-  }
-
-  private def fromProtobuf(
-      identifier: PbAuthProviderIdentifier): AuthProviderIdentifier = {
-    val provider = AuthProviderType(identifier.authProvider.value)
-    val id = Identifier(identifier.getIdentifier.value)
-    AuthProviderIdentifier(provider, id)
   }
 
   private def fromProtobuf(image: PbImage): Image = {
@@ -141,7 +125,7 @@ object ProtobufConverter {
     Artist(Name(artist.getName.value))
   }
 
-  private def fromProtobuf(user: PbUser): User = {
-    User(Name(user.getName.value), fromProtobuf(user.getIdentifier))
+  private def fromProtobuf(coin: PbCoinToken): CoinToken = {
+    CoinToken(Uid(coin.getVenueUid.value), coin.token)
   }
 }

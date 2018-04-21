@@ -57,7 +57,7 @@ class CommandProcessor @Inject()(
 
     case FinishCurrentTrack(_) ⇒ Seq(TrackFinished)
 
-    case AddTrack(_, user, trackIdentifier) ⇒ Seq(UserTrackAdded(user, trackIdentifier))
+    case AddTrack(_, coin, trackIdentifier) ⇒ Seq(UserTrackAdded(coin, trackIdentifier))
   }
 
   private def process(queue: Queue, event: Event): Queue = event match {

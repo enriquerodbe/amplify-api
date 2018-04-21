@@ -5,7 +5,7 @@ import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveState
 import com.amplify.api.domain.models.Spotify.TrackUri
 import com.amplify.api.domain.models._
 import com.amplify.api.exceptions.{InvalidProviderIdentifier, UnexpectedResponse}
-import com.amplify.api.it.fixtures.{DbUserFixture, DbVenueFixture}
+import com.amplify.api.it.fixtures.{DbCoinFixture, DbVenueFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import com.amplify.api.services.external.spotify.Converters.toModelPlaylist
 import org.mockito.Mockito.when
@@ -28,11 +28,11 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
 
   "retrievePlaylists" should {
     "respond OK" in new RetrievePlaylistsFixture {
-      val response = controller.retrievePlaylists()(FakeRequest().withAliceToken)
+      val response = controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceToken)
       status(response) mustEqual OK
     }
     "respond with playlists" in new RetrievePlaylistsFixture {
-      val response = controller.retrievePlaylists()(FakeRequest().withAliceToken)
+      val response = controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceToken)
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response).head
@@ -50,20 +50,20 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
           .thenReturn(Future.failed(UnexpectedResponse("Testing!")))
 
         intercept[UnexpectedResponse] {
-          await(controller.retrievePlaylists()(FakeRequest().withAliceToken))
+          await(controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceToken))
         }
       }
     }
   }
 
   class RetrieveVenueCurrentPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends DbVenueFixture with DbUserFixture
+    extends DbVenueFixture with DbCoinFixture
 
   "retrieveVenueCurrentPlaylist" should {
     "respond empty playlist" when {
       "no playlist was set" in new RetrieveVenueCurrentPlaylistFixture {
         val response =
-          controller.retrieveVenueCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
+          controller.retrieveVenueCurrentPlaylist(aliceVenueUid)(FakeRequest().withValidCoin)
         status(response) mustEqual NO_CONTENT
       }
     }
@@ -74,7 +74,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
       initQueue(aliceVenueUid, queue)
 
       val response =
-        controller.retrieveVenueCurrentPlaylist(aliceVenueUid)(FakeRequest().withAliceToken)
+        controller.retrieveVenueCurrentPlaylist(aliceVenueUid)(FakeRequest().withValidCoin)
 
       status(response) mustEqual OK
       contentType(response) must contain (Http.MimeTypes.JSON)
@@ -87,13 +87,13 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
   }
 
   class RetrieveCurrentPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends DbVenueFixture with DbUserFixture
+    extends DbVenueFixture
 
   "retrieveCurrentPlaylist" should {
     "respond empty playlist" when {
       "no playlist was set" in new RetrieveCurrentPlaylistFixture {
         val response =
-          controller.retrieveCurrentPlaylist()(FakeRequest().withAliceToken)
+          controller.retrieveCurrentPlaylist()(FakeRequest().withBody(()).withAliceToken)
         status(response) mustEqual NO_CONTENT
       }
     }
@@ -104,7 +104,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
       initQueue(aliceVenueUid, queue)
 
       val response =
-        controller.retrieveCurrentPlaylist()(FakeRequest().withAliceToken)
+        controller.retrieveCurrentPlaylist()(FakeRequest().withBody(()).withAliceToken)
 
       status(response) mustEqual OK
       contentType(response) must contain (Http.MimeTypes.JSON)

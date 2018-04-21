@@ -20,18 +20,18 @@ class VenuePlaylistController @Inject()(
     val actionBuilder: ActionBuilders)(
     implicit ec: ExecutionContext) extends AbstractController(cc) with AuthenticatedRequests {
 
-  def retrievePlaylists() = authenticatedVenue() { request ⇒
+  def retrievePlaylists() = authenticatedVenue(parse.empty) { request ⇒
     val eventualPlaylists = venuePlaylistLogic.retrievePlaylists(request.subject.venueReq)
     eventualPlaylists.map { playlists =>
       SuccessfulResponse(playlists.map(playlistInfoToPlaylistInfoResponse))
     }
   }
 
-  def retrieveCurrentPlaylist() = authenticatedVenue() { request ⇒
+  def retrieveCurrentPlaylist() = authenticatedVenue(parse.empty) { request ⇒
     doRetrieveCurrentPlaylist(request.subject.venue.uid)
   }
 
-  def retrieveVenueCurrentPlaylist(uid: String) = authenticatedUser() { _ ⇒
+  def retrieveVenueCurrentPlaylist(uid: String) = authenticatedCoin() { _ ⇒
     doRetrieveCurrentPlaylist(Uid(uid))
   }
 

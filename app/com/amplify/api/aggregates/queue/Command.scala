@@ -15,5 +15,6 @@ object Command {
 
   case class FinishCurrentTrack(venue: Venue) extends Command
 
-  case class AddTrack(venue: Venue, user: User, trackIdentifier: TrackIdentifier) extends Command
+  case class AddTrack(venue: Venue, coinToken: CoinToken, trackIdentifier: TrackIdentifier)
+    extends Command
 }

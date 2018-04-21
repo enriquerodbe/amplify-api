@@ -20,7 +20,7 @@ class VenueQueueController @Inject()(
     val actionBuilder: ActionBuilders)(
     implicit ec: ExecutionContext) extends AbstractController(cc) with AuthenticatedRequests {
 
-  def retrieveQueue() = authenticatedVenue() { request ⇒
+  def retrieveQueue() = authenticatedVenue(parse.empty) { request ⇒
     venueQueueLogic.retrieveQueue(request.subject.venue).map { queue ⇒
       SuccessfulResponse(queueToQueueResponse(queue))
     }
@@ -34,10 +34,12 @@ class VenueQueueController @Inject()(
     venueQueueLogic.finish(request.subject.venue).map(_ ⇒ NoContent)
   }
 
-  def addTrack(uid: String) = authenticatedUser(parse.json[AddTrackRequest]) { request ⇒
+  def addTrack(uid: String) = authenticatedCoin(parse.json[AddTrackRequest]) { request ⇒
     ContentIdentifier.fromString(request.body.identifier) match {
       case Success(identifier: TrackIdentifier) ⇒
-        venueQueueLogic.addTrack(Uid(uid), request.subject.user, identifier).map(_ ⇒ NoContent)
+        venueQueueLogic
+          .addTrack(Uid(uid), request.subject.coin.token, identifier)
+          .map(_ ⇒ NoContent)
       case Success(otherIdentifier) ⇒
         Future.failed(InvalidProviderIdentifier(otherIdentifier.toString))
       case Failure(ex) ⇒

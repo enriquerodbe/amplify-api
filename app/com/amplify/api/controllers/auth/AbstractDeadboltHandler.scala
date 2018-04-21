@@ -3,8 +3,8 @@ package com.amplify.api.controllers.auth
 import be.objectify.deadbolt.scala.models.Subject
 import be.objectify.deadbolt.scala.{AuthenticatedRequest, DeadboltHandler, DynamicResourceHandler}
 import com.amplify.api.controllers.dtos.ClientErrorResponse
-import com.amplify.api.domain.logic.{UserAuthLogic, VenueAuthLogic}
-import com.amplify.api.domain.models.{AuthToken, UserReq, VenueReq}
+import com.amplify.api.domain.logic.{CoinLogic, VenueAuthLogic}
+import com.amplify.api.domain.models.VenueReq
 import com.amplify.api.exceptions.AppExceptionCode
 import play.api.mvc.{Request, Result, Results}
 import play.mvc.Http
@@ -30,24 +30,18 @@ abstract class AbstractDeadboltHandler(
         Http.Status.FORBIDDEN)
     }
   }
-
-  override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] = {
-    authHeadersUtil.getAuthTokenFromHeaders(request) match {
-      case Success(authToken) ⇒ login(authToken)
-      case Failure(ex) ⇒ Future.failed(ex)
-    }
-  }
-
-  protected def login(authToken: AuthToken): Future[Option[Subject]]
 }
 
-class UserDeadboltHandler(
-    userAuthLogic: UserAuthLogic,
+class CoinDeadboltHandler(
+    coinLogic: CoinLogic,
     authHeadersUtil: AuthHeadersUtil)(
     implicit ec: ExecutionContext) extends AbstractDeadboltHandler(authHeadersUtil) {
 
-  override protected def login(authToken: AuthToken): Future[Option[Subject]] = {
-    userAuthLogic.login(authToken).map(_.map(user ⇒ AmplifyApiUser(UserReq(user, authToken))))
+  override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] = {
+    authHeadersUtil.getCoinFromHeaders(request) match {
+      case Success(coin) ⇒ coinLogic.login(coin).map(_.map(CoinSubject(_)))
+      case Failure(ex) ⇒ Future.failed(ex)
+    }
   }
 }
 
@@ -56,15 +50,21 @@ class VenueDeadboltHandler(
     authHeadersUtil: AuthHeadersUtil)(
     implicit ec: ExecutionContext) extends AbstractDeadboltHandler(authHeadersUtil) {
 
-  override protected def login(authToken: AuthToken): Future[Option[Subject]] = {
-    venueAuthLogic.login(authToken).map(_.map(venue ⇒ AmplifyApiVenue(VenueReq(venue, authToken))))
+  override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] = {
+    authHeadersUtil.getAuthTokenFromHeaders(request) match {
+      case Success(authToken) ⇒
+        val eventualMaybeVenue = venueAuthLogic.login(authToken)
+        eventualMaybeVenue.map(_.map(venue ⇒ VenueSubject(VenueReq(venue, authToken))))
+
+      case Failure(ex) ⇒ Future.failed(ex)
+    }
   }
 }
 
 class EmptyHandler(authHeadersUtil: AuthHeadersUtil)(implicit ec: ExecutionContext)
   extends AbstractDeadboltHandler(authHeadersUtil) {
 
-  override protected def login(authToken: AuthToken): Future[Option[Subject]] = {
+  override def getSubject[A](request: AuthenticatedRequest[A]): Future[Option[Subject]] = {
     Future.successful(None)
   }
 }

@@ -14,7 +14,7 @@ class CoinDaoImpl @Inject()(val dbConfigProvider: DatabaseConfigProvider, envCon
 
   lazy private val defaultMaxUsages = envConfig.coinsDefaultMaxUsages
 
-  override def createCoins(dbVenue: DbVenue, number: Int): DBIO[Seq[DbCoin]] = {
+  override def create(dbVenue: DbVenue, number: Int): DBIO[Seq[DbCoin]] = {
     val dbCoins =
       Seq.fill(number) {
         DbCoin(
@@ -24,5 +24,9 @@ class CoinDaoImpl @Inject()(val dbConfigProvider: DatabaseConfigProvider, envCon
       }
 
     insertCoinsQuery ++= dbCoins
+  }
+
+  override def retrieve(coinToken: CoinToken): DBIO[Option[DbCoin]] = {
+    coinsTable.filter(_.token === coinToken).result.headOption
   }
 }

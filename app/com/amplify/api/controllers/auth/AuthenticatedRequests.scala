@@ -1,7 +1,7 @@
 package com.amplify.api.controllers.auth
 
 import be.objectify.deadbolt.scala.ActionBuilders
-import com.amplify.api.controllers.auth.HandlerKeys.{UserHandlerKey, VenueHandlerKey}
+import com.amplify.api.controllers.auth.HandlerKeys.{CoinHandlerKey, VenueHandlerKey}
 import com.amplify.api.domain.models.AuthToken
 import play.api.mvc._
 import scala.concurrent.Future
@@ -11,29 +11,26 @@ trait AuthenticatedRequests { self: AbstractController ⇒
 
   def actionBuilder: ActionBuilders
 
-  case class AuthenticatedUserRequest[A](
-      subject: AmplifyApiUser,
-      request: Request[A]) extends WrappedRequest[A](request) {
-
-    def authToken: AuthToken = subject.userReq.authToken
-  }
+  case class AuthenticatedCoinRequest[A](
+      subject: CoinSubject,
+      request: Request[A]) extends WrappedRequest[A](request)
 
   case class AuthenticatedVenueRequest[A](
-      subject: AmplifyApiVenue,
+      subject: VenueSubject,
       request: Request[A]) extends WrappedRequest[A](request) {
 
     def authToken: AuthToken = subject.venueReq.authToken
   }
 
-  def authenticatedUser[A](
+  def authenticatedCoin[A](
       parser: BodyParser[A] = parse.anyContent)(
-      block: AuthenticatedUserRequest[A] ⇒ Future[Result]): Action[A] = {
-    actionBuilder.SubjectPresentAction().key(UserHandlerKey).apply(parser) { request ⇒
+      block: AuthenticatedCoinRequest[A] ⇒ Future[Result]): Action[A] = {
+    actionBuilder.SubjectPresentAction().key(CoinHandlerKey).apply(parser) { request ⇒
       request.subject match {
-        case Some(user: AmplifyApiUser) ⇒
-          block(AuthenticatedUserRequest[A](user, request))
+        case Some(coin: CoinSubject) ⇒
+          block(AuthenticatedCoinRequest[A](coin, request))
         case other ⇒
-          throw new IllegalStateException(s"Expected AuthUser, got: $other")
+          throw new IllegalStateException(s"Expected CoinSubject, got: $other")
       }
     }
   }
@@ -43,10 +40,10 @@ trait AuthenticatedRequests { self: AbstractController ⇒
       block: AuthenticatedVenueRequest[A] ⇒ Future[Result]): Action[A] = {
     actionBuilder.SubjectPresentAction().key(VenueHandlerKey).apply(parser) { request ⇒
       request.subject match {
-        case Some(venue: AmplifyApiVenue) ⇒
+        case Some(venue: VenueSubject) ⇒
           block(AuthenticatedVenueRequest[A](venue, request))
         case other ⇒
-          throw new IllegalStateException(s"Expected AuthVenue, got: $other")
+          throw new IllegalStateException(s"Expected VenueSubject, got: $other")
       }
     }
   }

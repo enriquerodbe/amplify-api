@@ -14,7 +14,7 @@ object Event {
 
   case object TrackFinished extends Event
 
-  case class UserTrackAdded(user: User, trackIdentifier: TrackIdentifier) extends Event
+  case class UserTrackAdded(coinToken: CoinToken, trackIdentifier: TrackIdentifier) extends Event
 
   case object CurrentTrackSkipped extends Event
 }

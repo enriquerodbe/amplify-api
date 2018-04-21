@@ -1,20 +1,39 @@
 package com.amplify.api.domain.logic
 
+import akka.actor.ActorRef
+import akka.pattern.ask
+import com.amplify.api.aggregates.queue.CommandRouter.RetrieveQueue
 import com.amplify.api.configuration.EnvConfig
-import com.amplify.api.domain.models.{Coin, Venue}
+import com.amplify.api.domain.models._
 import com.amplify.api.exceptions.InvalidCreateCoinsRequestedNumber
-import com.amplify.api.services.CoinService
-import javax.inject.Inject
-import scala.concurrent.Future
+import com.amplify.api.services.{CoinService, VenueService}
+import javax.inject.{Inject, Named}
+import scala.concurrent.{ExecutionContext, Future}
 
-class CoinLogicImpl @Inject()(envConfig: EnvConfig, coinService: CoinService) extends CoinLogic {
+class CoinLogicImpl @Inject()(
+    envConfig: EnvConfig,
+    coinService: CoinService,
+    venueService: VenueService,
+    @Named("queue-command-router") queueCommandRouter: ActorRef)(
+    implicit ec: ExecutionContext) extends CoinLogic {
 
   val maxCreatePerRequest = envConfig.coinsCreateMax
+  implicit val defaultTimeout = envConfig.defaultAskTimeout
 
   override def createCoins(venue: Venue, number: Int): Future[Seq[Coin]] = {
     if (number <= 0 || number > maxCreatePerRequest) {
       Future.failed(InvalidCreateCoinsRequestedNumber(maxCreatePerRequest, number))
     }
-    else coinService.createCoins(venue, number)
+    else coinService.create(venue, number)
+  }
+
+  override def login(coinToken: CoinToken): Future[Option[Coin]] = coinService.retrieve(coinToken)
+
+  override def retrieveStatus(coin: Coin): Future[CoinStatus] = {
+    for {
+      venue ← venueService.retrieve(coin.token.venueUid)
+      queue ← (queueCommandRouter ? RetrieveQueue(venue)).mapTo[Queue]
+    }
+    yield CoinStatus(coin, venue, queue.currentItem)
   }
 }

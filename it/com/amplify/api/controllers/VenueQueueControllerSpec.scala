@@ -4,7 +4,7 @@ import akka.pattern.ask
 import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveState
 import com.amplify.api.domain.models.Spotify.TrackUri
 import com.amplify.api.domain.models.{Playlist, Queue}
-import com.amplify.api.it.fixtures.{DbUserFixture, DbVenueFixture}
+import com.amplify.api.it.fixtures.{DbCoinFixture, DbVenueFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, UserRequests}
 import com.amplify.api.services.external.spotify.Converters.{toModelPlaylist, toModelTrack}
 import org.scalatest.Inside
@@ -60,7 +60,7 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
   }
 
   class AddTrackFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
-    extends DbVenueFixture with DbUserFixture {
+    extends DbVenueFixture with DbCoinFixture {
     val playlist = Playlist(toModelPlaylist(alicePlaylist), Seq(toModelTrack(bedOfNailsTrack)))
     val newQueue = Queue.empty.copy(currentPlaylist = Some(playlist))
     initQueue(aliceVenueUid, newQueue)
@@ -68,13 +68,13 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
 
   "addTrack" should {
     "respond No content" in new AddTrackFixture {
-      val request = addTrackRequest(TrackUri(bedOfNailsTrack.track.id)).withAliceToken
+      val request = addTrackRequest(TrackUri(bedOfNailsTrack.track.id)).withValidCoin
       val response = controller.addTrack(aliceVenueUid)(request)
       status(response) mustBe NO_CONTENT
     }
     "update queue next track" in new AddTrackFixture {
       val trackId = TrackUri(bedOfNailsTrack.track.id)
-      val request = addTrackRequest(trackId).withAliceToken
+      val request = addTrackRequest(trackId).withValidCoin
       await(controller.addTrack(aliceVenueUid)(request))
 
       val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
@@ -90,12 +90,12 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
 
   "retrieveQueue" should {
     "respond OK" in new RetrieveQueueFixture {
-      val response = controller.retrieveQueue()(FakeRequest().withAliceToken)
+      val response = controller.retrieveQueue()(FakeRequest().withBody(()).withAliceToken)
       status(response) mustBe OK
     }
 
     "respond with queue" in new RetrieveQueueFixture {
-      val response = controller.retrieveQueue()(FakeRequest().withAliceToken)
+      val response = controller.retrieveQueue()(FakeRequest().withBody(()).withAliceToken)
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response)

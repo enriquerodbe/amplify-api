@@ -5,7 +5,8 @@ package com.amplify.api.aggregates.queue.serialization;
 import "primitives.proto";
 
 enum PbContentProvider {
-    CONTENT_PROVIDER_SPOTIFY = 0;
+    CONTENT_PROVIDER_UNRECOGNIZED = 0;
+    CONTENT_PROVIDER_SPOTIFY = 1;
 }
 
 message PbPlaylistIdentifier {
@@ -28,9 +29,9 @@ message PbAuthProviderIdentifier {
     PbIdentifier identifier = 2;
 }
 
-message PbUser {
-    PbName name = 1;
-    PbAuthProviderIdentifier identifier = 2;
+message PbCoinToken {
+    PbUid venueUid = 1;
+    string token = 2;
 }
 
 message PbImage {
@@ -79,7 +80,7 @@ message PbVenueTrackAdded {
 message PbTrackFinished {}
 
 message PbUserTrackAdded {
-    PbUser user = 1;
+    PbCoinToken coinToken = 1;
     PbTrackIdentifier trackIdentifier = 2;
 }
 

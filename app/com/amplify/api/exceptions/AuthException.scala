@@ -22,3 +22,7 @@ case class UnsupportedAuthProvider(authProviderName: String)
 case object MissingAuthTokenHeader
   extends BadRequestException(AppExceptionCode.MissingAuthTokenHeader, "Missing auth-token header")
     with AuthException
+
+case object MissingCoin
+  extends BadRequestException(AppExceptionCode.MissingCoin, "Missing coin query param")
+    with AuthException

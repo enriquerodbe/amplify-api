@@ -2,11 +2,12 @@ package com.amplify.api.controllers
 
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.exceptions.InvalidCreateCoinsRequestedNumber
-import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import com.amplify.api.it.fixtures.{DbCoinFixture, DbVenueFixture}
+import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import org.scalatest.Inspectors.forAll
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.JsArray
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http
 
@@ -41,7 +42,7 @@ class CoinControllerSpec extends BaseIntegrationSpec with VenueRequests {
 
       val createdCoins = findCoins(aliceDbVenueId)
 
-      createdCoins must have size validRequestNumber
+      createdCoins must have size validRequestNumber + 1
       forAll(createdCoins) { coin ⇒
         coin.token.toString must have size 25
         coin.token.toString must startWith (s"$aliceVenueUid:")
@@ -60,6 +61,25 @@ class CoinControllerSpec extends BaseIntegrationSpec with VenueRequests {
           await(controller.createCoins()(createCoinsRequest(requestNumber).withAliceToken))
         }
       }
+    }
+  }
+
+  class CoinStatusFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+    extends DbVenueFixture with DbCoinFixture
+
+  "coinStatus" should {
+    "respond OK" in new CoinStatusFixture {
+      val response = controller.coinStatus()(FakeRequest().withBody(()).withValidCoin)
+      status(response) mustEqual OK
+    }
+    "respond with status" in new CoinStatusFixture {
+      val response = controller.coinStatus()(FakeRequest().withBody(()).withValidCoin)
+
+      status(response) mustEqual OK
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      val jsonResponse = contentAsJson(response)
+      (jsonResponse \ "venue_name").as[String] mustEqual aliceDbVenue.name.value
+      (jsonResponse \ "remaining_usages").as[Int] mustEqual 1
     }
   }
 }
