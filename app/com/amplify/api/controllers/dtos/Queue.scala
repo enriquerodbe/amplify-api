@@ -2,7 +2,7 @@ package com.amplify.api.controllers.dtos
 
 import com.amplify.api.controllers.dtos.Album.{AlbumResponse, albumToAlbumResponse}
 import com.amplify.api.domain.models.{QueueItem, Queue ⇒ ModelQueue}
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.json.{JsValue, Json, Reads, Writes}
 
 object Queue extends DtosDefinition {
 
@@ -43,7 +43,10 @@ object Queue extends DtosDefinition {
   case class QueueResponse(
       currentPlaylist: Option[String],
       currentTrack: Option[CurrentTrackResponse],
-      tracks: Seq[QueueTrackResponse])
+      tracks: Seq[QueueTrackResponse]) extends SuccessfulResponse {
+
+    override def toJson: JsValue = Json.toJson(this)
+  }
   def queueToQueueResponse(queue: ModelQueue): QueueResponse = {
     QueueResponse(
       queue.currentPlaylist.map(_.info.identifier.toString),

@@ -4,7 +4,7 @@ import com.amplify.api.domain.models.AuthToken
 import com.amplify.api.exceptions.{AppExceptionCode, InternalException}
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json, Reads}
-import play.api.libs.ws.{WSResponse, WSClient ⇒ PlayClient}
+import play.api.libs.ws.{BodyWritable, WSResponse, WSClient ⇒ PlayClient}
 import play.mvc.Http.HeaderNames.AUTHORIZATION
 import scala.concurrent.duration.DurationLong
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,7 +25,7 @@ trait OAuthClient {
       headers: Map[String, String] = Map.empty)(
       implicit reads: Reads[T],
       token: AuthToken): Future[T] = {
-    apiCallForResponse[T]("GET", path, query, headers)
+    authorizedApiCallForResponse[Nothing, T]("GET", path, query, headers)
   }
 
   def apiPost[T](
@@ -35,7 +35,17 @@ trait OAuthClient {
       headers: Map[String, String] = Map.empty)(
       implicit reads: Reads[T],
       token: AuthToken): Future[T] = {
-    apiCallForResponse[T]("POST", path, query, headers, Json.stringify(body))
+    authorizedApiCallForResponse[JsValue, T]("POST", path, query, headers, Some(body))
+  }
+
+  def apiPostFormData[T](
+      path: String,
+      body: Map[String, Seq[String]] = Map.empty,
+      query: Map[String, String] = Map.empty,
+      headers: Map[String, String] = Map.empty)(
+      implicit reads: Reads[T]): Future[T] = {
+    unauthorizedApiCallForResponse[Map[String, Seq[String]], T](
+      "POST", path, query, headers, Some(body))
   }
 
   def apiPut(
@@ -44,47 +54,69 @@ trait OAuthClient {
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty)(
       implicit token: AuthToken): Future[WSResponse] = {
-    apiCall("PUT", path, query, headers, Json.stringify(body))
+    authorizedCall("PUT", path, query, headers, Some(body))
   }
 
   def apiDelete(path: String,
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty)(
       implicit token: AuthToken): Future[WSResponse] = {
-    apiCall("DELETE", path, query, headers)
+    authorizedCall("DELETE", path, query, headers)
   }
 
-  def apiCall(
+  def unauthorizedCall[T](
       method: String,
       path: String,
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty,
-      body: String = "")(
-      implicit token: AuthToken): Future[WSResponse] = {
-    val authorizedHeaders = headers.updated(AUTHORIZATION, s"Bearer ${token.token}")
-
+      body: Option[T] = None)(
+      implicit writeable: BodyWritable[T]): Future[WSResponse] = {
     val request =
       ws.url(s"$baseUrl$path")
         .withRequestTimeout(MAX_WAIT_RESPONSE)
-        .addHttpHeaders(authorizedHeaders.toSeq: _*)
+        .addHttpHeaders(headers.toSeq: _*)
         .addQueryStringParameters(query.toSeq: _*)
 
-    val requestWithBody = if (body.isEmpty) request else request.withBody(body)
+    val requestWithBody = body.map(request.withBody(_)(writeable)).getOrElse(request)
 
-    logger.debug(s"Sending $method to $baseUrl$path " +
+    logger.warn(s"Sending $method to $baseUrl$path " +
       s"with headers: $headers query: $query and body $body")
     requestWithBody.execute(method).flatMap(customHandleResponse)
   }
 
-  protected def apiCallForResponse[T](
+  def authorizedCall[T](
       method: String,
       path: String,
       query: Map[String, String] = Map.empty,
       headers: Map[String, String] = Map.empty,
-      body: String = "")(
+      body: Option[T] = None)(
+      implicit token: AuthToken,
+      writeable: BodyWritable[T]): Future[WSResponse] = {
+    val authorizedHeaders = headers.updated(AUTHORIZATION, s"Bearer ${token.token}")
+    unauthorizedCall(method, path, query, authorizedHeaders, body)
+  }
+
+  protected def unauthorizedApiCallForResponse[B, T](
+      method: String,
+      path: String,
+      query: Map[String, String] = Map.empty,
+      headers: Map[String, String] = Map.empty,
+      body: Option[B] = None)(
       implicit reads: Reads[T],
+      writeable: BodyWritable[B]): Future[T] = {
+    unauthorizedCall(method, path, query, headers, body).flatMap(r ⇒ validate[T](r.json))
+  }
+
+  protected def authorizedApiCallForResponse[B, T](
+      method: String,
+      path: String,
+      query: Map[String, String] = Map.empty,
+      headers: Map[String, String] = Map.empty,
+      body: Option[B] = None)(
+      implicit reads: Reads[T],
+      writeable: BodyWritable[B],
       token: AuthToken): Future[T] = {
-    apiCall(method, path, query, headers, body).flatMap(r ⇒ validate[T](r.json))
+    authorizedCall(method, path, query, headers, body).flatMap(r ⇒ validate[T](r.json))
   }
 
   protected def customHandleResponse(response: WSResponse): Future[WSResponse] = {

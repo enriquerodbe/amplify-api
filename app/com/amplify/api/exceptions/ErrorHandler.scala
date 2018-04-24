@@ -1,7 +1,6 @@
 package com.amplify.api.exceptions
 
-import com.amplify.api.controllers.dtos.AmplifyApiResponse._
-import com.amplify.api.controllers.dtos.{ClientErrorResponse, ServerErrorResponse}
+import com.amplify.api.controllers.dtos.{ClientErrorResponse, ServerErrorResponse, UnauthorizedErrorResponse}
 import com.google.inject.Provider
 import javax.inject.{Inject, Singleton}
 import play.api.http.HttpErrorHandler
@@ -26,16 +25,17 @@ class ErrorHandler @Inject()(
       request: RequestHeader,
       statusCode: Int,
       message: String): Future[Result] = {
-    Future.successful(ClientErrorResponse(AppExceptionCode.BadRequest, message, statusCode))
+    val response = ClientErrorResponse(AppExceptionCode.BadRequest, message, statusCode)
+    Future.successful(response.toResult)
   }
 
   override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
     exception match {
       case ex: UnauthorizedException ⇒
-        val response = Unauthorized(Json.toJson(ClientErrorResponse(ex.code, ex.message)))
+        val response = UnauthorizedErrorResponse(ex.code, ex.message).toResult
         Future.successful(response.withHeaders(Http.HeaderNames.WWW_AUTHENTICATE → "Bearer"))
       case ex: BadRequestException ⇒
-        Future.successful(BadRequest(Json.toJson(ClientErrorResponse(ex.code, ex.message))))
+        Future.successful(ClientErrorResponse(ex.code, ex.message).toResult)
       case ex ⇒
         logger.error(s"Server error occurred: ${exception.getMessage}", exception)
         val message = "Internal server error"
@@ -43,7 +43,7 @@ class ErrorHandler @Inject()(
           case ex: InternalException ⇒ ServerErrorResponse(ex.code, message)
           case _ ⇒ ServerErrorResponse(message = message)
         }
-        Future.successful(response)
+        Future.successful(response.toResult)
     }
   }
 }

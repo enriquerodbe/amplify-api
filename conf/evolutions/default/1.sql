@@ -6,6 +6,8 @@ CREATE TABLE "venues" (
   "uid" CHAR(8) NOT NULL UNIQUE,
   "auth_provider" SMALLINT NOT NULL,
   "auth_identifier" VARCHAR(255) NOT NULL,
+  "refresh_token" VARCHAR(255) NOT NULL,
+  "access_token" VARCHAR(255) NOT NULL,
   UNIQUE ("auth_provider", "auth_identifier"));
 
 CREATE TABLE "venues_journal" (

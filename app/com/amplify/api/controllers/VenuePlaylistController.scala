@@ -3,7 +3,6 @@ package com.amplify.api.controllers
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.AuthenticatedRequests
 import com.amplify.api.controllers.dtos.Playlist.{PlaylistRequest, playlistInfoToPlaylistInfoResponse, playlistToPlaylistResponse}
-import com.amplify.api.controllers.dtos.SuccessfulResponse
 import com.amplify.api.domain.logic.VenuePlaylistLogic
 import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.domain.models.{ContentIdentifier, PlaylistIdentifier}
@@ -22,9 +21,7 @@ class VenuePlaylistController @Inject()(
 
   def retrievePlaylists() = authenticatedVenue(parse.empty) { request ⇒
     val eventualPlaylists = venuePlaylistLogic.retrievePlaylists(request.subject.venueReq)
-    eventualPlaylists.map { playlists =>
-      SuccessfulResponse(playlists.map(playlistInfoToPlaylistInfoResponse))
-    }
+    eventualPlaylists.map(_.map(playlistInfoToPlaylistInfoResponse))
   }
 
   def retrieveCurrentPlaylist() = authenticatedVenue(parse.empty) { request ⇒
@@ -37,7 +34,7 @@ class VenuePlaylistController @Inject()(
 
   private def doRetrieveCurrentPlaylist(venueUid: Uid): Future[Result] = {
     venuePlaylistLogic.retrieveCurrentPlaylist(venueUid).map {
-      case Some(playlist) ⇒ SuccessfulResponse(playlistToPlaylistResponse(playlist))
+      case Some(playlist) ⇒ playlistToPlaylistResponse(playlist)
       case _ ⇒ NoContent
     }
   }

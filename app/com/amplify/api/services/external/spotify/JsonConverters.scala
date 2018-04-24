@@ -23,4 +23,6 @@ object JsonConverters {
   implicit val trackFormat = Json.format[Track]
 
   implicit val trackItemFormat = Json.format[TrackItem]
+
+  implicit val refreshAndAccessTokensReads = Json.reads[RefreshAndAccessTokens]
 }

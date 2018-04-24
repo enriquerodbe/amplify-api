@@ -2,8 +2,7 @@ package com.amplify.api.controllers
 
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.AuthenticatedRequests
-import com.amplify.api.controllers.dtos.Queue.{AddTrackRequest, queueToQueueResponse}
-import com.amplify.api.controllers.dtos.SuccessfulResponse
+import com.amplify.api.controllers.dtos.Queue._
 import com.amplify.api.domain.logic.VenueQueueLogic
 import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.domain.models.{ContentIdentifier, TrackIdentifier}
@@ -21,9 +20,7 @@ class VenueQueueController @Inject()(
     implicit ec: ExecutionContext) extends AbstractController(cc) with AuthenticatedRequests {
 
   def retrieveQueue() = authenticatedVenue(parse.empty) { request ⇒
-    venueQueueLogic.retrieveQueue(request.subject.venue).map { queue ⇒
-      SuccessfulResponse(queueToQueueResponse(queue))
-    }
+    venueQueueLogic.retrieveQueue(request.subject.venue).map(queueToQueueResponse)
   }
 
   def skip() = authenticatedVenue(parse.empty) { request ⇒

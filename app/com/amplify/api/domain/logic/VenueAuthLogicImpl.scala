@@ -11,10 +11,11 @@ class VenueAuthLogicImpl @Inject()(
     venueService: VenueService)(
     implicit ec: ExecutionContext) extends VenueAuthLogic {
 
-  override def signUp(authToken: AuthToken, name: Name): Future[Venue] = {
+  override def signUp(authorizationCode: AuthToken, name: Name): Future[Venue] = {
     for {
-      userData ← authService.fetchUser(authToken)
-      venue ← venueService.retrieveOrCreate(userData, name)
+      (refreshToken, accessToken) ← authService.requestRefreshAndAccessTokens(authorizationCode)
+      venueData ← authService.fetchUser(AuthToken(authorizationCode.authProvider, accessToken))
+      venue ← venueService.retrieveOrCreate(name, venueData, refreshToken, accessToken)
     }
     yield venue
   }

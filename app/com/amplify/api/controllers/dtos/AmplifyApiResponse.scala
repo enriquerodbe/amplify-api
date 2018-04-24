@@ -6,48 +6,58 @@ import play.api.libs.json._
 import play.api.mvc.Results.Status
 import play.api.mvc.{Result, Results}
 import play.mvc.Http
-import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 
-sealed abstract class AmplifyApiResponse[T](val status: Int, val details: T)
+sealed trait AmplifyApiResponse {
 
-case class SuccessfulResponse[T](response: T) extends AmplifyApiResponse(Http.Status.OK, response)
+  def toJson: JsValue
 
-sealed abstract class FailedResponse(status: Int, val code: AppExceptionCode, message: String)
-  extends AmplifyApiResponse[String](status, message)
+  def toResult: Result
+}
+
+abstract class SuccessfulResponse extends AmplifyApiResponse {
+
+  override def toResult: Result = Results.Ok(toJson)
+}
+
+case class SeqResponse(seq: Seq[SuccessfulResponse]) extends SuccessfulResponse {
+
+  override def toJson: JsValue = JsArray(seq.map(_.toJson))
+}
+
+sealed abstract class FailedResponse(
+    val status: Int,
+    val code: AppExceptionCode,
+    val message: String) extends AmplifyApiResponse {
+
+  override def toJson: JsValue = Json.obj("code" → JsNumber(code.id), "message" → message)
+
+  override def toResult: Result = Status(status)(toJson)
+}
+
+case class UnauthorizedErrorResponse(
+    override val code: AppExceptionCode,
+    override val message: String,
+    override val status: Int = Http.Status.UNAUTHORIZED)
+  extends FailedResponse(status, code, message)
 
 case class ClientErrorResponse(
     override val code: AppExceptionCode,
-    message: String,
+    override val message: String,
     override val status: Int = Http.Status.BAD_REQUEST)
   extends FailedResponse(status, code, message)
 
 case class ServerErrorResponse(
     override val code: AppExceptionCode = AppExceptionCode.Unexpected,
-    message: String,
+    override val message: String,
     override val status: Int = Http.Status.INTERNAL_SERVER_ERROR)
   extends FailedResponse(status, code, message)
 
 object AmplifyApiResponse {
 
-  implicit def amplifyApiResponseWrites[T](
-      implicit writes: Writes[T]): Writes[AmplifyApiResponse[T]] = Writes {
-    case SuccessfulResponse(o) ⇒ Json.toJson(o)
-    case f: FailedResponse ⇒ Json.obj("code" → JsNumber(f.code.id), "message" → f.details)
-  }
-
   implicit def amplifyApiResponseToResult[T](
-      response: AmplifyApiResponse[T])(
-      implicit writes: Writes[T]): Result = {
-    response match {
-      case success: SuccessfulResponse[T] => Results.Ok(Json.toJson(success))
-      case failed: FailedResponse => Status(failed.status)(Json.toJson(failed))
-    }
-  }
-  implicit def amplifyApiResponseToResultFuture[T](
-      response: Future[AmplifyApiResponse[T]])(
-      implicit writes: Writes[T],
-      ec: ExecutionContext): Future[Result] = {
-    response.map(amplifyApiResponseToResult(_))
-  }
+      t: T)(
+      implicit toResponse: T ⇒ AmplifyApiResponse): Result = toResponse(t).toResult
+
+  implicit def seqToSuccessfulResponse(seq: Seq[SuccessfulResponse]): SeqResponse = SeqResponse(seq)
 }

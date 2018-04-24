@@ -27,4 +27,6 @@ trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
   implicit val authProviderTypeType =
     MappedColumnType.base[AuthProviderType, Int](_.id, AuthProviderType.apply)
+
+  implicit val tokenType = MappedColumnType.base[Token, String](_.value, Token.apply)
 }

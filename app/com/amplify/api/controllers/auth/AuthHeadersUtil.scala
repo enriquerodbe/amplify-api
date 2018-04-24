@@ -1,6 +1,7 @@
 package com.amplify.api.controllers.auth
 
 import com.amplify.api.controllers.auth.AuthHeadersUtil._
+import com.amplify.api.domain.models.primitives.Token
 import com.amplify.api.domain.models.{AuthProviderType, AuthToken, CoinToken}
 import com.amplify.api.exceptions.{MissingAuthTokenHeader, MissingCoin, UnsupportedAuthProvider, WrongAuthorizationHeader}
 import com.amplify.api.utils.DbioUtils.OptionT
@@ -19,7 +20,7 @@ class AuthHeadersUtil @Inject()(implicit ec: ExecutionContext) {
       authorizationHeader ← headers.get(Http.HeaderNames.AUTHORIZATION) ?! MissingAuthTokenHeader
       authToken ← parseAuthToken(authorizationHeader)
     }
-    yield AuthToken(authProvider, authToken)
+    yield AuthToken(authProvider, Token(authToken))
   }
 
   private def getAuthProviderFromHeaders(headers: Headers) = {
@@ -31,7 +32,7 @@ class AuthHeadersUtil @Inject()(implicit ec: ExecutionContext) {
       authProvider ← getAuthProviderFromQueryString(request)
       token ← request.getQueryString(TOKEN_QUERY_PARAM) ?! MissingAuthTokenHeader
     }
-    yield AuthToken(authProvider, token)
+    yield AuthToken(authProvider, Token(token))
   }
 
   private def getAuthProviderFromQueryString(request: RequestHeader) = {
@@ -69,4 +70,5 @@ object AuthHeadersUtil {
   val AUTH_PROVIDER_QUERY_PARAM = "auth-provider"
   val TOKEN_QUERY_PARAM = "token"
   val COIN_PARAM = "Coin"
+  val VENUE_UID = "venue-uid"
 }

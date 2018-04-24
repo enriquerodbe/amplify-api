@@ -9,7 +9,7 @@ class EnvConfigSpec extends BaseIntegrationSpec {
 
   "EnvConfig" should {
     "retrieve existing key" in {
-      subject.spotifyUrl mustEqual "http://test.xyz"
+      subject.spotifyWebApiUrl mustEqual "http://test.xyz"
     }
   }
 }

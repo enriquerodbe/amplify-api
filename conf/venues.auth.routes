@@ -6,22 +6,10 @@
 #      schema:
 #        $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueResponse'
 #  parameters:
-#  - name: Auth-provider
-#    description: Name of the OAuth authorization server
-#    in: header
-#    required: false
-#    type: string
-#    default: spotify
-#  - name: Authorization
-#    description: Access token issued by the authorization server
-#    in: header
-#    required: true
-#    type: string
-#  - name: venue
-#    in: body
+#  - in: body
 #    required: true
 #    schema:
-#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueRequest'
+#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueSignUpRequest'
 ###
 POST    /    com.amplify.api.controllers.VenueAuthController.signUp
 

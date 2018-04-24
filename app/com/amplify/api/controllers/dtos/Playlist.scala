@@ -4,7 +4,7 @@ import com.amplify.api.controllers.dtos.Album.{AlbumResponse, albumToAlbumRespon
 import com.amplify.api.controllers.dtos.Image.{ImageResponse, imageToImageResponse}
 import com.amplify.api.domain.models.{PlaylistInfo, Track, Playlist ⇒ ModelPlaylist}
 import play.api.libs.json.Reads._
-import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import play.api.libs.json._
 
 object Playlist extends DtosDefinition {
 
@@ -23,6 +23,10 @@ object Playlist extends DtosDefinition {
   }
 
   case class PlaylistInfoResponse(name: String, identifier: String, images: Seq[ImageResponse])
+    extends SuccessfulResponse {
+
+    override def toJson: JsValue = Json.toJson(this)
+  }
   def playlistInfoToPlaylistInfoResponse(info: PlaylistInfo): PlaylistInfoResponse = {
     PlaylistInfoResponse(
       info.name.value,
@@ -34,6 +38,10 @@ object Playlist extends DtosDefinition {
   }
 
   case class PlaylistResponse(info: PlaylistInfoResponse, tracks: Seq[PlaylistTrackResponse])
+    extends SuccessfulResponse {
+
+    override def toJson: JsValue = Json.toJson(this)
+  }
   def playlistToPlaylistResponse(playlist: ModelPlaylist): PlaylistResponse = {
     PlaylistResponse(
       playlistInfoToPlaylistInfoResponse(playlist.info),

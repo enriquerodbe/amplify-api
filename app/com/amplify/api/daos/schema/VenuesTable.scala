@@ -17,12 +17,16 @@ trait VenuesTable extends BaseTable {
     def uid = column[Uid]("uid")
     def authProviderType = column[AuthProviderType]("auth_provider")
     def authIdentifier = column[Identifier]("auth_identifier")
+    def refreshToken = column[Token]("refresh_token")
+    def accessToken = column[Token]("access_token")
 
     def authProviderIdentifier =
       (authProviderType, authIdentifier) <>
         ((AuthProviderIdentifier.apply _).tupled, AuthProviderIdentifier.unapply)
 
-    def * = (id, name, uid, authProviderIdentifier) <> (DbVenue.tupled, DbVenue.unapply)
+    def * =
+      (id, name, uid, authProviderIdentifier, refreshToken, accessToken) <>
+        (DbVenue.tupled, DbVenue.unapply)
   }
 
   lazy val venuesTable = TableQuery[Venues]

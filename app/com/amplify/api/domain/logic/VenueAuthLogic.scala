@@ -8,7 +8,7 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[VenueAuthLogicImpl])
 trait VenueAuthLogic {
 
-  def signUp(authToken: AuthToken, name: Name): Future[Venue]
+  def signUp(authorizationCode: AuthToken, name: Name): Future[Venue]
 
   def login(authToken: AuthToken): Future[Option[Venue]]
 }

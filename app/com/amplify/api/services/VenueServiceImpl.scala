@@ -2,7 +2,7 @@ package com.amplify.api.services
 
 import com.amplify.api.daos.{DbioRunner, VenueDao}
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.{Name, Uid}
+import com.amplify.api.domain.models.primitives.{Name, Token, Uid}
 import com.amplify.api.exceptions.VenueNotFoundByUid
 import com.amplify.api.services.converters.VenueConverter.{dbVenueToVenue, userDataToDbVenue}
 import com.amplify.api.services.external.ContentService
@@ -26,8 +26,12 @@ class VenueServiceImpl @Inject()(
     db.run(venueDao.retrieve(identifier).map(_.map(dbVenueToVenue)))
   }
 
-  override def retrieveOrCreate(userData: UserData, name: Name): Future[Venue] = {
-    val dbVenue = userDataToDbVenue(userData, name)
+  override def retrieveOrCreate(
+      name: Name,
+      userData: UserData,
+      refreshToken: Token,
+      accessToken: Token): Future[Venue] = {
+    val dbVenue = userDataToDbVenue(name, userData, refreshToken, accessToken)
     val createdVenue = db.runTransactionally(venueDao.retrieveOrCreate(dbVenue))
     createdVenue.map(dbVenueToVenue)
   }

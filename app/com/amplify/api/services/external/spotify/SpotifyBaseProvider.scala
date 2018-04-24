@@ -11,7 +11,7 @@ trait SpotifyBaseProvider extends OAuthClient {
 
   val envConfig: EnvConfig
 
-  override lazy val baseUrl = envConfig.spotifyUrl
+  override lazy val baseUrl = envConfig.spotifyWebApiUrl
 
   override def customHandleResponse(response: WSResponse): Future[WSResponse] = {
     response.status match {
