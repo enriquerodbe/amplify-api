@@ -20,9 +20,8 @@ class VenueAuthController @Inject()(
     implicit ec: ExecutionContext) extends AbstractController(cc) with AuthenticatedRequests {
 
   def signUp = Action.async(parse.json[VenueSignUpRequest]) { request ⇒
-    val authorizationCode =
-      AuthToken(AuthProviderType.Spotify, Token(request.body.code))
-    val eventualVenue = venueAuthLogic.signUp(authorizationCode, Name(request.body.name))
+    val authorizationCode = AuthToken(AuthProviderType.Spotify, Token(request.body.code))
+    val eventualVenue = venueAuthLogic.signUp(authorizationCode)
     eventualVenue.map { venue ⇒
       venueToVenueResponse(venue).withSession(AuthHeadersUtil.VENUE_UID → venue.uid.value)
     }

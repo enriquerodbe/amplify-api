@@ -2,7 +2,7 @@ package com.amplify.api.services
 
 import com.amplify.api.daos.{DbioRunner, VenueDao}
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.{Name, Token, Uid}
+import com.amplify.api.domain.models.primitives.{Token, Uid}
 import com.amplify.api.exceptions.VenueNotFoundByUid
 import com.amplify.api.services.converters.VenueConverter.{dbVenueToVenue, userDataToDbVenue}
 import com.amplify.api.services.external.ContentService
@@ -27,18 +27,16 @@ class VenueServiceImpl @Inject()(
   }
 
   override def retrieveOrCreate(
-      name: Name,
       userData: UserData,
       refreshToken: Token,
       accessToken: Token): Future[Venue] = {
-    val dbVenue = userDataToDbVenue(name, userData, refreshToken, accessToken)
+    val dbVenue = userDataToDbVenue(userData, refreshToken, accessToken)
     val createdVenue = db.runTransactionally(venueDao.retrieveOrCreate(dbVenue))
     createdVenue.map(dbVenueToVenue)
   }
 
   override def retrievePlaylists(venue: VenueReq): Future[Seq[PlaylistInfo]] = {
-    implicit val token = venue.authToken
-    contentService.fetchPlaylists(venue.contentProviders)
+    contentService.fetchPlaylists(venue.contentProviders, venue.authToken)
   }
 
   override def retrievePlaylist(
@@ -56,14 +54,12 @@ class VenueServiceImpl @Inject()(
   private def retrievePlaylistInfo(
       venue: VenueReq,
       playlistIdentifier: PlaylistIdentifier): Future[PlaylistInfo] = {
-    implicit val token = venue.authToken
-    contentService.fetchPlaylist(playlistIdentifier)
+    contentService.fetchPlaylist(playlistIdentifier, venue.authToken)
   }
 
   private def retrievePlaylistTracks(
       venue: VenueReq,
       playlistIdentifier: PlaylistIdentifier): Future[Seq[Track]] = {
-    implicit val token = venue.authToken
-    contentService.fetchPlaylistTracks(playlistIdentifier)
+    contentService.fetchPlaylistTracks(playlistIdentifier, venue.authToken)
   }
 }

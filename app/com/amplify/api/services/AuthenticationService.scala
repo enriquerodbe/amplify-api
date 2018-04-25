@@ -11,5 +11,5 @@ trait AuthenticationService {
 
   def requestRefreshAndAccessTokens(authorizationCode: AuthToken): Future[(Token, Token)]
 
-  def fetchUser(implicit authToken: AuthToken): Future[UserData]
+  def fetchUser(authToken: AuthToken): Future[UserData]
 }

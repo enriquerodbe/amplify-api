@@ -13,11 +13,7 @@ trait VenueService {
 
   def retrieve(identifier: AuthProviderIdentifier): Future[Option[Venue]]
 
-  def retrieveOrCreate(
-      name: Name,
-      userData: UserData,
-      refreshToken: Token,
-      accessToken: Token): Future[Venue]
+  def retrieveOrCreate(userData: UserData, refreshToken: Token, accessToken: Token): Future[Venue]
 
   def retrievePlaylists(venue: VenueReq): Future[Seq[PlaylistInfo]]
 

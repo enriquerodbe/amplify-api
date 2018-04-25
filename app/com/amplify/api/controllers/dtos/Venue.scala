@@ -1,7 +1,6 @@
 package com.amplify.api.controllers.dtos
 
 import com.amplify.api.domain.models.{Venue ⇒ VenueModel}
-import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 
@@ -16,9 +15,8 @@ object Venue extends DtosDefinition {
     VenueResponse(venue.name.value, venue.uid.value)
   }
 
-  case class VenueSignUpRequest(name: String, code: String)
-  implicit val venueRequestReads: Reads[VenueSignUpRequest] = (
-    (JsPath \ "name").read[String](minLength[String](1)) and
-    (JsPath \ "authorization_code").read[String](minLength[String](1))
-  )(VenueSignUpRequest.apply _)
+  case class VenueSignUpRequest(code: String)
+  implicit val venueRequestReads: Reads[VenueSignUpRequest] = {
+    (JsPath \ "code").read[String](minLength[String](1)).map(VenueSignUpRequest)
+  }
 }

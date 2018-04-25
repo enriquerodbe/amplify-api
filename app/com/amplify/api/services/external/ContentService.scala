@@ -9,14 +9,14 @@ import scala.concurrent.Future
 trait ContentService {
 
   def fetchPlaylists(
-      contentProvider: ContentProvider)(
-      implicit token: AuthToken): Future[Seq[PlaylistInfo]]
+      contentProvider: ContentProvider,
+      accessToken: AuthToken): Future[Seq[PlaylistInfo]]
 
   def fetchPlaylist(
-      playlistIdentifier: PlaylistIdentifier)(
-      implicit authToken: AuthToken): Future[PlaylistInfo]
+      playlistIdentifier: PlaylistIdentifier,
+      accessToken: AuthToken): Future[PlaylistInfo]
 
   def fetchPlaylistTracks(
-      playlistIdentifier: PlaylistIdentifier)(
-      implicit token: AuthToken): Future[Seq[Track]]
+      playlistIdentifier: PlaylistIdentifier,
+      accessToken: AuthToken): Future[Seq[Track]]
 }

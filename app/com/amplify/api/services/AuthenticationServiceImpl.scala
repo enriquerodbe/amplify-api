@@ -18,9 +18,9 @@ class AuthenticationServiceImpl @Inject()(spotifyAuthProvider: SpotifyAuthProvid
     }
   }
 
-  override def fetchUser(implicit authToken: AuthToken): Future[UserData] = {
+  override def fetchUser(authToken: AuthToken): Future[UserData] = {
     authToken.authProvider match {
-      case AuthProviderType.Spotify ⇒ spotifyAuthProvider.fetchUser
+      case AuthProviderType.Spotify ⇒ spotifyAuthProvider.fetchUser(authToken.token)
     }
   }
 }

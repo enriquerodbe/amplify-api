@@ -12,12 +12,11 @@ object VenueConverter {
   }
 
   def userDataToDbVenue(
-      name: Name,
       userData: UserData,
       refreshToken: Token,
       accessToken: Token): DbVenue = {
     DbVenue(
-      name = name,
+      name = userData.name,
       uid = Uid(),
       identifier = userData.identifier,
       refreshToken = refreshToken,

@@ -12,29 +12,31 @@ class ContentServiceImpl @Inject()(
     implicit ec: ExecutionContext) extends ContentService {
 
   override def fetchPlaylists(
-      contentProvider: ContentProvider)(
-      implicit token: AuthToken): Future[Seq[PlaylistInfo]] = {
+      contentProvider: ContentProvider,
+      accessToken: AuthToken): Future[Seq[PlaylistInfo]] = {
     contentProvider match {
       case ContentProvider.Spotify ⇒
-        spotifyContentProvider.fetchPlaylists.map(_.map(toModelPlaylist))
+        spotifyContentProvider.fetchPlaylists(accessToken.token).map(_.map(toModelPlaylist))
     }
   }
 
   override def fetchPlaylist(
-      playlistIdentifier: PlaylistIdentifier)(
-      implicit authToken: AuthToken): Future[PlaylistInfo] = {
+      playlistIdentifier: PlaylistIdentifier,
+      accessToken: AuthToken): Future[PlaylistInfo] = {
     playlistIdentifier match {
       case spotifyUri: Spotify.PlaylistUri ⇒
-        spotifyContentProvider.fetchPlaylist(spotifyUri).map(toModelPlaylist)
+        spotifyContentProvider.fetchPlaylist(spotifyUri, accessToken.token).map(toModelPlaylist)
     }
   }
 
   override def fetchPlaylistTracks(
-      playlistIdentifier: PlaylistIdentifier)(
-      implicit token: AuthToken): Future[Seq[Track]] = {
+      playlistIdentifier: PlaylistIdentifier,
+      accessToken: AuthToken): Future[Seq[Track]] = {
     playlistIdentifier match {
       case spotifyUri: Spotify.PlaylistUri ⇒
-        spotifyContentProvider.fetchPlaylistTracks(spotifyUri).map(_.map(toModelTrack))
+        spotifyContentProvider
+          .fetchPlaylistTracks(spotifyUri, accessToken.token)
+          .map(_.map(toModelTrack))
     }
   }
 }
