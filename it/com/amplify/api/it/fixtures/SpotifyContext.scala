@@ -2,8 +2,8 @@ package com.amplify.api.it.fixtures
 
 import com.amplify.api.controllers.auth.AuthHeadersUtil
 import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
-import com.amplify.api.domain.models.AuthToken
 import com.amplify.api.domain.models.Spotify.PlaylistUri
+import com.amplify.api.domain.models.primitives.Token
 import com.amplify.api.exceptions.UserAuthTokenNotFound
 import com.amplify.api.services.external.spotify.Dtos._
 import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
@@ -11,7 +11,6 @@ import com.amplify.api.services.models._
 import org.mockito.Mockito.{RETURNS_SMART_NULLS, when, withSettings}
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.FakeRequest
-import play.mvc.Http.HeaderNames
 import scala.concurrent.Future
 
 trait SpotifyContext extends CommonData with MockitoSugar {
@@ -21,21 +20,15 @@ trait SpotifyContext extends CommonData with MockitoSugar {
   val spotifyAuthProvider =
     mock[SpotifyAuthProvider](withSettings().defaultAnswer(RETURNS_SMART_NULLS))
 
-  implicit val aliceAuthToken = AuthToken(AuthSpotify, aliceToken)
-  val bobAuthToken = AuthToken(AuthSpotify, bobToken)
-  val invalidAuthToken = AuthToken(AuthSpotify, invalidToken)
+  implicit class FakeRequestWithCookie[T](fakeRequest: FakeRequest[T]) {
 
-  implicit class FakeRequestWithAuthToken[T](fakeRequest: FakeRequest[T]) {
+    def cookie(venueUid: String): (String, String) = AuthHeadersUtil.VENUE_UID → venueUid
 
-    def tokenHeader(token: String): (String, String) = HeaderNames.AUTHORIZATION → s"Bearer $token"
-
-    def withAuthToken(token: String): FakeRequest[T] = {
-      fakeRequest.withHeaders(tokenHeader(token))
+    def withSession(venueUid: String): FakeRequest[T] = {
+      fakeRequest.withSession(cookie(venueUid))
     }
 
-    def withAliceToken: FakeRequest[T] = withAuthToken(aliceToken)
-
-    def withBobToken: FakeRequest[T] = withAuthToken(bobToken)
+    def withAliceSession: FakeRequest[T] = withSession(aliceVenueUid)
   }
 
   implicit class FakeRequestWithCoin[T](fakeRequest: FakeRequest[T]) {
@@ -59,14 +52,20 @@ trait SpotifyContext extends CommonData with MockitoSugar {
     Playlist(alicePlaylistUri.id, aliceSpotifyUser, "Alice playlist", alicePlaylistImages)
   val bobUserData = UserData(AuthSpotify → bobSpotifyId, "Bob Marley")
 
-  when(spotifyAuthProvider.fetchUser(aliceAuthToken)).thenReturn(Future.successful(aliceUserData))
-  when(spotifyAuthProvider.fetchUser(bobAuthToken)).thenReturn(Future.successful(bobUserData))
-  when(spotifyAuthProvider.fetchUser(invalidAuthToken))
+  when(spotifyAuthProvider.requestRefreshAndAccessTokens(aliceCode))
+      .thenReturn(Future.successful((Token(aliceRefreshToken), Token(aliceToken))))
+  when(spotifyAuthProvider.requestRefreshAndAccessTokens(bobCode))
+      .thenReturn(Future.successful((Token(bobRefreshToken), Token(bobToken))))
+  when(spotifyAuthProvider.requestRefreshAndAccessTokens(invalidToken))
+      .thenReturn(Future.failed(UserAuthTokenNotFound))
+  when(spotifyAuthProvider.fetchUser(aliceToken)).thenReturn(Future.successful(aliceUserData))
+  when(spotifyAuthProvider.fetchUser(bobToken)).thenReturn(Future.successful(bobUserData))
+  when(spotifyAuthProvider.fetchUser(invalidToken))
     .thenReturn(Future.failed(UserAuthTokenNotFound))
-  when(spotifyContentProvider.fetchPlaylists(aliceAuthToken))
+  when(spotifyContentProvider.fetchPlaylists(aliceToken))
     .thenReturn(Future.successful(Seq(alicePlaylist)))
-  when(spotifyContentProvider.fetchPlaylist(alicePlaylistUri))
+  when(spotifyContentProvider.fetchPlaylist(alicePlaylistUri, aliceToken))
     .thenReturn(Future.successful(alicePlaylist))
-  when(spotifyContentProvider.fetchPlaylistTracks(alicePlaylistUri))
+  when(spotifyContentProvider.fetchPlaylistTracks(alicePlaylistUri, aliceToken))
     .thenReturn(Future.successful(alicePlaylistTracks))
 }

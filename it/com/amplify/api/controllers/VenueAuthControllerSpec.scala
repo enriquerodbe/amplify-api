@@ -1,6 +1,6 @@
 package com.amplify.api.controllers
 
-import com.amplify.api.exceptions.{BadRequestException, MissingAuthTokenHeader, UserAuthTokenNotFound}
+import com.amplify.api.exceptions.{BadRequestException, UserAuthTokenNotFound}
 import com.amplify.api.it.fixtures.DbVenueFixture
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,46 +14,37 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
 
   class SignUpFixture(implicit val dbConfigProvider: DatabaseConfigProvider) extends DbVenueFixture
 
-  "signUp" should {
+  "signIn" should {
     "respond OK" in {
-      val response = controller.signUp()(venueRequest("Test venue").withBobToken)
+      val response = controller.signIn()(venueRequest(bobCode))
       status(response) mustEqual OK
     }
     "respond with name" in {
-      val response = contentAsJson(controller.signUp()(venueRequest("Test venue").withBobToken))
-      (response \ "name").as[String] mustEqual "Test venue"
+      val response = contentAsJson(controller.signIn()(venueRequest(bobCode)))
+      (response \ "name").as[String] mustEqual bobUserData.name.value
     }
     "respond with uid" in {
-      val response = contentAsJson(controller.signUp()(venueRequest("Test venue").withBobToken))
+      val response = contentAsJson(controller.signIn()(venueRequest(bobCode)))
       (response \ "uid").as[String] must have size 8
     }
     "create venue" in new SignUpFixture {
-      await(controller.signUp()(venueRequest("Test venue").withBobToken))
-      findVenues("Test venue").headOption mustBe defined
+      await(controller.signIn()(venueRequest(bobCode)))
+      findVenues(bobUserData.name.value).headOption mustBe defined
     }
     "retrieve venue if it already exists" in new SignUpFixture {
-      await(controller.signUp()(venueRequest("Test bar").withAliceToken))
+      await(controller.signIn()(venueRequest(aliceCode).withAliceSession))
       findVenues(aliceDbVenue.name.value).headOption mustBe defined
     }
 
     "fail" when {
-      "no Auth-token provided" in {
-        val response = controller.signUp()(venueRequest("Test venue"))
-        val exception = intercept[BadRequestException](status(response))
-        exception mustEqual MissingAuthTokenHeader
+      "no authorization code provided" in {
+        intercept[Exception](await(controller.signIn()(venueRequest(null))))
       }
 
-      "invalid Auth-token provided" in {
-        val response = controller.signUp()(venueRequest("Test venue").withAuthToken(invalidToken))
+      "invalid authorization code provided" in {
+        val response = controller.signIn()(venueRequest(invalidToken))
         val exception = intercept[BadRequestException](status(response))
         exception mustEqual UserAuthTokenNotFound
-      }
-
-      "venue without name provided" in {
-        intercept[Exception] {
-          val response = controller.signUp()(venueRequest(null).withBobToken)
-          status(response)
-        }
       }
     }
   }
@@ -63,12 +54,12 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
 
   "retrieveCurrent" should {
     "respond OK" in new RetrieveCurrentFixture {
-      val response = controller.retrieveCurrent()(FakeRequest().withAliceToken)
+      val response = controller.retrieveCurrent()(FakeRequest().withAliceSession)
 
       status(response) mustBe OK
     }
     "respond with venue" in new RetrieveCurrentFixture {
-      val response = controller.retrieveCurrent()(FakeRequest().withAliceToken)
+      val response = controller.retrieveCurrent()(FakeRequest().withAliceSession)
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response)

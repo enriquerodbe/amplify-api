@@ -2,13 +2,15 @@ package com.amplify.api.services.external.spotify
 
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models.primitives.Token
+import com.amplify.api.exceptions.UserAuthTokenNotFound
 import com.amplify.api.services.external.spotify.Converters.userToUserData
 import com.amplify.api.services.external.spotify.Dtos.{RefreshAndAccessTokens, User ⇒ SpotifyUser}
 import com.amplify.api.services.external.spotify.JsonConverters._
 import com.amplify.api.services.external.spotify.SpotifyBaseClient._
 import com.amplify.api.services.models.UserData
 import javax.inject.Inject
-import play.api.libs.ws.WSAuthScheme
+import play.api.http.Status
+import play.api.libs.ws.{WSAuthScheme, WSResponse}
 import scala.concurrent.{ExecutionContext, Future}
 
 class SpotifyAuthProvider @Inject()(
@@ -32,8 +34,17 @@ class SpotifyAuthProvider @Inject()(
       .accountsRequest("/api/token")
       .withAuth(clientId, clientSecret, WSAuthScheme.BASIC)
       .post(body)
+      .flatMap(handleInvalidAuthorizationCode)
       .parseJson[RefreshAndAccessTokens]
       .map(tokens => (Token(tokens.refreshToken), Token(tokens.accessToken)))
+  }
+
+  private def handleInvalidAuthorizationCode(response: WSResponse): Future[WSResponse] = {
+    if (response.status == Status.BAD_REQUEST &&
+      (response.json \ "error").as[String] == "invalid_grant") {
+      Future.failed(UserAuthTokenNotFound)
+    }
+    else Future.successful(response)
   }
 
   def fetchUser(accessToken: Token): Future[UserData] = {

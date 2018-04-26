@@ -8,17 +8,14 @@ class HttpSpec extends BaseHttpSpec {
   "The application" should {
     "respond ok" in {
       val response = await {
-        wsUrl("/venues")
-          .withHttpHeaders(AUTHORIZATION → s"Bearer $aliceToken")
-          .post(Json.obj("name" → "test"))
+        wsUrl("/venues").post(Json.obj("code" → aliceCode))
       }
       response.status mustBe OK
       response.contentType mustBe JSON
     }
     "respond unauthorized" in {
       val response = await(wsUrl("/venues")
-        .withHttpHeaders(AUTHORIZATION → s"Bearer $invalidToken")
-        .post(Json.obj("name" → "test")))
+        .post(Json.obj("code" → invalidToken)))
       response.status mustBe UNAUTHORIZED
       response.contentType mustBe JSON
     }

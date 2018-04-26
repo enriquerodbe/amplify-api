@@ -1,5 +1,5 @@
 ###
-#  summary: Register new venue
+#  summary: Venue sign in
 #  responses:
 #    200:
 #      description: success
@@ -9,9 +9,9 @@
 #  - in: body
 #    required: true
 #    schema:
-#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueSignUpRequest'
+#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueSignInRequest'
 ###
-POST    /    com.amplify.api.controllers.VenueAuthController.signUp
+POST    /    com.amplify.api.controllers.VenueAuthController.signIn
 
 ###
 #  summary: Retrieve the authenticated venue
@@ -20,17 +20,5 @@ POST    /    com.amplify.api.controllers.VenueAuthController.signUp
 #      description: success
 #      schema:
 #        $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueResponse'
-#  parameters:
-#  - name: Auth-provider
-#    description: Name of the OAuth authorization server
-#    in: header
-#    required: false
-#    type: string
-#    default: spotify
-#  - name: Authorization
-#    description: Access token issued by the authorization server
-#    in: header
-#    required: true
-#    type: string
 ###
 GET    /me    com.amplify.api.controllers.VenueAuthController.retrieveCurrent

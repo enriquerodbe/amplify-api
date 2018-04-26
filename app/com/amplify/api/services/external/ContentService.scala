@@ -1,7 +1,8 @@
 package com.amplify.api.services.external
 
 import com.amplify.api.domain.models.ContentProvider.ContentProvider
-import com.amplify.api.domain.models.{AuthToken, PlaylistIdentifier, PlaylistInfo, Track}
+import com.amplify.api.domain.models.primitives.Token
+import com.amplify.api.domain.models.{PlaylistIdentifier, PlaylistInfo, Track}
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
 
@@ -10,13 +11,13 @@ trait ContentService {
 
   def fetchPlaylists(
       contentProvider: ContentProvider,
-      accessToken: AuthToken): Future[Seq[PlaylistInfo]]
+      accessToken: Token): Future[Seq[PlaylistInfo]]
 
   def fetchPlaylist(
       playlistIdentifier: PlaylistIdentifier,
-      accessToken: AuthToken): Future[PlaylistInfo]
+      accessToken: Token): Future[PlaylistInfo]
 
   def fetchPlaylistTracks(
       playlistIdentifier: PlaylistIdentifier,
-      accessToken: AuthToken): Future[Seq[Track]]
+      accessToken: Token): Future[Seq[Track]]
 }

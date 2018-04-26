@@ -28,11 +28,11 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
 
   "retrievePlaylists" should {
     "respond OK" in new RetrievePlaylistsFixture {
-      val response = controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceToken)
+      val response = controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceSession)
       status(response) mustEqual OK
     }
     "respond with playlists" in new RetrievePlaylistsFixture {
-      val response = controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceToken)
+      val response = controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceSession)
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response).head
@@ -46,11 +46,11 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
 
     "fail" when {
       "Spotify responds with unexpected response" in new RetrievePlaylistsFixture {
-        when(spotifyContentProvider.fetchPlaylists(aliceAuthToken))
+        when(spotifyContentProvider.fetchPlaylists(aliceToken))
           .thenReturn(Future.failed(UnexpectedResponse("Testing!")))
 
         intercept[UnexpectedResponse] {
-          await(controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceToken))
+          await(controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceSession))
         }
       }
     }
@@ -93,7 +93,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
     "respond empty playlist" when {
       "no playlist was set" in new RetrieveCurrentPlaylistFixture {
         val response =
-          controller.retrieveCurrentPlaylist()(FakeRequest().withBody(()).withAliceToken)
+          controller.retrieveCurrentPlaylist()(FakeRequest().withBody(()).withAliceSession)
         status(response) mustEqual NO_CONTENT
       }
     }
@@ -104,7 +104,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
       initQueue(aliceVenueUid, queue)
 
       val response =
-        controller.retrieveCurrentPlaylist()(FakeRequest().withBody(()).withAliceToken)
+        controller.retrieveCurrentPlaylist()(FakeRequest().withBody(()).withAliceSession)
 
       status(response) mustEqual OK
       contentType(response) must contain (Http.MimeTypes.JSON)
@@ -122,12 +122,12 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
   "setCurrentPlaylist" should {
     "respond No content" in new SetCurrentPlaylistFixture {
       val response = controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistUri.toString).withAliceToken)
+        playlistRequest(alicePlaylistUri.toString).withAliceSession)
       status(response) mustEqual NO_CONTENT
     }
     "update queue current playlist" in new SetCurrentPlaylistFixture {
       await(controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistUri.toString).withAliceToken))
+        playlistRequest(alicePlaylistUri.toString).withAliceSession))
 
       val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
@@ -173,7 +173,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
     }
     "update queue current track" in new SetCurrentPlaylistFixture {
       await(controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistUri.toString).withAliceToken))
+        playlistRequest(alicePlaylistUri.toString).withAliceSession))
 
       val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
@@ -187,7 +187,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
     }
     "update queue items" in new SetCurrentPlaylistFixture {
       await(controller.setCurrentPlaylist()(
-        playlistRequest(alicePlaylistUri.toString).withAliceToken))
+        playlistRequest(alicePlaylistUri.toString).withAliceSession))
 
       val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
@@ -199,13 +199,13 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
       "invalid identifier" in new SetCurrentPlaylistFixture {
         intercept[InvalidProviderIdentifier] {
           await(controller.setCurrentPlaylist()(
-            playlistRequest("wrong_identifier").withAliceToken))
+            playlistRequest("wrong_identifier").withAliceSession))
         }
       }
       "invalid content provider" in new SetCurrentPlaylistFixture {
         intercept[InvalidProviderIdentifier] {
           await(controller.setCurrentPlaylist()(
-            playlistRequest("wrong_provider:wrong_identifier").withAliceToken))
+            playlistRequest("wrong_provider:wrong_identifier").withAliceSession))
         }
       }
     }

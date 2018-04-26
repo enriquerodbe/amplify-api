@@ -15,8 +15,8 @@ object Venue extends DtosDefinition {
     VenueResponse(venue.name.value, venue.uid.value)
   }
 
-  case class VenueSignUpRequest(code: String)
-  implicit val venueRequestReads: Reads[VenueSignUpRequest] = {
-    (JsPath \ "code").read[String](minLength[String](1)).map(VenueSignUpRequest)
+  case class VenueSignInRequest(code: String)
+  implicit val venueRequestReads: Reads[VenueSignInRequest] = {
+    (JsPath \ "code").read[String](minLength[String](1)).map(VenueSignInRequest)
   }
 }

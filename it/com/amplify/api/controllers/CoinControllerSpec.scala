@@ -22,11 +22,11 @@ class CoinControllerSpec extends BaseIntegrationSpec with VenueRequests {
 
   "createCoins" should {
     "respond OK" in new CreateCoinsFixture {
-      val response = controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceToken)
+      val response = controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceSession)
       status(response) mustEqual OK
     }
     "respond with coins" in new CreateCoinsFixture {
-      val response = controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceToken)
+      val response = controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceSession)
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response).as[JsArray]
@@ -38,7 +38,7 @@ class CoinControllerSpec extends BaseIntegrationSpec with VenueRequests {
       }
     }
     "create coins" in new CreateCoinsFixture {
-      await(controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceToken))
+      await(controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceSession))
 
       val createdCoins = findCoins(aliceDbVenueId)
 
@@ -52,13 +52,13 @@ class CoinControllerSpec extends BaseIntegrationSpec with VenueRequests {
     "fail" when {
       "zero requested" in new CreateCoinsFixture {
         intercept[InvalidCreateCoinsRequestedNumber] {
-          await(controller.createCoins()(createCoinsRequest(0).withAliceToken))
+          await(controller.createCoins()(createCoinsRequest(0).withAliceSession))
         }
       }
       "more than the maximum requested" in new CreateCoinsFixture {
         val requestNumber = envConfig.coinsCreateMax + 1
         intercept[InvalidCreateCoinsRequestedNumber] {
-          await(controller.createCoins()(createCoinsRequest(requestNumber).withAliceToken))
+          await(controller.createCoins()(createCoinsRequest(requestNumber).withAliceSession))
         }
       }
     }

@@ -17,7 +17,7 @@ class CoinController @Inject()(
 
   def createCoins() = authenticatedVenue(parse.json[CreateCoinsRequest]) { request ⇒
     coinLogic
-      .createCoins(request.subject.venueReq.venue, request.body.number)
+      .createCoins(request.subject.venue, request.body.number)
       .map(_.map(coinToCoinResponse))
   }
 

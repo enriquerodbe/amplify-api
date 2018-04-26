@@ -23,11 +23,11 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
 
   "skip" should {
     "respond No content" in new SkipFixture {
-      val response = controller.skip()(fakeRequest().withAliceToken)
+      val response = controller.skip()(fakeRequest().withAliceSession)
       status(response) mustBe NO_CONTENT
     }
     "update queue current track" in new SkipFixture {
-      await(controller.skip()(fakeRequest().withAliceToken))
+      await(controller.skip()(fakeRequest().withAliceSession))
 
       val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
@@ -43,11 +43,11 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
 
   "finish" should {
     "respond No content" in new FinishFixture {
-      val response = controller.finish()(fakeRequest().withAliceToken)
+      val response = controller.finish()(fakeRequest().withAliceSession)
       status(response) mustBe NO_CONTENT
     }
     "update queue current track" in new FinishFixture {
-      await(controller.finish()(fakeRequest().withAliceToken))
+      await(controller.finish()(fakeRequest().withAliceSession))
 
       val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
@@ -90,12 +90,12 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
 
   "retrieveQueue" should {
     "respond OK" in new RetrieveQueueFixture {
-      val response = controller.retrieveQueue()(FakeRequest().withBody(()).withAliceToken)
+      val response = controller.retrieveQueue()(FakeRequest().withBody(()).withAliceSession)
       status(response) mustBe OK
     }
 
     "respond with queue" in new RetrieveQueueFixture {
-      val response = controller.retrieveQueue()(FakeRequest().withBody(()).withAliceToken)
+      val response = controller.retrieveQueue()(FakeRequest().withBody(()).withAliceSession)
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response)

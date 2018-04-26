@@ -7,7 +7,9 @@ import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveQueue, RouteComma
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.exceptions.VenueNotFoundByUid
 import com.amplify.api.services.VenueService
+import com.amplify.api.utils.FutureUtils._
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -20,24 +22,24 @@ class VenuePlaylistLogicImpl @Inject()(
 
   implicit val askTimeout = envConfig.defaultAskTimeout
 
-  override def retrievePlaylists(venue: VenueReq): Future[Seq[PlaylistInfo]] = {
+  override def retrievePlaylists(venue: Venue): Future[Seq[PlaylistInfo]] = {
     venueService.retrievePlaylists(venue)
   }
 
   override def retrieveCurrentPlaylist(uid: Uid): Future[Option[Playlist]] = {
     for {
-      venue ← venueService.retrieve(uid)
+      venue ← venueService.retrieve(uid) ?! VenueNotFoundByUid(uid)
       queue ← (queueCommandRouter ? RetrieveQueue(venue)).mapTo[Queue]
     }
     yield queue.currentPlaylist
   }
 
   override def setCurrentPlaylist(
-      venueReq: VenueReq,
+      venue: Venue,
       playlistIdentifier: PlaylistIdentifier): Future[Unit] = {
     for {
-      playlist ← venueService.retrievePlaylist(venueReq, playlistIdentifier)
-      command = SetCurrentPlaylist(venueReq.venue, playlist)
+      playlist ← venueService.retrievePlaylist(venue, playlistIdentifier)
+      command = SetCurrentPlaylist(venue, playlist)
       result ← (queueCommandRouter ? RouteCommand(command)).mapTo[Unit]
     }
     yield result

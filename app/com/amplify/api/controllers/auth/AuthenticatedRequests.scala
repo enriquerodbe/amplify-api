@@ -2,7 +2,6 @@ package com.amplify.api.controllers.auth
 
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.controllers.auth.HandlerKeys.{CoinHandlerKey, VenueHandlerKey}
-import com.amplify.api.domain.models.AuthToken
 import play.api.mvc._
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
@@ -17,10 +16,7 @@ trait AuthenticatedRequests { self: AbstractController ⇒
 
   case class AuthenticatedVenueRequest[A](
       subject: VenueSubject,
-      request: Request[A]) extends WrappedRequest[A](request) {
-
-    def authToken: AuthToken = subject.venueReq.authToken
-  }
+      request: Request[A]) extends WrappedRequest[A](request)
 
   def authenticatedCoin[A](
       parser: BodyParser[A] = parse.anyContent)(

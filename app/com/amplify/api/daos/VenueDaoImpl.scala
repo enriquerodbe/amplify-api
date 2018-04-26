@@ -19,20 +19,29 @@ class VenueDaoImpl @Inject()(
     venuesTable.filter(_.uid === uid).result.headOption
   }
 
-  override def retrieve(identifier: AuthProviderIdentifier): DBIO[Option[DbVenue]] = {
-    val query = venuesTable.filter { venue ⇒
-      venue.authIdentifier === identifier.identifier &&
-        venue.authProviderType === identifier.authProvider
-    }
-
-    query.result.headOption
-  }
-
   override def retrieveOrCreate(dbVenue: DbVenue): DBIO[DbVenue] = {
     val maybeExistingVenue = retrieve(dbVenue.identifier)
     maybeExistingVenue.flatMap {
-      case Some(venue) ⇒ DBIO.successful(venue)
+      case Some(_) ⇒ updateTokens(dbVenue).andThen(DBIO.successful(dbVenue))
       case _ ⇒ create(dbVenue)
+    }
+  }
+
+  private def retrieve(identifier: AuthProviderIdentifier): DBIO[Option[DbVenue]] = {
+    filterByIdentifier(identifier).result.headOption
+  }
+
+  private def updateTokens(dbVenue: DbVenue): DBIO[Unit] = {
+    filterByIdentifier(dbVenue.identifier)
+      .map(r ⇒ r.refreshToken → r.accessToken)
+      .update(dbVenue.refreshToken → dbVenue.accessToken)
+      .map(_ ⇒ ())
+  }
+
+  private def filterByIdentifier(identifier: AuthProviderIdentifier) = {
+    venuesTable.filter { venue ⇒
+      venue.authIdentifier === identifier.identifier &&
+        venue.authProviderType === identifier.authProvider
     }
   }
 

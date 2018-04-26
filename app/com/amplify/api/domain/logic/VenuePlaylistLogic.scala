@@ -8,9 +8,9 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[VenuePlaylistLogicImpl])
 trait VenuePlaylistLogic {
 
-  def retrievePlaylists(user: VenueReq): Future[Seq[PlaylistInfo]]
+  def retrievePlaylists(user: Venue): Future[Seq[PlaylistInfo]]
 
   def retrieveCurrentPlaylist(uid: Uid): Future[Option[Playlist]]
 
-  def setCurrentPlaylist(venue: VenueReq, playlistIdentifier: PlaylistIdentifier): Future[Unit]
+  def setCurrentPlaylist(venue: Venue, playlistIdentifier: PlaylistIdentifier): Future[Unit]
 }

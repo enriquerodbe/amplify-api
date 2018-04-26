@@ -20,7 +20,7 @@ class VenuePlaylistController @Inject()(
     implicit ec: ExecutionContext) extends AbstractController(cc) with AuthenticatedRequests {
 
   def retrievePlaylists() = authenticatedVenue(parse.empty) { request ⇒
-    val eventualPlaylists = venuePlaylistLogic.retrievePlaylists(request.subject.venueReq)
+    val eventualPlaylists = venuePlaylistLogic.retrievePlaylists(request.subject.venue)
     eventualPlaylists.map(_.map(playlistInfoToPlaylistInfoResponse))
   }
 
@@ -42,8 +42,7 @@ class VenuePlaylistController @Inject()(
   def setCurrentPlaylist() = authenticatedVenue(parse.json[PlaylistRequest]) { request ⇒
     ContentIdentifier.fromString(request.body.identifier) match {
       case Success(identifier: PlaylistIdentifier) ⇒
-        val venueReq = request.subject.venueReq
-        venuePlaylistLogic.setCurrentPlaylist(venueReq, identifier).map(_ ⇒ NoContent)
+        venuePlaylistLogic.setCurrentPlaylist(request.subject.venue, identifier).map(_ ⇒ NoContent)
       case Success(otherIdentifier) ⇒
         Future.failed(InvalidProviderIdentifier(otherIdentifier.toString))
       case Failure(ex) ⇒
