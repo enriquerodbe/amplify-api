@@ -40,4 +40,11 @@ class ContentServiceImpl @Inject()(
           .map(_.map(toModelTrack))
     }
   }
+
+  override def startPlayback(tracks: Seq[TrackIdentifier], accessToken: Token): Future[Unit] = {
+    tracks.headOption match {
+      case Some(_: Spotify.TrackUri) ⇒ spotifyContentProvider.startPlayback(tracks, accessToken)
+      case None ⇒ Future.successful(())
+    }
+  }
 }

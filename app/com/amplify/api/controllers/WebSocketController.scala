@@ -2,7 +2,7 @@ package com.amplify.api.controllers
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
-import com.amplify.api.aggregates.queue.EventNotifier
+import com.amplify.api.aggregates.queue.VenueNotifier
 import com.amplify.api.controllers.auth.AuthHeadersUtil
 import com.amplify.api.domain.logic.VenueAuthLogic
 import com.amplify.api.domain.models.Venue
@@ -31,5 +31,5 @@ class WebSocketController @Inject()(
     }
   }
 
-  private def notifierFlow(venue: Venue) = ActorFlow.actorRef(EventNotifier.props(venue.uid, _))
+  private def notifierFlow(venue: Venue) = ActorFlow.actorRef(VenueNotifier.props(venue, _))
 }

@@ -71,6 +71,8 @@ message PbCurrentPlaylistSet {
     PbPlaylist playlist = 1;
 }
 
+message PbPlaybackStarted {}
+
 message PbVenueTracksRemoved {}
 
 message PbVenueTrackAdded {

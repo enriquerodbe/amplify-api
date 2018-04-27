@@ -55,4 +55,8 @@ class VenueServiceImpl @Inject()(
       playlistIdentifier: PlaylistIdentifier): Future[Seq[Track]] = {
     contentService.fetchPlaylistTracks(playlistIdentifier, venue.accessToken)
   }
+
+  override def startPlayback(venue: Venue, tracks: Seq[TrackIdentifier]): Future[Unit] = {
+    contentService.startPlayback(tracks, venue.accessToken)
+  }
 }

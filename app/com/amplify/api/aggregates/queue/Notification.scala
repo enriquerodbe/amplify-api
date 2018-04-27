@@ -1,11 +1,10 @@
 package com.amplify.api.aggregates.queue
 
-import com.amplify.api.domain.models.Queue
-import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.models.{Queue, Venue}
 
 sealed trait Notification {
 
-  def venueUid: Uid
+  def venue: Venue
 }
 
-case class QueueUpdated(venueUid: Uid, queue: Queue) extends Notification
+case class QueueUpdated(venue: Venue, event: Event, queue: Queue) extends Notification

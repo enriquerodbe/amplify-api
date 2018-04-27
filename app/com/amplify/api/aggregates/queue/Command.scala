@@ -11,6 +11,8 @@ object Command {
 
   case class SetCurrentPlaylist(venue: Venue, playlist: Playlist) extends Command
 
+  case class StartPlayback(venue: Venue) extends Command
+
   case class SkipCurrentTrack(venue: Venue) extends Command
 
   case class FinishCurrentTrack(venue: Venue) extends Command

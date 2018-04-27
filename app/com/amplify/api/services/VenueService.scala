@@ -16,4 +16,6 @@ trait VenueService {
   def retrievePlaylists(venue: Venue): Future[Seq[PlaylistInfo]]
 
   def retrievePlaylist(venue: Venue, identifier: PlaylistIdentifier): Future[Playlist]
+
+  def startPlayback(venue: Venue, tracks: Seq[TrackIdentifier]): Future[Unit]
 }

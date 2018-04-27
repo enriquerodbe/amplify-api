@@ -22,7 +22,11 @@ class VenueDaoImpl @Inject()(
   override def retrieveOrCreate(dbVenue: DbVenue): DBIO[DbVenue] = {
     val maybeExistingVenue = retrieve(dbVenue.identifier)
     maybeExistingVenue.flatMap {
-      case Some(_) ⇒ updateTokens(dbVenue).andThen(DBIO.successful(dbVenue))
+      case Some(venue) ⇒
+        val updated =
+          venue.copy(refreshToken = dbVenue.refreshToken, accessToken = dbVenue.accessToken)
+        updateTokens(updated)
+
       case _ ⇒ create(dbVenue)
     }
   }
@@ -31,11 +35,11 @@ class VenueDaoImpl @Inject()(
     filterByIdentifier(identifier).result.headOption
   }
 
-  private def updateTokens(dbVenue: DbVenue): DBIO[Unit] = {
+  private def updateTokens(dbVenue: DbVenue): DBIO[DbVenue] = {
     filterByIdentifier(dbVenue.identifier)
       .map(r ⇒ r.refreshToken → r.accessToken)
       .update(dbVenue.refreshToken → dbVenue.accessToken)
-      .map(_ ⇒ ())
+      .map(_ ⇒ dbVenue)
   }
 
   private def filterByIdentifier(identifier: AuthProviderIdentifier) = {

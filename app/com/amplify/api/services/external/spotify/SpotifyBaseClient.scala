@@ -5,6 +5,7 @@ import com.amplify.api.domain.models.primitives.Token
 import com.amplify.api.exceptions._
 import com.amplify.api.services.external.spotify.SpotifyBaseClient._
 import javax.inject.Inject
+import play.api.Logger
 import play.api.libs.functional.syntax.{unlift, _}
 import play.api.libs.json.{Format, JsValue, Reads, __}
 import play.api.libs.ws.{WSRequest, WSResponse, WSClient ⇒ PlayClient}
@@ -72,6 +73,8 @@ class SpotifyBaseClient @Inject()(
 
 object SpotifyBaseClient {
 
+  private lazy val logger = Logger(classOf[SpotifyBaseClient])
+
   private def validate[T](json: JsValue)(implicit reads: Reads[T]): Future[T] = {
     json.validate[T].asEither match {
       case Left(errors) =>
@@ -97,7 +100,13 @@ object SpotifyBaseClient {
     }
   }
 
-  implicit class RequestWithBearerToken(wsRequest: WSRequest) {
+  implicit class RequestBuilder(wsRequest: WSRequest) {
+
+    def logRequest(implicit ec: ExecutionContext): WSRequest = {
+      logger.warn(s"Sending request to ${wsRequest.url} " +
+        s"with headers ${wsRequest.headers} and body ${wsRequest.body}")
+      wsRequest
+    }
 
     def withBearerToken(token: Token): WSRequest = {
       wsRequest.withHttpHeaders(HeaderNames.AUTHORIZATION → s"Bearer ${token.value}")
@@ -108,6 +117,17 @@ object SpotifyBaseClient {
 
     def parseJson[T](implicit ec: ExecutionContext, reads: Reads[T]): Future[T] = {
       wsResponse.flatMap(customHandleResponse).flatMap(r ⇒ validate[T](r.json))
+    }
+
+    def logResponse(implicit ec: ExecutionContext): Future[WSResponse] = {
+      wsResponse.map { response ⇒
+        logger.warn(s"Got response with status ${response.status} and body ${response.body}")
+        response
+      }
+    }
+
+    def emptyResponse(implicit ec: ExecutionContext): Future[Unit] = {
+      wsResponse.flatMap(customHandleResponse).map(_ ⇒ ())
     }
   }
 }

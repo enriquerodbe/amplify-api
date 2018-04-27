@@ -10,6 +10,15 @@ GET    /me/queue    com.amplify.api.controllers.VenueQueueController.retrieveQue
 
 
 ###
+#  summary: Start playing the queue of the authenticated venue
+#  responses:
+#    204:
+#      description: success
+###
+PUT    /me/queue/start    com.amplify.api.controllers.VenueQueueController.start
+
+
+###
 #  summary: Skip playing the current track of the authenticated venue
 #  responses:
 #    204:

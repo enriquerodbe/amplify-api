@@ -15,6 +15,7 @@ object ProtobufConverter {
 
   def toProtobuf(evt: Event): GeneratedMessage = evt match {
     case Event.CurrentPlaylistSet(playlist) ⇒ PbCurrentPlaylistSet(Some(toProtobuf(playlist)))
+    case Event.PlaybackStarted ⇒ PbPlaybackStarted()
     case Event.VenueTracksRemoved ⇒ PbVenueTracksRemoved()
     case Event.VenueTrackAdded(track) ⇒ PbVenueTrackAdded(Some(toProtobuf(track)))
     case Event.TrackFinished ⇒ PbTrackFinished()
@@ -69,6 +70,7 @@ object ProtobufConverter {
 
   def fromProtobuf(message: GeneratedMessage): Event = message match {
     case c: PbCurrentPlaylistSet ⇒ Event.CurrentPlaylistSet(fromProtobuf(c.getPlaylist))
+    case _: PbPlaybackStarted ⇒ Event.PlaybackStarted
     case _: PbVenueTracksRemoved ⇒ Event.VenueTracksRemoved
     case a: PbVenueTrackAdded ⇒ Event.VenueTrackAdded(fromProtobuf(a.getTrack))
     case _: PbTrackFinished ⇒ Event.TrackFinished

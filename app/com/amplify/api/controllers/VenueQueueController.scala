@@ -23,6 +23,10 @@ class VenueQueueController @Inject()(
     venueQueueLogic.retrieveQueue(request.subject.venue).map(queueToQueueResponse)
   }
 
+  def start() = authenticatedVenue(parse.empty) { request ⇒
+    venueQueueLogic.start(request.subject.venue).map(_ ⇒ NoContent)
+  }
+
   def skip() = authenticatedVenue(parse.empty) { request ⇒
     venueQueueLogic.skip(request.subject.venue).map(_ ⇒ NoContent)
   }

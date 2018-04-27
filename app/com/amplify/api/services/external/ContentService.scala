@@ -2,7 +2,7 @@ package com.amplify.api.services.external
 
 import com.amplify.api.domain.models.ContentProvider.ContentProvider
 import com.amplify.api.domain.models.primitives.Token
-import com.amplify.api.domain.models.{PlaylistIdentifier, PlaylistInfo, Track}
+import com.amplify.api.domain.models.{PlaylistIdentifier, PlaylistInfo, Track, TrackIdentifier}
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
 
@@ -20,4 +20,6 @@ trait ContentService {
   def fetchPlaylistTracks(
       playlistIdentifier: PlaylistIdentifier,
       accessToken: Token): Future[Seq[Track]]
+
+  def startPlayback(tracks: Seq[TrackIdentifier], accessToken: Token): Future[Unit]
 }

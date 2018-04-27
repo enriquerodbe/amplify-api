@@ -3,10 +3,11 @@ package com.amplify.api.controllers
 import akka.pattern.ask
 import com.amplify.api.aggregates.queue.CommandProcessor.RetrieveState
 import com.amplify.api.domain.models.Spotify.TrackUri
-import com.amplify.api.domain.models.{Playlist, Queue}
+import com.amplify.api.domain.models.{Playlist, Queue, QueueItem, QueueItemType}
 import com.amplify.api.it.fixtures.{DbCoinFixture, DbVenueFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, UserRequests}
 import com.amplify.api.services.external.spotify.Converters.{toModelPlaylist, toModelTrack}
+import org.mockito.Mockito.{atLeastOnce, verify}
 import org.scalatest.Inside
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsArray, JsDefined}
@@ -18,6 +19,27 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
 
   val controller = instanceOf[VenueQueueController]
   val commandProcessor = findCommandProcessor(aliceVenueUid)
+
+  class StartFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+    extends DbVenueFixture with DbCoinFixture {
+    val newQueue =
+      Queue.empty.copy(
+        futureItems = List(QueueItem(toModelTrack(bedOfNailsTrack), QueueItemType.Venue)))
+    initQueue(aliceVenueUid, newQueue)
+  }
+
+  "start" should {
+    "respond No content" in new StartFixture {
+      val response = controller.start()(fakeRequest().withAliceSession)
+      status(response) mustBe NO_CONTENT
+    }
+    "call content provider" in new StartFixture {
+      await(controller.start()(fakeRequest().withAliceSession))
+
+      verify(spotifyContentProvider, atLeastOnce())
+        .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), aliceToken)
+    }
+  }
 
   class SkipFixture(implicit val dbConfigProvider: DatabaseConfigProvider) extends DbVenueFixture
 

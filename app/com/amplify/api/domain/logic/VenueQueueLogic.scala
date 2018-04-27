@@ -10,6 +10,8 @@ trait VenueQueueLogic {
 
   def retrieveQueue(venue: Venue): Future[Queue]
 
+  def start(venue: Venue): Future[Unit]
+
   def skip(venue: Venue): Future[Unit]
 
   def finish(venue: Venue): Future[Unit]

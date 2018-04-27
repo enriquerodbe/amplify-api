@@ -2,7 +2,7 @@ package com.amplify.api.domain.logic
 
 import akka.actor.ActorRef
 import akka.pattern.ask
-import com.amplify.api.aggregates.queue.Command.{AddTrack, FinishCurrentTrack, SkipCurrentTrack}
+import com.amplify.api.aggregates.queue.Command.{AddTrack, FinishCurrentTrack, SkipCurrentTrack, StartPlayback}
 import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveQueue, RouteCommand}
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models._
@@ -27,6 +27,10 @@ class VenueQueueLogicImpl @Inject()(
 
   override def skip(venue: Venue): Future[Unit] = {
     (queueCommandRouter ? RouteCommand(SkipCurrentTrack(venue))).mapTo[Unit]
+  }
+
+  override def start(venue: Venue): Future[Unit] = {
+    (queueCommandRouter ? RouteCommand(StartPlayback(venue))).mapTo[Unit]
   }
 
   override def finish(venue: Venue): Future[Unit] = {

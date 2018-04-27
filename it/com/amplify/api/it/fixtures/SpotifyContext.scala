@@ -2,7 +2,7 @@ package com.amplify.api.it.fixtures
 
 import com.amplify.api.controllers.auth.AuthHeadersUtil
 import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
-import com.amplify.api.domain.models.Spotify.PlaylistUri
+import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
 import com.amplify.api.domain.models.primitives.Token
 import com.amplify.api.exceptions.UserAuthTokenNotFound
 import com.amplify.api.services.external.spotify.Dtos._
@@ -53,11 +53,11 @@ trait SpotifyContext extends CommonData with MockitoSugar {
   val bobUserData = UserData(AuthSpotify → bobSpotifyId, "Bob Marley")
 
   when(spotifyAuthProvider.requestRefreshAndAccessTokens(aliceCode))
-      .thenReturn(Future.successful((Token(aliceRefreshToken), Token(aliceToken))))
+    .thenReturn(Future.successful((Token(aliceRefreshToken), Token(aliceToken))))
   when(spotifyAuthProvider.requestRefreshAndAccessTokens(bobCode))
-      .thenReturn(Future.successful((Token(bobRefreshToken), Token(bobToken))))
+    .thenReturn(Future.successful((Token(bobRefreshToken), Token(bobToken))))
   when(spotifyAuthProvider.requestRefreshAndAccessTokens(invalidToken))
-      .thenReturn(Future.failed(UserAuthTokenNotFound))
+    .thenReturn(Future.failed(UserAuthTokenNotFound))
   when(spotifyAuthProvider.fetchUser(aliceToken)).thenReturn(Future.successful(aliceUserData))
   when(spotifyAuthProvider.fetchUser(bobToken)).thenReturn(Future.successful(bobUserData))
   when(spotifyAuthProvider.fetchUser(invalidToken))
@@ -68,4 +68,6 @@ trait SpotifyContext extends CommonData with MockitoSugar {
     .thenReturn(Future.successful(alicePlaylist))
   when(spotifyContentProvider.fetchPlaylistTracks(alicePlaylistUri, aliceToken))
     .thenReturn(Future.successful(alicePlaylistTracks))
+  when(spotifyContentProvider.startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), aliceToken))
+    .thenReturn(Future.successful(()))
 }

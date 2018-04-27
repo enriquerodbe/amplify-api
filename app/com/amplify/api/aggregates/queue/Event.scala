@@ -8,6 +8,8 @@ object Event {
 
   case class CurrentPlaylistSet(playlist: Playlist) extends Event
 
+  case object PlaybackStarted extends Event
+
   case object VenueTracksRemoved extends Event
 
   case class VenueTrackAdded(track: Track) extends Event

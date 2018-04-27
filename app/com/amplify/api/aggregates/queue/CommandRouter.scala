@@ -13,19 +13,19 @@ class CommandRouter @Inject()(
 
   override def receive: Receive = {
     case RouteCommand(command) ⇒
-      val commandProcessor = getCommandProcessor(command.venue.uid)
+      val commandProcessor = getCommandProcessor(command.venue)
       commandProcessor forward HandleCommand(command)
 
     case RetrieveQueue(venue) ⇒
-      val commandProcessor = getCommandProcessor(venue.uid)
+      val commandProcessor = getCommandProcessor(venue)
       commandProcessor forward RetrieveState
   }
 
-  private def getCommandProcessor(venueUid: Uid) = {
-    val name = createCommandProcessorName(venueUid)
+  private def getCommandProcessor(venue: Venue) = {
+    val name = createCommandProcessorName(venue.uid)
     val maybeActorRef = context.child(name)
     maybeActorRef.getOrElse {
-      injectedChild(commandProcessorFactory(venueUid), name, _.withMailbox("stash-mailbox"))
+      injectedChild(commandProcessorFactory(venue), name, _.withMailbox("stash-mailbox"))
     }
   }
 
