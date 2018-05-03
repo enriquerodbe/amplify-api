@@ -3,14 +3,12 @@ version := sys.props.getOrElse("amplify.api.version", "1.0-SNAPSHOT")
 scalaVersion := "2.12.4"
 
 lazy val dependencies = Seq(
-  "com.typesafe.play" %% "play-slick" % "3.0.3",
+  guice,
+  ws,
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
-  "com.typesafe.akka" %% "akka-persistence" % "2.5.8",
   "com.github.dnvriend" %% "akka-persistence-jdbc" % "3.3.0",
   "org.postgresql" % "postgresql" % "42.2.2",
   "be.objectify" %% "deadbolt-scala" % "2.6.1",
-  guice,
-  ws,
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "it,test",
   "org.mockito" % "mockito-core" % "2.13.0" % "it,test")
 
