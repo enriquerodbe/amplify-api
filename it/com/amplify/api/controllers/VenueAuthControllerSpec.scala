@@ -37,12 +37,8 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
     }
 
     "fail" when {
-      "no authorization code provided" in {
-        intercept[Exception](await(controller.signIn()(venueRequest(null))))
-      }
-
       "invalid authorization code provided" in {
-        val response = controller.signIn()(venueRequest(invalidToken))
+        val response = controller.signIn()(venueRequest(invalidAuthCode))
         val exception = intercept[BadRequestException](status(response))
         exception mustEqual UserAuthTokenNotFound
       }

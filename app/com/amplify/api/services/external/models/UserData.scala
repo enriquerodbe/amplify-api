@@ -1,4 +1,4 @@
-package com.amplify.api.services.models
+package com.amplify.api.services.external.models
 
 import com.amplify.api.domain.models.AuthProviderIdentifier
 import com.amplify.api.domain.models.primitives.Name

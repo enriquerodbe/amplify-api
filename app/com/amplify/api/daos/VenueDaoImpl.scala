@@ -2,8 +2,10 @@ package com.amplify.api.daos
 
 import com.amplify.api.daos.models.DbVenue
 import com.amplify.api.daos.schema.VenuesTable
-import com.amplify.api.domain.models.AuthProviderIdentifier
-import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.models.primitives.{Access, Token, Uid}
+import com.amplify.api.domain.models.{AuthProviderIdentifier, Venue}
+import com.amplify.api.exceptions.VenueNotFoundByUid
+import com.amplify.api.utils.DbioUtils._
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import scala.concurrent.ExecutionContext
@@ -32,22 +34,27 @@ class VenueDaoImpl @Inject()(
   }
 
   private def retrieve(identifier: AuthProviderIdentifier): DBIO[Option[DbVenue]] = {
-    filterByIdentifier(identifier).result.headOption
+    val query = venuesTable.filter { venue ⇒
+      venue.authIdentifier === identifier.identifier &&
+        venue.authProviderType === identifier.authProvider
+    }
+    query.result.headOption
   }
 
   private def updateTokens(dbVenue: DbVenue): DBIO[DbVenue] = {
-    filterByIdentifier(dbVenue.identifier)
+    venuesTable.filter(_.id === dbVenue.id)
       .map(r ⇒ r.refreshToken → r.accessToken)
       .update(dbVenue.refreshToken → dbVenue.accessToken)
       .map(_ ⇒ dbVenue)
   }
 
-  private def filterByIdentifier(identifier: AuthProviderIdentifier) = {
-    venuesTable.filter { venue ⇒
-      venue.authIdentifier === identifier.identifier &&
-        venue.authProviderType === identifier.authProvider
-    }
-  }
-
   private def create(dbVenue: DbVenue): DBIO[DbVenue] = insertVenuesQuery += dbVenue
+
+  override def updateAccessToken(venue: Venue, accessToken: Token[Access]): DBIO[Unit] = {
+    for {
+      dbVenue ← retrieve(venue.uid) ?! VenueNotFoundByUid(venue.uid)
+      _ ← updateTokens(dbVenue.copy(accessToken = accessToken))
+    }
+    yield ()
+  }
 }

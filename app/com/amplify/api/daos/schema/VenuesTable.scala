@@ -17,8 +17,8 @@ trait VenuesTable extends BaseTable {
     def uid = column[Uid]("uid")
     def authProviderType = column[AuthProviderType]("auth_provider")
     def authIdentifier = column[Identifier]("auth_identifier")
-    def refreshToken = column[Token]("refresh_token")
-    def accessToken = column[Token]("access_token")
+    def refreshToken = column[Token[Refresh]]("refresh_token")
+    def accessToken = column[Token[Access]]("access_token")
 
     def authProviderIdentifier =
       (authProviderType, authIdentifier) <>

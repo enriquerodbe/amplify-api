@@ -18,5 +18,7 @@ object Dtos {
 
   case class Artist(name: String)
 
-  case class RefreshAndAccessTokens(refreshToken: String, accessToken: String, expiresIn: Int)
+  case class RefreshAndAccessTokens(refreshToken: String, accessToken: String)
+
+  case class AccessToken(accessToken: String)
 }

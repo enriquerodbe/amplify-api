@@ -15,14 +15,13 @@ class CoinServiceImpl @Inject()(
     implicit ec: ExecutionContext) extends CoinService {
 
   override def create(venue: Venue, number: Int): Future[Seq[Coin]] = {
-    val actions =
+    db.run {
       for {
         dbVenue ← venueDao.retrieve(venue.uid) ?! VenueNotFoundByUid(venue.uid)
         coins ← coinDao.create(dbVenue, number).map(_.map(dbCoinToCoin(_, Seq.empty)))
       }
       yield coins
-
-    db.run(actions)
+    }
   }
 
   override def retrieve(coinToken: CoinToken): Future[Option[Coin]] = {

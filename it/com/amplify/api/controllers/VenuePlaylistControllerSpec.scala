@@ -46,7 +46,7 @@ class VenuePlaylistControllerSpec extends BaseIntegrationSpec with VenueRequests
 
     "fail" when {
       "Spotify responds with unexpected response" in new RetrievePlaylistsFixture {
-        when(spotifyContentProvider.fetchPlaylists(aliceToken))
+        when(spotifyContentProvider.fetchPlaylists(aliceAccessToken))
           .thenReturn(Future.failed(UnexpectedResponse("Testing!")))
 
         intercept[UnexpectedResponse] {

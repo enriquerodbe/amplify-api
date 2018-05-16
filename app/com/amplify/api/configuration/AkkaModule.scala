@@ -8,7 +8,7 @@ class AkkaModule extends AbstractModule with AkkaGuiceSupport {
 
   override def configure(): Unit = {
     bindActor[CommandRouter]("queue-command-router")
+    bindActor[PlaybackNotifier]("queue-playback-notifier")
     bindActorFactory[QueueCommandProcessor, QueueCommandProcessor.Factory]
-    bindActorFactory[PlaybackNotifier, PlaybackNotifier.Factory]
   }
 }

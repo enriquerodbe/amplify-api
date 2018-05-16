@@ -1,7 +1,8 @@
 package com.amplify.api.services.external.spotify
 
 import com.amplify.api.configuration.EnvConfig
-import com.amplify.api.domain.models.primitives.Token
+import com.amplify.api.domain.models.ContentIdentifier
+import com.amplify.api.domain.models.primitives.{Access, Token}
 import com.amplify.api.exceptions._
 import com.amplify.api.services.external.spotify.SpotifyBaseClient._
 import javax.inject.Inject
@@ -45,7 +46,7 @@ class SpotifyBaseClient @Inject()(
 
   def paginatedFetch[T: Format](
       path: String,
-      accessToken: Token,
+      accessToken: Token[Access],
       query: Map[String, String] = Map.empty,
       acc: Seq[T] = Seq.empty,
       offset: Int = 0): Future[Seq[T]] = {
@@ -58,11 +59,11 @@ class SpotifyBaseClient @Inject()(
     }
   }
 
-  def fetchPage[T: Format](
+  private def fetchPage[T: Format](
       path: String,
       query: Map[String, String],
       offset: Int,
-      accessToken: Token): Future[Page[T]] = {
+      accessToken: Token[Access]): Future[Page[T]] = {
     apiRequest(path)
       .withBearerToken(accessToken)
       .withQueryStringParameters(query.updated(paginationOffsetHeader, offset.toString).toSeq: _*)
@@ -108,26 +109,34 @@ object SpotifyBaseClient {
       wsRequest
     }
 
-    def withBearerToken(token: Token): WSRequest = {
+    def withBearerToken(token: Token[Access]): WSRequest = {
       wsRequest.withHttpHeaders(HeaderNames.AUTHORIZATION → s"Bearer ${token.value}")
     }
   }
 
-  implicit class ResponseHandler(wsResponse: Future[WSResponse]) {
+  implicit class ResponseHandler(wsResponse: Future[WSResponse])(implicit ec: ExecutionContext) {
 
-    def parseJson[T](implicit ec: ExecutionContext, reads: Reads[T]): Future[T] = {
+    def parseJson[T](implicit reads: Reads[T]): Future[T] = {
       wsResponse.flatMap(customHandleResponse).flatMap(r ⇒ validate[T](r.json))
     }
 
-    def logResponse(implicit ec: ExecutionContext): Future[WSResponse] = {
+    def logResponse(): Future[WSResponse] = {
       wsResponse.map { response ⇒
         logger.warn(s"Got response with status ${response.status} and body ${response.body}")
         response
       }
     }
 
-    def emptyResponse(implicit ec: ExecutionContext): Future[Unit] = {
-      wsResponse.flatMap(customHandleResponse).map(_ ⇒ ())
+    def emptyResponse(): Future[Unit] = wsResponse.flatMap(customHandleResponse).map(_ ⇒ ())
+  }
+
+  implicit class NotFoundHandler[T](wsResponse: Future[T])(implicit ec: ExecutionContext) {
+
+    def handleNotFound(contentIdentifier: ContentIdentifier): Future[T] = {
+      wsResponse.recoverWith {
+        case ExternalResourceNotFound ⇒
+          Future.failed(RequestedResourceNotFound(contentIdentifier.toString)): Future[T]
+      }
     }
   }
 }

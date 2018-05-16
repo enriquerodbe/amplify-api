@@ -10,14 +10,14 @@ trait CommonData {
   val aliceSpotifyId = "alice-spotify-id"
   val aliceVenueUid = "Fa84A3fl"
 
-  val aliceToken = "alice-token"
-  val aliceRefreshToken = "alice-refresh-token"
-  val bobRefreshToken = "bob-refresh-token"
-  val bobToken = "bob-token"
-  val invalidToken = "invalid-token"
-
-  val aliceCode = "alice-auth-code"
-  val bobCode = "alice-auth-code"
+  val aliceAccessToken = Token[Access]("alice-access-token")
+  val aliceRefreshToken = Token[Refresh]("alice-refresh-token")
+  val aliceCode = Token[AuthorizationCode]("alice-auth-code")
+  val bobRefreshToken = Token[Refresh]("bob-refresh-token")
+  val bobAccessToken = Token[Access]("bob-access-token")
+  val bobCode = Token[AuthorizationCode]("alice-auth-code")
+  val invalidAccessToken = Token[Access]("invalid-access-token")
+  val invalidAuthCode = Token[AuthorizationCode]("invalid-auth-code")
 
   val validDbCoinId = 1L
   val validCoinTokenStr = "valid_coin123456"
@@ -28,6 +28,5 @@ trait CommonData {
   implicit def string2Name(str: String): Name = Name(str)
   implicit def string2Identifier(str: String): Identifier = Identifier(str)
   implicit def string2Uid(str: String): Uid = Uid(str)
-  implicit def string2Token(str: String): Token = Token(str)
   implicit def long2Id(long: Long): Id = Id(long)
 }

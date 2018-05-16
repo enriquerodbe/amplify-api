@@ -2,6 +2,7 @@ package com.amplify.api.it
 
 import com.amplify.api.it.fixtures.SpotifyContext
 import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
+import org.mockito.Mockito.reset
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.{PlaySpec, WsScalaTestClient}
@@ -31,8 +32,15 @@ trait BaseHttpSpec
   protected def instanceOf[T: ClassTag]: T = app.injector.instanceOf[T]
   implicit val dbConfig = instanceOf[DatabaseConfigProvider]
   val database = instanceOf[DBApi].database("default")
-  override def beforeEach(): Unit = Evolutions.applyEvolutions(database)
-  override def afterEach(): Unit = Evolutions.cleanupEvolutions(database)
+  override def beforeEach(): Unit = {
+    Evolutions.applyEvolutions(database)
+    mockSpotify()
+  }
+  override def afterEach(): Unit = {
+    Evolutions.cleanupEvolutions(database)
+    reset(spotifyContentProvider)
+    reset(spotifyAuthProvider)
+  }
   override def fakeApplication(): Application = {
     new GuiceApplicationBuilder().overrides(
       bind[SpotifyContentProvider].toInstance(spotifyContentProvider),

@@ -4,8 +4,8 @@ import com.amplify.api.domain.models
 import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
 import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
 import com.amplify.api.domain.models.primitives.Name
+import com.amplify.api.services.external.models.UserData
 import com.amplify.api.services.external.spotify.Dtos._
-import com.amplify.api.services.models._
 
 object Converters {
 

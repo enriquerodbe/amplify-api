@@ -7,13 +7,16 @@ import com.amplify.api.domain.models.{Playlist, Queue, QueueItem, QueueItemType}
 import com.amplify.api.it.fixtures.{DbCoinFixture, DbVenueFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, UserRequests}
 import com.amplify.api.services.external.spotify.Converters.{toModelPlaylist, toModelTrack}
-import org.mockito.Mockito.{atLeastOnce, verify}
+import org.mockito.Mockito.{atLeastOnce, verify, inOrder ⇒ order}
 import org.scalatest.Inside
+import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.PatienceConfiguration.Timeout
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsArray, JsDefined}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http
+import scala.concurrent.duration.DurationLong
 
 class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with UserRequests {
 
@@ -37,7 +40,26 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
       await(controller.start()(fakeRequest().withAliceSession))
 
       verify(spotifyContentProvider, atLeastOnce())
-        .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), aliceToken)
+        .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), aliceAccessToken)
+    }
+    "refresh tokens" when {
+      "access token expires" in new StartFixture with Eventually {
+        import profile.api._
+        await(db.run {
+          venuesTable.filter(_.id === aliceDbVenue.id).map(_.accessToken).update(invalidAccessToken)
+        })
+
+        await(controller.start()(fakeRequest().withAliceSession))
+
+        eventually(Timeout(2.seconds)) {
+          val calls = order(spotifyContentProvider, spotifyAuthProvider, spotifyContentProvider)
+          calls.verify(spotifyContentProvider)
+            .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), invalidAccessToken)
+          calls.verify(spotifyAuthProvider).refreshAccessToken(aliceRefreshToken)
+          calls.verify(spotifyContentProvider)
+            .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), aliceAccessToken)
+        }
+      }
     }
   }
 

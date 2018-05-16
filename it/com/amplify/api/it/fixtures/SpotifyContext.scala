@@ -3,11 +3,10 @@ package com.amplify.api.it.fixtures
 import com.amplify.api.controllers.auth.AuthHeadersUtil
 import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
 import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
-import com.amplify.api.domain.models.primitives.Token
 import com.amplify.api.exceptions.UserAuthTokenNotFound
+import com.amplify.api.services.external.models._
 import com.amplify.api.services.external.spotify.Dtos._
 import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
-import com.amplify.api.services.models._
 import org.mockito.Mockito.{RETURNS_SMART_NULLS, when, withSettings}
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.FakeRequest
@@ -24,9 +23,7 @@ trait SpotifyContext extends CommonData with MockitoSugar {
 
     def cookie(venueUid: String): (String, String) = AuthHeadersUtil.VENUE_UID → venueUid
 
-    def withSession(venueUid: String): FakeRequest[T] = {
-      fakeRequest.withSession(cookie(venueUid))
-    }
+    def withSession(venueUid: String): FakeRequest[T] = fakeRequest.withSession(cookie(venueUid))
 
     def withAliceSession: FakeRequest[T] = withSession(aliceVenueUid)
   }
@@ -52,22 +49,31 @@ trait SpotifyContext extends CommonData with MockitoSugar {
     Playlist(alicePlaylistUri.id, aliceSpotifyUser, "Alice playlist", alicePlaylistImages)
   val bobUserData = UserData(AuthSpotify → bobSpotifyId, "Bob Marley")
 
-  when(spotifyAuthProvider.requestRefreshAndAccessTokens(aliceCode))
-    .thenReturn(Future.successful((Token(aliceRefreshToken), Token(aliceToken))))
-  when(spotifyAuthProvider.requestRefreshAndAccessTokens(bobCode))
-    .thenReturn(Future.successful((Token(bobRefreshToken), Token(bobToken))))
-  when(spotifyAuthProvider.requestRefreshAndAccessTokens(invalidToken))
-    .thenReturn(Future.failed(UserAuthTokenNotFound))
-  when(spotifyAuthProvider.fetchUser(aliceToken)).thenReturn(Future.successful(aliceUserData))
-  when(spotifyAuthProvider.fetchUser(bobToken)).thenReturn(Future.successful(bobUserData))
-  when(spotifyAuthProvider.fetchUser(invalidToken))
-    .thenReturn(Future.failed(UserAuthTokenNotFound))
-  when(spotifyContentProvider.fetchPlaylists(aliceToken))
-    .thenReturn(Future.successful(Seq(alicePlaylist)))
-  when(spotifyContentProvider.fetchPlaylist(alicePlaylistUri, aliceToken))
-    .thenReturn(Future.successful(alicePlaylist))
-  when(spotifyContentProvider.fetchPlaylistTracks(alicePlaylistUri, aliceToken))
-    .thenReturn(Future.successful(alicePlaylistTracks))
-  when(spotifyContentProvider.startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), aliceToken))
-    .thenReturn(Future.successful(()))
+  def mockSpotify(): Unit = {
+    when(spotifyAuthProvider.requestRefreshAndAccessTokens(aliceCode))
+      .thenReturn(Future.successful(aliceRefreshToken → aliceAccessToken))
+    when(spotifyAuthProvider.requestRefreshAndAccessTokens(bobCode))
+      .thenReturn(Future.successful(bobRefreshToken → bobAccessToken))
+    when(spotifyAuthProvider.requestRefreshAndAccessTokens(invalidAuthCode))
+      .thenReturn(Future.failed(UserAuthTokenNotFound))
+    when(spotifyAuthProvider.refreshAccessToken(aliceRefreshToken))
+      .thenReturn(Future.successful(aliceAccessToken))
+    when(spotifyAuthProvider.fetchUser(aliceAccessToken))
+      .thenReturn(Future.successful(aliceUserData))
+    when(spotifyAuthProvider.fetchUser(bobAccessToken)).thenReturn(Future.successful(bobUserData))
+    when(spotifyAuthProvider.fetchUser(invalidAccessToken))
+      .thenReturn(Future.failed(UserAuthTokenNotFound))
+    when(spotifyContentProvider.fetchPlaylists(aliceAccessToken))
+      .thenReturn(Future.successful(Seq(alicePlaylist)))
+    when(spotifyContentProvider.fetchPlaylist(alicePlaylistUri, aliceAccessToken))
+      .thenReturn(Future.successful(alicePlaylist))
+    when(spotifyContentProvider.fetchPlaylistTracks(alicePlaylistUri, aliceAccessToken))
+      .thenReturn(Future.successful(alicePlaylistTracks))
+    when(spotifyContentProvider
+      .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), invalidAccessToken))
+      .thenReturn(Future.failed(UserAuthTokenNotFound))
+    when(spotifyContentProvider
+      .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), aliceAccessToken))
+      .thenReturn(Future.successful(()))
+  }
 }

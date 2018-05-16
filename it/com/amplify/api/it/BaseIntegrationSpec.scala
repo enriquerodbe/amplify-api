@@ -7,6 +7,7 @@ import com.amplify.api.domain.models.Queue
 import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.it.fixtures.SpotifyContext
 import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
+import org.mockito.Mockito.reset
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -46,9 +47,14 @@ trait BaseIntegrationSpec
   override def beforeEach(): Unit = {
     app.actorSystem.actorSelection(s"/user/queue-command-router/*") ! SetState(Queue.empty)
     Evolutions.applyEvolutions(database)
+    mockSpotify()
   }
 
-  override def afterEach(): Unit = Evolutions.cleanupEvolutions(database)
+  override def afterEach(): Unit = {
+    Evolutions.cleanupEvolutions(database)
+    reset(spotifyContentProvider)
+    reset(spotifyAuthProvider)
+  }
 
   protected def findCommandProcessor(venueUid: Uid) = {
     val path = s"/user/queue-command-router/queue-command-processor-$venueUid"

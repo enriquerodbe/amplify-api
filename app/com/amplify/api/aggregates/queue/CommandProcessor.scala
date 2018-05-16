@@ -6,27 +6,23 @@ import com.amplify.api.aggregates.queue.Command._
 import com.amplify.api.aggregates.queue.CommandProcessor._
 import com.amplify.api.aggregates.queue.Event._
 import com.amplify.api.configuration.EnvConfig
-import com.amplify.api.daos.DbioRunner
-import com.amplify.api.domain.models.{Queue, Venue}
+import com.amplify.api.domain.models.Queue
+import com.amplify.api.domain.models.primitives.Uid
 import com.google.inject.assistedinject.Assisted
 import javax.inject.Inject
 import play.api.libs.concurrent.InjectedActorSupport
 import scala.concurrent.ExecutionContext
 
 class CommandProcessor @Inject()(
-    db: DbioRunner,
     envConfig: EnvConfig,
-    playbackNotifierFactory: PlaybackNotifier.Factory,
-    @Assisted venue: Venue)(
+    @Assisted venueUid: Uid)(
     implicit ec: ExecutionContext) extends PersistentActor with InjectedActorSupport {
 
-  override val persistenceId: String = s"queue-${venue.uid}"
+  override val persistenceId: String = s"queue-$venueUid"
 
   implicit val askTimeout = envConfig.defaultAskTimeout
 
   private var queue = Queue.empty
-
-  injectedChild(playbackNotifierFactory(venue), s"${venue.uid}-playback-notifier")
 
   override def receiveCommand: Receive = {
     case HandleCommand(command) ⇒
@@ -35,7 +31,7 @@ class CommandProcessor @Inject()(
       persistAll(events.toList) { event ⇒
         if (last.contains(event)) {
           queue = events.foldLeft(queue)(process)
-          context.system.eventStream.publish(QueueUpdated(venue, event, queue))
+          context.system.eventStream.publish(QueueUpdated(command.venue, event, queue))
           sender().!(())
         }
       }
@@ -79,7 +75,7 @@ class CommandProcessor @Inject()(
 object CommandProcessor {
 
   trait Factory {
-    def apply(venue: Venue): Actor
+    def apply(venueUid: Uid): Actor
   }
 
   sealed trait CommandProcessorProtocol
