@@ -8,7 +8,7 @@ import com.amplify.api.domain.models.primitives.{AuthorizationCode, Token}
 import com.amplify.api.domain.models.{AuthProviderType, AuthToken}
 import javax.inject.Inject
 import play.api.mvc.{AbstractController, ControllerComponents}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 // scalastyle:off public.methods.have.type
 class VenueAuthController @Inject()(
@@ -27,6 +27,6 @@ class VenueAuthController @Inject()(
   }
 
   def retrieveCurrent() = authenticatedVenue() { request ⇒
-    Future.successful(venueToVenueResponse(request.subject.venue))
+    venueAuthLogic.refreshToken(request.subject.venue).map(venueToVenueResponse)
   }
 }

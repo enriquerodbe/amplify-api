@@ -11,4 +11,6 @@ trait VenueAuthLogic {
   def signIn(authorizationCode: AuthToken[AuthorizationCode]): Future[Venue]
 
   def login(venueUid: Uid): Future[Option[Venue]]
+
+  def refreshToken(venue: Venue): Future[Venue]
 }

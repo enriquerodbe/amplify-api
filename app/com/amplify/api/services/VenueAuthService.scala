@@ -1,7 +1,7 @@
 package com.amplify.api.services
 
 import com.amplify.api.domain.models.primitives.AuthorizationCode
-import com.amplify.api.domain.models.{AuthToken, VenueData}
+import com.amplify.api.domain.models.{AuthToken, Venue, VenueData}
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
 
@@ -9,4 +9,6 @@ import scala.concurrent.Future
 trait VenueAuthService {
 
   def signIn(authorizationCode: AuthToken[AuthorizationCode]): Future[VenueData]
+
+  def refreshToken(venue: Venue): Future[Venue]
 }

@@ -16,4 +16,6 @@ class VenueAuthLogicImpl @Inject()(
   }
 
   override def login(venueUid: Uid): Future[Option[Venue]] = venueService.retrieve(venueUid)
+
+  override def refreshToken(venue: Venue): Future[Venue] = venueAuthService.refreshToken(venue)
 }

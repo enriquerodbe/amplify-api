@@ -7,12 +7,13 @@ import play.api.libs.json._
 object Venue extends DtosDefinition {
 
   implicit val venueResponseWrites: Writes[VenueResponse] = Json.writes[VenueResponse]
-  case class VenueResponse(name: String, uid: String) extends SuccessfulResponse {
+  case class VenueResponse(name: String, uid: String, accessToken: String)
+    extends SuccessfulResponse {
 
     override def toJson: JsValue = Json.toJson(this)
   }
   def venueToVenueResponse(venue: VenueModel): VenueResponse = {
-    VenueResponse(venue.name.value, venue.uid.value)
+    VenueResponse(venue.name.value, venue.uid.value, venue.accessToken.value)
   }
 
   case class VenueSignInRequest(code: String)

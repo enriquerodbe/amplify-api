@@ -51,7 +51,7 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
 
         await(controller.start()(fakeRequest().withAliceSession))
 
-        eventually(Timeout(2.seconds)) {
+        eventually(Timeout(3.seconds)) {
           val calls = order(spotifyContentProvider, spotifyAuthProvider, spotifyContentProvider)
           calls.verify(spotifyContentProvider)
             .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), invalidAccessToken)

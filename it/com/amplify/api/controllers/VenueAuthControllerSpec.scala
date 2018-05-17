@@ -3,6 +3,7 @@ package com.amplify.api.controllers
 import com.amplify.api.exceptions.{BadRequestException, UserAuthTokenNotFound}
 import com.amplify.api.it.fixtures.DbVenueFixture
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
+import org.mockito.Mockito.verify
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -61,6 +62,15 @@ class VenueAuthControllerSpec extends BaseIntegrationSpec with VenueRequests {
       val jsonResponse = contentAsJson(response)
       (jsonResponse \ "name").as[String] mustEqual aliceDbVenue.name.toString
       (jsonResponse \ "uid").as[String] must have size 8
+    }
+    "refresh access token" in new RetrieveCurrentFixture {
+      val response = controller.retrieveCurrent()(FakeRequest().withAliceSession)
+
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      val jsonResponse = contentAsJson(response)
+      (jsonResponse \ "access_token").as[String] mustEqual aliceAccessToken.value
+
+      verify(spotifyAuthProvider).refreshAccessToken(aliceRefreshToken)
     }
   }
 }
