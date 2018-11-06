@@ -3,7 +3,7 @@ package com.amplify.api.services
 import com.amplify.api.daos.{DbioRunner, VenueDao}
 import com.amplify.api.domain.models._
 import com.amplify.api.domain.models.primitives.{Access, Token, Uid}
-import com.amplify.api.services.converters.VenueConverter.{dbVenueToVenue, userDataToDbVenue}
+import com.amplify.api.services.converters.VenueConverter.{dbVenueToVenue, venueDataToDbVenue}
 import com.amplify.api.services.external.{ExternalAuthService, ExternalContentService}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,7 +20,7 @@ class VenueServiceImpl @Inject()(
   }
 
   override def retrieveOrCreate(venueData: VenueData): Future[Venue] = {
-    db.run(venueDao.retrieveOrCreate(userDataToDbVenue(venueData))).map(dbVenueToVenue)
+    db.run(venueDao.retrieveOrCreate(venueDataToDbVenue(venueData))).map(dbVenueToVenue)
   }
 
   override def retrievePlaylists(

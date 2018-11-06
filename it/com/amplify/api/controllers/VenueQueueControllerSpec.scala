@@ -36,11 +36,13 @@ class VenueQueueControllerSpec extends BaseIntegrationSpec with Inside with User
       val response = controller.start()(fakeRequest().withAliceSession)
       status(response) mustBe NO_CONTENT
     }
-    "call content provider" in new StartFixture {
+    "call content provider" in new StartFixture with Eventually {
       await(controller.start()(fakeRequest().withAliceSession))
 
-      verify(spotifyContentProvider, atLeastOnce())
-        .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), aliceAccessToken)
+      eventually(Timeout(3.seconds)) {
+        verify(spotifyContentProvider, atLeastOnce())
+          .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), aliceAccessToken)
+      }
     }
     "refresh tokens" when {
       "access token expires" in new StartFixture with Eventually {

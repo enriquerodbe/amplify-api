@@ -10,7 +10,7 @@ object VenueConverter {
     Venue(dbVenue.name, dbVenue.uid, dbVenue.identifier, dbVenue.refreshToken, dbVenue.accessToken)
   }
 
-  def userDataToDbVenue(venueData: VenueData): DbVenue = {
+  def venueDataToDbVenue(venueData: VenueData): DbVenue = {
     DbVenue(
       name = venueData.name,
       uid = Uid(),

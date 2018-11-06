@@ -24,7 +24,7 @@ class VenuePlaylistLogicImpl @Inject()(
   implicit val askTimeout = envConfig.defaultAskTimeout
 
   override def retrievePlaylists(venue: Venue): Future[Seq[PlaylistInfo]] = {
-    venueAuthService.withRefreshToken(venue)(venueService.retrievePlaylists(venue))
+    withRefreshToken(venue)(venueService.retrievePlaylists(venue))
   }
 
   override def retrieveCurrentPlaylist(uid: Uid): Future[Option[Playlist]] = {
@@ -46,7 +46,7 @@ class VenuePlaylistLogicImpl @Inject()(
     yield result
   }
 
-  private def withRefreshToken[T](venue: Venue)(f: Token[Access] ⇒ Future[T]) = {
+  private def withRefreshToken[T](venue: Venue)(f: Token[Access] ⇒ Future[T]): Future[T] = {
     venueAuthService.withRefreshToken(venue)(f)
   }
 }
