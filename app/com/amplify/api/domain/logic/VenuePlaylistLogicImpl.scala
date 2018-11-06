@@ -6,9 +6,9 @@ import com.amplify.api.aggregates.queue.Command.SetCurrentPlaylist
 import com.amplify.api.aggregates.queue.CommandRouter.{RetrieveQueue, RouteCommand}
 import com.amplify.api.configuration.EnvConfig
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.models.primitives.{Access, Token, Uid}
 import com.amplify.api.exceptions.VenueNotFoundByUid
-import com.amplify.api.services.VenueService
+import com.amplify.api.services.{VenueAuthService, VenueService}
 import com.amplify.api.utils.FutureUtils._
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,6 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class VenuePlaylistLogicImpl @Inject()(
     venueService: VenueService,
+    venueAuthService: VenueAuthService,
     @Named("queue-command-router") queueCommandRouter: ActorRef,
     envConfig: EnvConfig)(
     implicit ec: ExecutionContext) extends VenuePlaylistLogic {
@@ -23,7 +24,7 @@ class VenuePlaylistLogicImpl @Inject()(
   implicit val askTimeout = envConfig.defaultAskTimeout
 
   override def retrievePlaylists(venue: Venue): Future[Seq[PlaylistInfo]] = {
-    venueService.retrievePlaylists(venue)
+    venueAuthService.withRefreshToken(venue)(venueService.retrievePlaylists(venue))
   }
 
   override def retrieveCurrentPlaylist(uid: Uid): Future[Option[Playlist]] = {
@@ -38,10 +39,14 @@ class VenuePlaylistLogicImpl @Inject()(
       venue: Venue,
       playlistIdentifier: PlaylistIdentifier): Future[Unit] = {
     for {
-      playlist ← venueService.retrievePlaylist(venue, playlistIdentifier)
+      playlist ← withRefreshToken(venue)(venueService.retrievePlaylist(playlistIdentifier))
       command = SetCurrentPlaylist(venue, playlist)
       result ← (queueCommandRouter ? RouteCommand(command)).mapTo[Unit]
     }
     yield result
+  }
+
+  private def withRefreshToken[T](venue: Venue)(f: Token[Access] ⇒ Future[T]) = {
+    venueAuthService.withRefreshToken(venue)(f)
   }
 }

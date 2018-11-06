@@ -4,7 +4,7 @@ import com.amplify.api.daos.{DbioRunner, VenueDao}
 import com.amplify.api.domain.models.primitives._
 import com.amplify.api.domain.models.{AuthProviderIdentifier, AuthProviderType, AuthToken, Venue}
 import com.amplify.api.exceptions.UserAuthTokenNotFound
-import com.amplify.api.services.external.{ExternalAuthService, ExternalContentService}
+import com.amplify.api.services.external.ExternalAuthService
 import com.amplify.api.test.BaseUnitSpec
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import slick.dbio.DBIO
 
-class VenueServiceImplSpec extends BaseUnitSpec {
+class VenueAuthServiceImplSpec extends BaseUnitSpec {
 
   trait TestContext {
     val db = {
@@ -21,7 +21,6 @@ class VenueServiceImplSpec extends BaseUnitSpec {
       mock
     }
     val authService = strictMock[ExternalAuthService]
-    val contentService = strictMock[ExternalContentService]
     val venueDao = strictMock[VenueDao]
 
     val venue =
@@ -38,21 +37,21 @@ class VenueServiceImplSpec extends BaseUnitSpec {
     when(authService.refreshAccessToken(authToken)).thenReturn(Future.successful(accessToken))
     when(venueDao.updateAccessToken(venue, accessToken)).thenReturn(DBIO.successful(()))
 
-    val venueService = new VenueServiceImpl(db, authService, contentService, venueDao)
+    val venueAuthService = new VenueAuthServiceImpl(db, venueDao, authService)
   }
 
-  "VenueServiceImpl" should {
+  "VenueAuthServiceImpl" should {
     "refresh tokens" when {
       "access token not found" in new TestContext {
-        when(contentService.startPlayback(Seq.empty, venue.accessToken))
-            .thenReturn(Future.failed(UserAuthTokenNotFound))
-          when(contentService.startPlayback(Seq.empty, accessToken))
-            .thenReturn(Future.successful(()))
+        private def validation(token: Token[Access]) = {
+          if (token == accessToken) Future.successful(())
+          else Future.failed(UserAuthTokenNotFound)
+        }
 
-        await(venueService.startPlayback(venue, Seq.empty))
+        await(venueAuthService.withRefreshToken(venue)(validation))
 
-        verify(contentService).startPlayback(Seq.empty, venue.accessToken)
-        verify(contentService).startPlayback(Seq.empty, accessToken)
+        verify(authService).refreshAccessToken(authToken)
+        verify(venueDao).updateAccessToken(venue, accessToken)
       }
     }
   }

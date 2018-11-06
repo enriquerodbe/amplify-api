@@ -2,8 +2,7 @@ package com.amplify.api.services
 
 import com.amplify.api.daos.{DbioRunner, VenueDao}
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.{Access, Refresh, Token, Uid}
-import com.amplify.api.exceptions.UserAuthTokenNotFound
+import com.amplify.api.domain.models.primitives.{Access, Token, Uid}
 import com.amplify.api.services.converters.VenueConverter.{dbVenueToVenue, userDataToDbVenue}
 import com.amplify.api.services.external.{ExternalAuthService, ExternalContentService}
 import javax.inject.Inject
@@ -24,15 +23,17 @@ class VenueServiceImpl @Inject()(
     db.run(venueDao.retrieveOrCreate(userDataToDbVenue(venueData))).map(dbVenueToVenue)
   }
 
-  override def retrievePlaylists(venue: Venue): Future[Seq[PlaylistInfo]] = {
-    withRefreshToken(venue)(contentService.fetchPlaylists(venue.contentProviders, _))
+  override def retrievePlaylists(
+      venue: Venue)(
+      accessToken: Token[Access]): Future[Seq[PlaylistInfo]] = {
+    contentService.fetchPlaylists(venue.contentProviders, accessToken)
   }
 
   override def retrievePlaylist(
-      venue: Venue,
-      identifier: PlaylistIdentifier): Future[Playlist] = {
-    val eventualPlaylistInfo = retrievePlaylistInfo(venue, identifier)
-    val eventualPlaylistTracks = retrievePlaylistTracks(venue, identifier)
+      identifier: PlaylistIdentifier)(
+      accessToken: Token[Access]): Future[Playlist] = {
+    val eventualPlaylistInfo = retrievePlaylistInfo(identifier)(accessToken)
+    val eventualPlaylistTracks = retrievePlaylistTracks(identifier)(accessToken)
     for {
       playlistInfo ← eventualPlaylistInfo
       playlistTracks ← eventualPlaylistTracks
@@ -41,31 +42,18 @@ class VenueServiceImpl @Inject()(
   }
 
   private def retrievePlaylistInfo(
-      venue: Venue,
-      playlistIdentifier: PlaylistIdentifier): Future[PlaylistInfo] = {
-    withRefreshToken(venue)(contentService.fetchPlaylist(playlistIdentifier, _))
+      playlistIdentifier: PlaylistIdentifier)(
+      accessToken: Token[Access]): Future[PlaylistInfo] = {
+    contentService.fetchPlaylist(playlistIdentifier, accessToken)
   }
 
   private def retrievePlaylistTracks(
-      venue: Venue,
-      playlistIdentifier: PlaylistIdentifier): Future[Seq[Track]] = {
-    withRefreshToken(venue)(contentService.fetchPlaylistTracks(playlistIdentifier, _))
+      playlistIdentifier: PlaylistIdentifier)(
+      accessToken: Token[Access]): Future[Seq[Track]] = {
+    contentService.fetchPlaylistTracks(playlistIdentifier, accessToken)
   }
 
-  override def startPlayback(venue: Venue, tracks: Seq[TrackIdentifier]): Future[Unit] = {
-    withRefreshToken(venue)(contentService.startPlayback(tracks, _))
-  }
-
-  private def withRefreshToken[T](venue: Venue)(f: Token[Access] ⇒ Future[T]): Future[T] = {
-    f(venue.accessToken).recoverWith {
-      case UserAuthTokenNotFound ⇒
-        val refreshToken = AuthToken[Refresh](venue.identifier.authProvider, venue.refreshToken)
-        for {
-          accessToken ← authService.refreshAccessToken(refreshToken)
-          _ ← db.run(venueDao.updateAccessToken(venue, accessToken))
-          result ← f(accessToken)
-        }
-        yield result
-    }
-  }
+  override def startPlayback(
+      tracks: Seq[TrackIdentifier])(
+      accessToken: Token[Access]): Future[Unit] = contentService.startPlayback(tracks, accessToken)
 }

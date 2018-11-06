@@ -1,7 +1,7 @@
 package com.amplify.api.services
 
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.models.primitives.{Access, Token, Uid}
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
 
@@ -12,9 +12,9 @@ trait VenueService {
 
   def retrieveOrCreate(venueData: VenueData): Future[Venue]
 
-  def retrievePlaylists(venue: Venue): Future[Seq[PlaylistInfo]]
+  def retrievePlaylists(venue: Venue)(accessToken: Token[Access]): Future[Seq[PlaylistInfo]]
 
-  def retrievePlaylist(venue: Venue, identifier: PlaylistIdentifier): Future[Playlist]
+  def retrievePlaylist(identifier: PlaylistIdentifier)(accessToken: Token[Access]): Future[Playlist]
 
-  def startPlayback(venue: Venue, tracks: Seq[TrackIdentifier]): Future[Unit]
+  def startPlayback(tracks: Seq[TrackIdentifier])(accessToken: Token[Access]): Future[Unit]
 }

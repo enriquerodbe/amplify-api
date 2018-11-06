@@ -1,8 +1,9 @@
 package com.amplify.api.services
 
 import com.amplify.api.daos.{DbioRunner, VenueDao}
-import com.amplify.api.domain.models.primitives.{AuthorizationCode, Refresh}
+import com.amplify.api.domain.models.primitives.{Access, AuthorizationCode, Refresh, Token}
 import com.amplify.api.domain.models.{AuthToken, Venue, VenueData}
+import com.amplify.api.exceptions.UserAuthTokenNotFound
 import com.amplify.api.services.external.ExternalAuthService
 import com.amplify.api.services.external.models.RefreshTokens
 import javax.inject.Inject
@@ -29,5 +30,12 @@ class VenueAuthServiceImpl @Inject()(
       _ ← db.run(venueDao.updateAccessToken(venue, accessToken))
     }
     yield venue.copy(accessToken = accessToken)
+  }
+
+  override def withRefreshToken[T](venue: Venue)(f: Token[Access] ⇒ Future[T]): Future[T] = {
+    f(venue.accessToken).recoverWith {
+      case UserAuthTokenNotFound ⇒
+        refreshToken(venue).flatMap(refreshedVenue ⇒ f(refreshedVenue.accessToken))
+    }
   }
 }
