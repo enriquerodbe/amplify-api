@@ -2,4 +2,3 @@ project/project
 target
 test
 it
-conf/*.local.*

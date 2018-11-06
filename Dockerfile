@@ -1,4 +1,4 @@
-FROM enriquerodbe/sbt-play:1.1.2_2.6.13 as dist
+FROM enriquerodbe/sbt-play:2.12.7_1.2.6_2.6.20 as dist
 ARG version=1.0-SNAPSHOT
 COPY . /dist
 WORKDIR /dist

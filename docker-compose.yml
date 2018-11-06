@@ -1,7 +1,7 @@
 version: '2'
 services:
   swagger-ui:
-    image: swaggerapi/swagger-ui:v3.0.5
+    image: swaggerapi/swagger-ui:v3.19.5
     ports:
       - "8082:8080"
     environment:
