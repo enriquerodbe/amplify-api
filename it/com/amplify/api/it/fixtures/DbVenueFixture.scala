@@ -1,9 +1,8 @@
 package com.amplify.api.it.fixtures
 
-import com.amplify.api.daos.models.DbVenue
-import com.amplify.api.daos.schema.VenuesTable
 import com.amplify.api.domain.models.AuthProviderType.Spotify
 import com.amplify.api.domain.models.primitives.{Id, Name}
+import com.amplify.api.domain.venue.{DbVenue, VenuesTable}
 
 trait DbVenueFixture extends BaseDbFixture with CommonData with VenuesTable {
 

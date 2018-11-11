@@ -48,22 +48,22 @@ lazy val `amplify-api` = (project in file("."))
   .enablePlugins(PlayScala, SwaggerPlugin)
 
 // Swagger
-swaggerDomainNameSpaces := Seq("com.amplify.api.controllers.dtos")
+swaggerDomainNameSpaces := Seq("com.amplify.api.shared.controllers.dtos")
 
 // Integration tests
 fork in IntegrationTest := true
 javaOptions in IntegrationTest += "-Dconfig.file=it/conf/application.test.conf"
 
 // Scoverage
-coverageMinimum := 71
+coverageMinimum := 72
 coverageFailOnMinimum := true
 lazy val coverageExcludedPackagesSeq = Seq(
   "<empty>",
   "Reverse.*",
   "router",
-  "users",
+  "coins",
   "venues\\..*",
-  "com.amplify.api.aggregates.queue.serialization")
+  "com.amplify.api.domain.queue.serialization")
 coverageExcludedPackages := coverageExcludedPackagesSeq.mkString(";")
 
 // Scalastyle
@@ -85,4 +85,4 @@ PB.targets in Compile := Seq(
   scalapb.gen(flatPackage = true) -> (sourceManaged in Compile).value
 )
 PB.protoSources in Compile :=
-  Seq(file("app/com/amplify/api/aggregates/queue/serialization/protobuf"))
+  Seq(file("app/com/amplify/api/domain/queue/serialization/protobuf"))

@@ -1,7 +1,7 @@
 package com.amplify.api.domain.models
 
 import com.amplify.api.domain.models.ContentProvider.ContentProvider
-import com.amplify.api.domain.models.primitives._
+import com.amplify.api.domain.models.primitives.{Access, Refresh, Token, _}
 
 case class Venue(
     name: Name,

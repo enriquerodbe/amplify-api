@@ -1,12 +1,13 @@
 package com.amplify.api.it.fixtures
 
-import com.amplify.api.controllers.auth.AuthHeadersUtil
+import com.amplify.api.domain.coin.CoinDeadboltHandler.COIN_PARAM
 import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
 import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
-import com.amplify.api.exceptions.UserAuthTokenNotFound
-import com.amplify.api.services.external.models._
-import com.amplify.api.services.external.spotify.Dtos._
-import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
+import com.amplify.api.domain.venue.auth.AuthHeaders
+import com.amplify.api.shared.exceptions.UserAuthTokenNotFound
+import com.amplify.api.shared.services.external.models._
+import com.amplify.api.shared.services.external.spotify.Dtos._
+import com.amplify.api.shared.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
 import org.mockito.Mockito.{RETURNS_SMART_NULLS, when, withSettings}
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.FakeRequest
@@ -21,7 +22,7 @@ trait SpotifyContext extends CommonData with MockitoSugar {
 
   implicit class FakeRequestWithCookie[T](fakeRequest: FakeRequest[T]) {
 
-    def cookie(venueUid: String): (String, String) = AuthHeadersUtil.VENUE_UID → venueUid
+    def cookie(venueUid: String): (String, String) = AuthHeaders.VENUE_UID → venueUid
 
     def withSession(venueUid: String): FakeRequest[T] = fakeRequest.withSession(cookie(venueUid))
 
@@ -30,7 +31,7 @@ trait SpotifyContext extends CommonData with MockitoSugar {
 
   implicit class FakeRequestWithCoin[T](fakeRequest: FakeRequest[T]) {
 
-    def coinHeader(coin: String): (String, String) = AuthHeadersUtil.COIN_PARAM → coin
+    def coinHeader(coin: String): (String, String) = COIN_PARAM → coin
 
     def withCoin(coin: String): FakeRequest[T] = fakeRequest.withHeaders(coinHeader(coin))
 

@@ -6,12 +6,12 @@
 #      schema:
 #        type: array
 #        items:
-#          $ref: '#/definitions/com.amplify.api.controllers.dtos.Coin.CoinResponse'
+#          $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.CoinDtos.CoinResponse'
 #  parameters:
 #  - name: number
 #    in: body
 #    required: true
 #    schema:
-#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Coin.CreateCoinsRequest'
+#      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.CoinDtos.CreateCoinsRequest'
 ###
-POST    /me/coins    com.amplify.api.controllers.CoinController.createCoins()
+POST    /me/coins    com.amplify.api.domain.coin.CoinController.createCoins()

@@ -4,14 +4,14 @@
 #    200:
 #      description: success
 #      schema:
-#        $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueResponse'
+#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.VenueDtos.VenueResponse'
 #  parameters:
 #  - in: body
 #    required: true
 #    schema:
-#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueSignInRequest'
+#      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.VenueDtos.VenueSignInRequest'
 ###
-POST    /    com.amplify.api.controllers.VenueAuthController.signIn
+POST    /    com.amplify.api.domain.venue.auth.VenueAuthController.signIn
 
 ###
 #  summary: Retrieve the authenticated venue
@@ -19,6 +19,6 @@ POST    /    com.amplify.api.controllers.VenueAuthController.signIn
 #    200:
 #      description: success
 #      schema:
-#        $ref: '#/definitions/com.amplify.api.controllers.dtos.Venue.VenueResponse'
+#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.VenueDtos.VenueResponse'
 ###
-GET    /me    com.amplify.api.controllers.VenueAuthController.retrieveCurrent
+GET    /me    com.amplify.api.domain.venue.auth.VenueAuthController.retrieveCurrent

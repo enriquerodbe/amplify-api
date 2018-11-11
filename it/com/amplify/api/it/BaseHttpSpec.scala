@@ -1,12 +1,12 @@
 package com.amplify.api.it
 
+import com.amplify.api.shared.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
 import com.amplify.api.it.fixtures.SpotifyContext
-import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
 import org.mockito.Mockito.reset
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play.{PlaySpec, WsScalaTestClient}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import org.scalatestplus.play.{PlaySpec, WsScalaTestClient}
 import play.api.Application
 import play.api.db.DBApi
 import play.api.db.evolutions.Evolutions

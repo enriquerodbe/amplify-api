@@ -4,7 +4,7 @@
 #    200:
 #      description: success
 #      schema:
-#        $ref: '#/definitions/com.amplify.api.controllers.dtos.Coin.CoinStatusResponse'
+#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.CoinDtos.CoinStatusResponse'
 #  parameters:
 #  - name: coin
 #    description: Coin token
@@ -12,4 +12,4 @@
 #    required: true
 #    type: string
 ###
-GET    /    com.amplify.api.controllers.CoinController.coinStatus()
+GET    /    com.amplify.api.domain.coin.CoinController.coinStatus()

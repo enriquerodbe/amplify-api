@@ -1,7 +1,5 @@
 package com.amplify.api.domain.models
 
-import scala.language.implicitConversions
-
 object AuthProviderType extends Enumeration {
 
   type AuthProviderType = Value

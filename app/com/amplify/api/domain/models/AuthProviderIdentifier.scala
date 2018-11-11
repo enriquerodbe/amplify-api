@@ -2,7 +2,7 @@ package com.amplify.api.domain.models
 
 import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
 import com.amplify.api.domain.models.primitives.Identifier
-import com.amplify.api.exceptions.InvalidProviderIdentifier
+import com.amplify.api.shared.exceptions.InvalidProviderIdentifier
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 

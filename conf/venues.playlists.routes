@@ -6,9 +6,9 @@
 #      schema:
 #        type: array
 #        items:
-#          $ref: '#/definitions/com.amplify.api.controllers.dtos.Playlist.PlaylistResponse'
+#          $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
 ###
-GET    /me/playlists    com.amplify.api.controllers.VenuePlaylistController.retrievePlaylists
+GET    /me/playlists    com.amplify.api.domain.playlist.PlaylistController.retrievePlaylists
 
 ###
 #  summary: Retrieve the current playlist of the authenticated venue
@@ -16,11 +16,11 @@ GET    /me/playlists    com.amplify.api.controllers.VenuePlaylistController.retr
 #    200:
 #      description: success
 #      schema:
-#        $ref: '#/definitions/com.amplify.api.controllers.dtos.Playlist.PlaylistResponse'
+#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
 #    204:
 #      description: no current playlist set
 ###
-GET    /me/playlists/current    com.amplify.api.controllers.VenuePlaylistController.retrieveCurrentPlaylist()
+GET    /me/playlists/current    com.amplify.api.domain.playlist.PlaylistController.retrieveCurrentPlaylist
 
 ###
 #  summary: Retrieve the current playlist of a venue
@@ -28,7 +28,7 @@ GET    /me/playlists/current    com.amplify.api.controllers.VenuePlaylistControl
 #    200:
 #      description: success
 #      schema:
-#        $ref: '#/definitions/com.amplify.api.controllers.dtos.Playlist.PlaylistResponse'
+#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
 #    204:
 #      description: no current playlist set
 #  parameters:
@@ -38,7 +38,7 @@ GET    /me/playlists/current    com.amplify.api.controllers.VenuePlaylistControl
 #    required: true
 #    type: string
 ###
-GET    /:uid/playlists/current    com.amplify.api.controllers.VenuePlaylistController.retrieveVenueCurrentPlaylist(uid: String)
+GET    /:uid/playlists/current    com.amplify.api.domain.playlist.PlaylistController.retrieveVenueCurrentPlaylist(uid: String)
 
 ###
 #  summary: Set the current playlist of allowed tracks for the authenticated venue
@@ -50,9 +50,9 @@ GET    /:uid/playlists/current    com.amplify.api.controllers.VenuePlaylistContr
 #    in: body
 #    required: true
 #    schema:
-#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Playlist.PlaylistRequest'
+#      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistRequest'
 ###
-PUT    /me/playlists/current    com.amplify.api.controllers.VenuePlaylistController.setCurrentPlaylist
+PUT    /me/playlists/current    com.amplify.api.domain.playlist.PlaylistController.setCurrentPlaylist
 
 ### NoDocs ###
-GET /ws com.amplify.api.controllers.WebSocketController.connect
+GET /ws com.amplify.api.domain.venue.WebSocketController.connect

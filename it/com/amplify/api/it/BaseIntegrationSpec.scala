@@ -1,12 +1,12 @@
 package com.amplify.api.it
 
 import akka.pattern.ask
-import com.amplify.api.aggregates.queue.CommandProcessor.SetState
-import com.amplify.api.controllers.VenuePlaylistController
 import com.amplify.api.domain.models.Queue
 import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.playlist.PlaylistController
+import com.amplify.api.domain.queue.CommandProcessor.SetState
+import com.amplify.api.shared.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
 import com.amplify.api.it.fixtures.SpotifyContext
-import com.amplify.api.services.external.spotify.{SpotifyAuthProvider, SpotifyContentProvider}
 import org.mockito.Mockito.reset
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
@@ -62,7 +62,7 @@ trait BaseIntegrationSpec
   }
 
   protected def initQueue(venueUid: Uid, queue: Queue) = {
-    await(instanceOf[VenuePlaylistController]
+    await(instanceOf[PlaylistController]
       .retrieveVenueCurrentPlaylist(venueUid.value)(FakeRequest().withAliceSession.withValidCoin))
     val processor = findCommandProcessor(venueUid)
     await((processor ? SetState(queue)).mapTo[Unit])

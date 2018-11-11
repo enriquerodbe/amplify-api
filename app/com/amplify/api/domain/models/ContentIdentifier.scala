@@ -4,7 +4,7 @@ import com.amplify.api.domain.models.ContentProvider.ContentProvider
 import com.amplify.api.domain.models.ContentType.ContentType
 import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
 import com.amplify.api.domain.models.primitives.Identifier
-import com.amplify.api.exceptions.InvalidProviderIdentifier
+import com.amplify.api.shared.exceptions.InvalidProviderIdentifier
 import scala.util.{Failure, Success, Try}
 
 sealed trait ContentIdentifier {

@@ -1,7 +1,7 @@
 package com.amplify.api.domain.models
 
 import com.amplify.api.domain.models.primitives.Uid
-import com.amplify.api.exceptions.InvalidCoinToken
+import com.amplify.api.shared.exceptions.InvalidCoinToken
 import scala.util.{Failure, Random, Success, Try}
 
 case class CoinToken private (venueUid: Uid, token: String) {

@@ -1,7 +1,6 @@
 package com.amplify.api.it.fixtures
 
-import com.amplify.api.daos.models.DbCoin
-import com.amplify.api.daos.schema.CoinsTable
+import com.amplify.api.domain.coin.{CoinsTable, DbCoin}
 import com.amplify.api.domain.models.CoinToken
 import com.amplify.api.domain.models.primitives.Id
 

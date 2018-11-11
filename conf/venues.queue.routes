@@ -4,9 +4,9 @@
 #    200:
 #      description: success
 #      schema:
-#        $ref: '#/definitions/com.amplify.api.controllers.dtos.Queue.QueueResponse'
+#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.QueueDtos.QueueResponse'
 ###
-GET    /me/queue    com.amplify.api.controllers.VenueQueueController.retrieveQueue
+GET    /me/queue    com.amplify.api.domain.queue.QueueController.retrieveQueue
 
 
 ###
@@ -15,7 +15,7 @@ GET    /me/queue    com.amplify.api.controllers.VenueQueueController.retrieveQue
 #    204:
 #      description: success
 ###
-PUT    /me/queue/start    com.amplify.api.controllers.VenueQueueController.start
+PUT    /me/queue/start    com.amplify.api.domain.queue.QueueController.start
 
 
 ###
@@ -24,7 +24,7 @@ PUT    /me/queue/start    com.amplify.api.controllers.VenueQueueController.start
 #    204:
 #      description: success
 ###
-PUT    /me/queue/skip    com.amplify.api.controllers.VenueQueueController.skip
+PUT    /me/queue/skip    com.amplify.api.domain.queue.QueueController.skip
 
 
 ###
@@ -33,7 +33,7 @@ PUT    /me/queue/skip    com.amplify.api.controllers.VenueQueueController.skip
 #    204:
 #      description: success
 ###
-PUT    /me/queue/finish    com.amplify.api.controllers.VenueQueueController.finish
+PUT    /me/queue/finish    com.amplify.api.domain.queue.QueueController.finish
 
 ###
 #  summary: Add a track to a venue's queue
@@ -50,6 +50,6 @@ PUT    /me/queue/finish    com.amplify.api.controllers.VenueQueueController.fini
 #    in: body
 #    required: true
 #    schema:
-#      $ref: '#/definitions/com.amplify.api.controllers.dtos.Queue.AddTrackRequest'
+#      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.QueueDtos.AddTrackRequest'
 ###
-POST    /:uid/queue    com.amplify.api.controllers.VenueQueueController.addTrack(uid: String)
+POST    /:uid/queue    com.amplify.api.domain.queue.QueueController.addTrack(uid: String)
