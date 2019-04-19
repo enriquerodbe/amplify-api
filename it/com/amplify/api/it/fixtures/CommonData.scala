@@ -20,7 +20,7 @@ trait CommonData {
   val invalidAuthCode = Token[AuthorizationCode]("invalid-auth-code")
 
   val validDbCoinId = 1L
-  val validCoinTokenStr = "valid_coin123456"
+  val validCoinCodeStr = "valid_coin123456"
 
   val bobDbUserId = 2L
   val bobSpotifyId = "bob-spotify-id"

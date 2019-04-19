@@ -11,20 +11,20 @@ import scala.concurrent.ExecutionContext
 // scalastyle:off public.methods.have.type
 class VenueAuthController @Inject()(
     cc: ControllerComponents,
-    venueAuthLogic: VenueAuthLogic,
+    venueAuthService: VenueAuthService,
     val actionBuilder: ActionBuilders)(
     implicit ec: ExecutionContext) extends AbstractController(cc) with VenueAuthRequests {
 
   def signIn = Action.async(parse.json[VenueSignInRequest]) { request ⇒
     val authorizationCode =
       AuthToken(AuthProviderType.Spotify, Token[AuthorizationCode](request.body.code))
-    val eventualVenue = venueAuthLogic.signIn(authorizationCode)
+    val eventualVenue = venueAuthService.signIn(authorizationCode)
     eventualVenue.map { venue ⇒
       venueToVenueResponse(venue).withSession(AuthHeaders.VENUE_UID → venue.uid.value)
     }
   }
 
   def retrieveCurrent() = authenticatedVenue() { request ⇒
-    venueAuthLogic.refreshToken(request.subject.venue).map(venueToVenueResponse)
+    venueAuthService.refreshToken(request.subject.venue).map(venueToVenueResponse)
   }
 }

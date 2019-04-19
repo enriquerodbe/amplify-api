@@ -8,7 +8,7 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[VenueServiceImpl])
 trait VenueService {
 
-  def retrieve(uid: Uid): Future[Option[Venue]]
-
   def retrieveOrCreate(venueData: VenueData): Future[Venue]
+
+  def retrieve(uid: Uid): Future[Option[Venue]]
 }

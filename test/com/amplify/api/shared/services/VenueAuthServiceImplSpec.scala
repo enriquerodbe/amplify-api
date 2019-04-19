@@ -2,7 +2,7 @@ package com.amplify.api.shared.services
 
 import com.amplify.api.domain.models.primitives._
 import com.amplify.api.domain.models.{AuthProviderIdentifier, AuthProviderType, AuthToken, Venue}
-import com.amplify.api.domain.venue.VenueDao
+import com.amplify.api.domain.venue.{VenueDao, VenueService}
 import com.amplify.api.domain.venue.auth.{VenueAuthServiceImpl, VenueExternalAuthService}
 import com.amplify.api.shared.daos.DbioRunner
 import com.amplify.api.shared.exceptions.UserAuthTokenNotFound
@@ -21,6 +21,7 @@ class VenueAuthServiceImplSpec extends BaseUnitSpec {
       when(mock.run(any(classOf[DBIO[Unit]]))).thenReturn(Future.successful(()))
       mock
     }
+    val venueService = strictMock[VenueService]
     val authService = strictMock[VenueExternalAuthService]
     val venueDao = strictMock[VenueDao]
 
@@ -38,7 +39,7 @@ class VenueAuthServiceImplSpec extends BaseUnitSpec {
     when(authService.refreshAccessToken(authToken)).thenReturn(Future.successful(accessToken))
     when(venueDao.updateAccessToken(venue, accessToken)).thenReturn(DBIO.successful(()))
 
-    val venueAuthService = new VenueAuthServiceImpl(db, venueDao, authService)
+    val venueAuthService = new VenueAuthServiceImpl(db, venueService, venueDao, authService)
   }
 
   "VenueAuthServiceImpl" should {

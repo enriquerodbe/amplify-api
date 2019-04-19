@@ -1,40 +1,42 @@
 package com.amplify.api.domain.queue
 
-import akka.actor.Actor
-import akka.persistence.PersistentActor
+import akka.actor.{Actor, Stash}
 import com.amplify.api.domain.models.Queue
 import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.playlist.PlaylistService
 import com.amplify.api.domain.queue.Command._
 import com.amplify.api.domain.queue.CommandProcessor._
-import com.amplify.api.domain.queue.Event._
-import com.amplify.api.shared.configuration.EnvConfig
+import com.amplify.api.shared.daos.DbioRunner
 import com.google.inject.assistedinject.Assisted
 import javax.inject.Inject
 import play.api.libs.concurrent.InjectedActorSupport
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class CommandProcessor @Inject()(
-    envConfig: EnvConfig,
+    db: DbioRunner,
+    playlistService: PlaylistService,
+    queueEventDao: QueueEventDao,
     @Assisted venueUid: Uid)(
-    implicit ec: ExecutionContext) extends PersistentActor with InjectedActorSupport {
+    implicit ec: ExecutionContext) extends Actor with Stash with InjectedActorSupport {
 
-  override val persistenceId: String = s"queue-$venueUid"
-
-  implicit val askTimeout = envConfig.defaultAskTimeout
+  private lazy val eventStream = context.system.eventStream
 
   private var queue = Queue.empty
 
-  override def receiveCommand: Receive = {
+  override def receive: Receive = {
     case HandleCommand(command) ⇒
-      val events = createEvents(command)
-      val last = events.lastOption
-      persistAll(events.toList) { event ⇒
-        if (last.contains(event)) {
-          queue = events.foldLeft(queue)(process)
-          context.system.eventStream.publish(QueueUpdated(command.venue, event, queue))
-          sender().!(())
-        }
+      val commandSender = sender()
+      val event = createEvent(command)
+      val result = db.run(queueEventDao.create(event)).flatMap(_ ⇒ newState(queue, event))
+      result.onComplete {
+        case Failure(_) ⇒ self ! FinishedProcessing(queue)
+        case Success(newQueue) ⇒
+          self ! FinishedProcessing(newQueue)
+          eventStream.publish(QueueUpdated(event, newQueue))
+          commandSender.!(())
       }
+      context.become(processing)
 
     case RetrieveState ⇒ sender() ! queue
 
@@ -43,32 +45,56 @@ class CommandProcessor @Inject()(
       sender().!(())
   }
 
-  override def receiveRecover: Receive = {
-    case event: Event ⇒ queue = process(queue, event)
+  private def processing: Receive = {
+    case FinishedProcessing(newQueue) ⇒
+      queue = newQueue
+      unstashAll()
+      context.become(receive)
+
+    case SetState(newQueue) ⇒
+      queue = newQueue
+      sender().!(())
+
+    case _ ⇒ stash()
   }
 
-  private def createEvents(command: Command): Seq[Event] = command match {
-    case SetCurrentPlaylist(_, playlist) ⇒
-      val tracksEvents = playlist.tracks.map(VenueTrackAdded)
-      VenueTracksRemoved +: tracksEvents :+ CurrentPlaylistSet(playlist)
+  private def createEvent(command: Command): QueueEvent = command match {
+    case SetCurrentPlaylist(venue, playlist) ⇒ CurrentPlaylistSet(venue.uid, playlist)
 
-    case StartPlayback(_) ⇒ Seq(PlaybackStarted)
+    case StartPlayback(venue) ⇒ PlaybackStarted(venue.uid)
 
-    case SkipCurrentTrack(_) ⇒ Seq(CurrentTrackSkipped)
+    case SkipCurrentTrack(venue) ⇒ CurrentTrackSkipped(venue.uid)
 
-    case FinishCurrentTrack(_) ⇒ Seq(TrackFinished)
+    case FinishCurrentTrack(venue) ⇒ TrackFinished(venue.uid)
 
-    case AddTrack(_, coin, trackIdentifier) ⇒ Seq(UserTrackAdded(coin, trackIdentifier))
+    case AddTrack(venue, coin, trackIdentifier) ⇒
+      UserTrackAdded(venue.uid, coin.code, trackIdentifier)
   }
 
-  private def process(queue: Queue, event: Event): Queue = event match {
-    case VenueTracksRemoved ⇒ queue.removeVenueTracks()
-    case VenueTrackAdded(track) ⇒ queue.addVenueTrack(track)
-    case CurrentPlaylistSet(playlist) ⇒ queue.setCurrentPlaylist(playlist)
-    case PlaybackStarted ⇒ queue
-    case TrackFinished ⇒ queue.finishCurrentTrack()
-    case UserTrackAdded(_, identifier) ⇒ queue.addUserTrack(identifier)
-    case CurrentTrackSkipped ⇒ queue.skipCurrentTrack()
+  private def newState(queue: Queue, event: QueueEvent): Future[Queue] = event match {
+    case CurrentPlaylistSet(uid, playlistIdentifier) ⇒
+      playlistService.retrievePlaylist(uid, playlistIdentifier).map(queue.setCurrentPlaylist)
+
+    case _: PlaybackStarted ⇒ Future.successful(queue)
+
+    case _: TrackFinished ⇒ Future.successful(queue.finishCurrentTrack())
+
+    case UserTrackAdded(_, _, trackIdentifier) ⇒
+      Future.successful(queue.addUserTrack(trackIdentifier))
+
+    case _: CurrentTrackSkipped ⇒ Future.successful(queue.skipCurrentTrack())
+  }
+
+  override def preStart(): Unit = {
+    db.run(queueEventDao.retrieve(venueUid)).map { events ⇒
+      val initial = Future.successful(queue)
+      val computation = events.foldLeft(initial)((state, event) ⇒ state.flatMap(newState(_, event)))
+      computation.onComplete {
+        case Success(result) ⇒ self ! FinishedProcessing(result)
+        case Failure(_) ⇒ self ! FinishedProcessing(queue)
+      }
+    }
+    context.become(processing)
   }
 }
 
@@ -84,5 +110,8 @@ object CommandProcessor {
 
   case object RetrieveState extends CommandProcessorProtocol
 
+  private case class FinishedProcessing(queue: Queue) extends CommandProcessorProtocol
+
+  // For testing only
   case class SetState(queue: Queue) extends CommandProcessorProtocol
 }

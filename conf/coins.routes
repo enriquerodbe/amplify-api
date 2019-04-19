@@ -7,7 +7,7 @@
 #        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.CoinDtos.CoinStatusResponse'
 #  parameters:
 #  - name: coin
-#    description: Coin token
+#    description: Coin code
 #    in: header
 #    required: true
 #    type: string

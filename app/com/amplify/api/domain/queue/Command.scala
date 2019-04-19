@@ -1,6 +1,6 @@
 package com.amplify.api.domain.queue
 
-import com.amplify.api.domain.models.{CoinToken, Playlist, TrackIdentifier, Venue}
+import com.amplify.api.domain.models.{CoinCode, PlaylistIdentifier, TrackIdentifier, Venue}
 
 sealed trait Command {
 
@@ -9,7 +9,7 @@ sealed trait Command {
 
 object Command {
 
-  case class SetCurrentPlaylist(venue: Venue, playlist: Playlist) extends Command
+  case class SetCurrentPlaylist(venue: Venue, playlist: PlaylistIdentifier) extends Command
 
   case class StartPlayback(venue: Venue) extends Command
 
@@ -17,6 +17,6 @@ object Command {
 
   case class FinishCurrentTrack(venue: Venue) extends Command
 
-  case class AddTrack(venue: Venue, coinToken: CoinToken, trackIdentifier: TrackIdentifier)
+  case class AddTrack(venue: Venue, coinCode: CoinCode, trackIdentifier: TrackIdentifier)
     extends Command
 }

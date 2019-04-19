@@ -23,30 +23,32 @@ class CoinControllerSpec extends BaseIntegrationSpec with VenueRequests {
 
   "createCoins" should {
     "respond OK" in new CreateCoinsFixture {
-      val response = controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceSession)
+      val response =
+        controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceSession)
       status(response) mustEqual OK
     }
     "respond with coins" in new CreateCoinsFixture {
-      val response = controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceSession)
+      val response =
+        controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceSession)
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response).as[JsArray]
       jsonResponse.value.foreach { jsValue ⇒
         (jsValue \ "remaining").as[Int] mustBe 1
-        val token = (jsValue \ "token").as[String]
-        token must have size 25
-        token must startWith (s"$aliceVenueUid:")
+        val code = (jsValue \ "code").as[String]
+        code must have size 25
+        code must startWith (s"$aliceVenueUid:")
       }
     }
     "create coins" in new CreateCoinsFixture {
       await(controller.createCoins()(createCoinsRequest(validRequestNumber).withAliceSession))
 
-      val createdCoins = findCoins(aliceDbVenueId)
+      val createdCoins = findCoins(aliceVenueUid)
 
       createdCoins must have size validRequestNumber + 1
       forAll(createdCoins) { coin ⇒
-        coin.token.toString must have size 25
-        coin.token.toString must startWith (s"$aliceVenueUid:")
+        coin.coinCode.toString must have size 25
+        coin.coinCode.toString must startWith (s"$aliceVenueUid:")
         coin.maxUsages mustBe envConfig.coinsDefaultMaxUsages
       }
     }

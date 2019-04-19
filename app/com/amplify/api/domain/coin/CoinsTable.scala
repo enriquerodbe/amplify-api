@@ -1,26 +1,26 @@
 package com.amplify.api.domain.coin
 
-import com.amplify.api.domain.models.CoinToken
-import com.amplify.api.domain.models.primitives.Id
+import com.amplify.api.domain.models.CoinCode
+import com.amplify.api.domain.models.primitives.{Code, Id, Uid}
 import com.amplify.api.shared.daos.BaseTable
 
 trait CoinsTable extends BaseTable {
 
   import profile.api._
 
-  implicit val coinTokenType = {
-    MappedColumnType.base[CoinToken, String](_.toString, CoinToken.fromString(_).get)
+  implicit val coinCodeType = {
+    MappedColumnType.base[CoinCode, String](_.toString, CoinCode.fromString(_).get)
   }
 
   // scalastyle:off public.methods.have.type
   // scalastyle:off method.name
   class Coins(tag: Tag) extends Table[DbCoin](tag, "coins") {
     def id = column[Id]("id", O.PrimaryKey, O.AutoInc)
-    def venueId = column[Id]("venue_id")
-    def token = column[CoinToken]("token")
+    def venueUid = column[Uid]("venue_uid")
+    def code = column[Code]("code")
     def maxUsages = column[Int]("max_usages")
 
-    def * = (id, venueId, token, maxUsages) <> (DbCoin.tupled, DbCoin.unapply)
+    def * = (id, venueUid, code, maxUsages) <> (DbCoin.tupled, DbCoin.unapply)
   }
 
   lazy val coinsTable = TableQuery[Coins]

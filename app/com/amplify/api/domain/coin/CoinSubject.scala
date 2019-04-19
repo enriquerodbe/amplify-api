@@ -8,5 +8,5 @@ case class CoinSubject(
     roles: List[Role] = Nil,
     permissions: List[Permission] = Nil) extends Subject {
 
-  override def identifier: String = coin.token.toString
+  override def identifier: String = coin.code.toString
 }

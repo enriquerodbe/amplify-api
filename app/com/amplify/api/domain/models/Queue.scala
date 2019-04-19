@@ -8,11 +8,11 @@ case class Queue(
 
   def allItems: List[QueueItem] = pastItems ++ currentItem.toList ++ futureItems
 
-  def removeVenueTracks(): Queue = {
+  private def removeVenueTracks(): Queue = {
     copy(futureItems = futureItems.takeWhile(_.itemType == QueueItemType.User))
   }
 
-  def addVenueTrack(track: Track): Queue = {
+  private def addVenueTrack(track: Track): Queue = {
     val newItem = QueueItem(track, QueueItemType.Venue)
 
     currentItem match {
@@ -21,7 +21,12 @@ case class Queue(
     }
   }
 
-  def setCurrentPlaylist(playlist: Playlist): Queue = copy(currentPlaylist = Some(playlist))
+  def setCurrentPlaylist(playlist: Playlist): Queue = {
+    playlist
+        .tracks
+        .foldLeft(removeVenueTracks())(_.addVenueTrack(_))
+        .copy(currentPlaylist = Some(playlist))
+  }
 
   def finishCurrentTrack(): Queue = {
     copy(
@@ -43,7 +48,7 @@ case class Queue(
     result.getOrElse(this)
   }
 
-  def findTrack(identifier: TrackIdentifier): Option[Track] = {
+  private def findTrack(identifier: TrackIdentifier): Option[Track] = {
     currentPlaylist match {
       case Some(playlist) ⇒ playlist.findTrack(identifier)
       case _ ⇒ None

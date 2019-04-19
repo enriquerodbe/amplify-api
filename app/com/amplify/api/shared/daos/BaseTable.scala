@@ -1,8 +1,10 @@
 package com.amplify.api.shared.daos
 
-import com.amplify.api.domain.models.AuthProviderType
+import com.amplify.api.domain.models.{AuthProviderType, ContentIdentifier}
 import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
 import com.amplify.api.domain.models.primitives._
+import com.amplify.api.domain.queue.QueueEventType
+import com.amplify.api.domain.queue.QueueEventType.QueueEventType
 import java.sql.Timestamp
 import java.time.Instant
 import play.api.db.slick.HasDatabaseConfigProvider
@@ -31,4 +33,16 @@ trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
   implicit def tokenType[T <: TokenType] = {
     MappedColumnType.base[Token[T], String](_.value, Token.apply[T])
   }
+
+  implicit val contentIdentifierType = {
+    MappedColumnType.base[ContentIdentifier, String](
+      _.toString,
+      ContentIdentifier.fromString(_).get)
+  }
+
+  implicit val queueEventTypeType = {
+    MappedColumnType.base[QueueEventType, String](_.toString, QueueEventType.withName)
+  }
+
+  implicit val codeType = MappedColumnType.base[Code, String](_.value, Code.apply)
 }

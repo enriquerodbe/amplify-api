@@ -1,14 +1,14 @@
 package com.amplify.api.domain.playlist
 
-import com.amplify.api.domain.models.primitives.{Access, Token}
-import com.amplify.api.domain.models.{Playlist, PlaylistIdentifier, PlaylistInfo, Venue}
+import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.models.{Playlist, PlaylistIdentifier, PlaylistInfo}
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
 
 @ImplementedBy(classOf[PlaylistServiceImpl])
 trait PlaylistService {
 
-  def retrievePlaylists(venue: Venue)(accessToken: Token[Access]): Future[Seq[PlaylistInfo]]
+  def retrievePlaylists(venueUid: Uid): Future[Seq[PlaylistInfo]]
 
-  def retrievePlaylist(identifier: PlaylistIdentifier)(accessToken: Token[Access]): Future[Playlist]
+  def retrievePlaylist(venueUid: Uid, identifier: PlaylistIdentifier): Future[Playlist]
 }

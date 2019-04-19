@@ -1,5 +1,9 @@
-FROM enriquerodbe/sbt-play:2.12.7_1.2.6_2.6.20 as dist
+FROM mozilla/sbt:8u181_1.2.7 as dist
 ARG version=1.0-SNAPSHOT
+COPY build.sbt /dist/
+COPY project/ /dist/project/
+WORKDIR /dist
+RUN sbt update
 COPY . /dist
 WORKDIR /dist
 RUN sbt -Damplify.api.version=$version dist &&\

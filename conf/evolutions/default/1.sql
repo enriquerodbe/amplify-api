@@ -10,40 +10,28 @@ CREATE TABLE "venues" (
   "access_token" VARCHAR(255) NOT NULL,
   UNIQUE ("auth_provider", "auth_identifier"));
 
-CREATE TABLE "venues_journal" (
-  "ordering" BIGSERIAL,
-  "persistence_id" VARCHAR(255) NOT NULL,
-  "sequence_number" BIGINT NOT NULL,
-  "deleted" BOOLEAN DEFAULT FALSE,
-  "tags" VARCHAR(255) DEFAULT NULL,
-  "message" BYTEA NOT NULL,
-  "time" TIMESTAMP NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (persistence_id, sequence_number)
+CREATE TABLE "queue_events" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "venue_uid" CHAR(8) NOT NULL,
+  "event_type" VARCHAR(63) NOT NULL,
+  "coin_code" VARCHAR(255),
+  "content_identifier" VARCHAR(255),
+  "created_at" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE UNIQUE INDEX "venues_journal_ordering_idx" ON "venues_journal" ("ordering");
-
-CREATE TABLE "venues_snapshot" (
-  "persistence_id" VARCHAR(255) NOT NULL,
-  "sequence_number" BIGINT NOT NULL,
-  "created" BIGINT NOT NULL,
-  "snapshot" BYTEA NOT NULL,
-  "time" TIMESTAMP NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (persistence_id, sequence_number)
-);
+CREATE INDEX index_on_queue_events_venue_uid ON "queue_events" ("venue_uid");
 
 CREATE TABLE "coins" (
   "id" BIGSERIAL PRIMARY KEY,
-  "venue_id" BIGINT NOT NULL,
-  "token" VARCHAR(255) UNIQUE,
+  "venue_uid" CHAR(8) NOT NULL,
+  "code" VARCHAR(255) UNIQUE,
   "max_usages" SMALLINT,
-  "time" TIMESTAMP NOT NULL DEFAULT NOW()
+  "created_at" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 
 # --- !Downs
 
 DROP TABLE "venues";
-DROP TABLE "venues_journal";
-DROP TABLE "venues_snapshot";
+DROP TABLE "queue_events";
 DROP TABLE "coins";

@@ -8,7 +8,7 @@ import com.amplify.api.shared.controllers.dtos.QueueDtos.queueToQueueResponse
 class VenueNotifier(venue: Venue, webSocketListener: ActorRef) extends Actor {
 
   override def receive: Receive = {
-    case QueueUpdated(affectedVenue, _, queue) if affectedVenue.uid == venue.uid ⇒
+    case QueueUpdated(event, queue) if event.venueUid == venue.uid ⇒
       webSocketListener ! queueToQueueResponse(queue).toJson.toString()
   }
 

@@ -10,19 +10,19 @@ import scala.concurrent.ExecutionContext
 // scalastyle:off public.methods.have.type
 class CoinController @Inject()(
     cc: ControllerComponents,
-    coinLogic: CoinLogic,
+    coinService: CoinService,
     val actionBuilder: ActionBuilders)(
     implicit ec: ExecutionContext)
   extends AbstractController(cc) with CoinAuthRequests with VenueAuthRequests {
 
   def createCoins() = authenticatedVenue(parse.json[CreateCoinsRequest]) { request ⇒
-    coinLogic
+    coinService
       .createCoins(request.subject.venue, request.body.number)
       .map(_.map(coinToCoinResponse))
   }
 
   def coinStatus() = authenticatedCoin(parse.empty) { request ⇒
-    coinLogic
+    coinService
       .retrieveStatus(request.subject.coin)
       .map(coinStatusToCoinStatusResponse)
   }

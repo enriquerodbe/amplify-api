@@ -9,12 +9,12 @@ object CoinDtos extends DtosDefinition {
   case class CreateCoinsRequest(number: Int)
   implicit val createCoinsRequestReads: Reads[CreateCoinsRequest] = Json.reads[CreateCoinsRequest]
 
-  case class CoinResponse(token: String, remaining: Int) extends SuccessfulResponse {
+  case class CoinResponse(code: String, remaining: Int) extends SuccessfulResponse {
 
     override def toJson: JsValue = Json.toJson(this)
   }
   def coinToCoinResponse(coin: Coin): CoinResponse = {
-    CoinResponse(coin.token.toString, coin.remainingUsages)
+    CoinResponse(coin.code.toString, coin.remainingUsages)
   }
   implicit val coinResponseWrites: Writes[CoinResponse] = Json.writes[CoinResponse]
 

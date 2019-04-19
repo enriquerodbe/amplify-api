@@ -8,51 +8,7 @@
 #        items:
 #          $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
 ###
-GET    /me/playlists    com.amplify.api.domain.playlist.PlaylistController.retrievePlaylists
-
-###
-#  summary: Retrieve the current playlist of the authenticated venue
-#  responses:
-#    200:
-#      description: success
-#      schema:
-#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
-#    204:
-#      description: no current playlist set
-###
-GET    /me/playlists/current    com.amplify.api.domain.playlist.PlaylistController.retrieveCurrentPlaylist
-
-###
-#  summary: Retrieve the current playlist of a venue
-#  responses:
-#    200:
-#      description: success
-#      schema:
-#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
-#    204:
-#      description: no current playlist set
-#  parameters:
-#  - name: coin
-#    description: Coin token
-#    in: header
-#    required: true
-#    type: string
-###
-GET    /:uid/playlists/current    com.amplify.api.domain.playlist.PlaylistController.retrieveVenueCurrentPlaylist(uid: String)
-
-###
-#  summary: Set the current playlist of allowed tracks for the authenticated venue
-#  responses:
-#    204:
-#      description: success
-#  parameters:
-#  - name: playlist
-#    in: body
-#    required: true
-#    schema:
-#      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistRequest'
-###
-PUT    /me/playlists/current    com.amplify.api.domain.playlist.PlaylistController.setCurrentPlaylist
+GET    /me/playlists    com.amplify.api.domain.venue.VenueController.retrievePlaylists
 
 ### NoDocs ###
 GET /ws com.amplify.api.domain.venue.WebSocketController.connect

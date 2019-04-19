@@ -8,10 +8,10 @@ case class InvalidProviderIdentifier(identifier: String)
     s"Invalid content provider identifier: $identifier")
     with ValidationException
 
-case class InvalidCoinToken(token: String)
+case class InvalidCoinCode(coinCode: String)
   extends BadRequestException(
-      AppExceptionCode.InvalidCoinToken,
-      s"Invalid coin token: $token")
+      AppExceptionCode.InvalidCoinCode,
+      s"Invalid coin code: $coinCode")
     with ValidationException
 
 case class InvalidCreateCoinsRequestedNumber(max: Int, number: Int)
