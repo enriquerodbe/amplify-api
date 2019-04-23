@@ -7,7 +7,7 @@ import com.amplify.api.shared.daos.DbioRunner
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class VenueServiceImpl @Inject()(
+private class VenueServiceImpl @Inject()(
     db: DbioRunner,
     venueDao: VenueDao)(
     implicit ec: ExecutionContext) extends VenueService {

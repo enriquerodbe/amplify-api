@@ -7,7 +7,7 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
 
-trait VenueAuthRequests { self: AbstractController ⇒
+private[venue] trait VenueAuthRequests { self: AbstractController ⇒
 
   def actionBuilder: ActionBuilders
 

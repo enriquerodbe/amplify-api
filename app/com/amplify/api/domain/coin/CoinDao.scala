@@ -6,7 +6,7 @@ import com.google.inject.ImplementedBy
 import slick.dbio.DBIO
 
 @ImplementedBy(classOf[CoinDaoImpl])
-private[coin] trait CoinDao {
+private trait CoinDao {
 
   def create(venueUid: Uid, number: Int): DBIO[Seq[DbCoin]]
 

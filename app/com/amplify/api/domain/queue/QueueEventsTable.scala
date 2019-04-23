@@ -5,7 +5,7 @@ import com.amplify.api.domain.models.primitives.{Code, Id, Uid}
 import com.amplify.api.domain.queue.QueueEventType.QueueEventType
 import com.amplify.api.shared.daos.BaseTable
 
-trait QueueEventsTable extends BaseTable {
+private trait QueueEventsTable extends BaseTable {
 
   import profile.api._
 
@@ -28,5 +28,4 @@ trait QueueEventsTable extends BaseTable {
   }
 
   lazy val queueEventsTable = TableQuery[QueueEvents]
-  lazy val insertQueueEventQuery = queueEventsTable.returning(queueEventsTable.map(_.id))
 }

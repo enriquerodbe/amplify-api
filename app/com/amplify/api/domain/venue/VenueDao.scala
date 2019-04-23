@@ -6,7 +6,7 @@ import com.google.inject.ImplementedBy
 import slick.dbio.DBIO
 
 @ImplementedBy(classOf[VenueDaoImpl])
-trait VenueDao {
+private trait VenueDao {
 
   def retrieve(uid: Uid): DBIO[Option[DbVenue]]
 

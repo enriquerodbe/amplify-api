@@ -9,7 +9,7 @@ import com.amplify.api.shared.services.external.models.RefreshTokens
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class VenueAuthServiceImpl @Inject()(
+private class VenueAuthServiceImpl @Inject()(
     db: DbioRunner,
     venueService: VenueService,
     venueDao: VenueDao,

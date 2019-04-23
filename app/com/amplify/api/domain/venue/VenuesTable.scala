@@ -12,7 +12,6 @@ trait VenuesTable extends BaseTable {
   // scalastyle:off public.methods.have.type
   // scalastyle:off method.name
   class Venues(tag: Tag) extends Table[DbVenue](tag, "venues") {
-    def id = column[Id]("id", O.PrimaryKey, O.AutoInc)
     def name = column[Name]("name")
     def uid = column[Uid]("uid")
     def authProviderType = column[AuthProviderType]("auth_provider")
@@ -25,11 +24,10 @@ trait VenuesTable extends BaseTable {
         ((AuthProviderIdentifier.apply _).tupled, AuthProviderIdentifier.unapply)
 
     def * =
-      (id, name, uid, authProviderIdentifier, refreshToken, accessToken) <>
+      (name, uid, authProviderIdentifier, refreshToken, accessToken) <>
         (DbVenue.tupled, DbVenue.unapply)
   }
 
   lazy val venuesTable = TableQuery[Venues]
-  lazy val insertVenuesQuery =
-    venuesTable.returning(venuesTable.map(_.id)).into((obj, id) ⇒ obj.copy(id = id))
+  lazy val insertVenuesQuery = venuesTable.returning(venuesTable)
 }

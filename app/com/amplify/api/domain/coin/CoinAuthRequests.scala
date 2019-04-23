@@ -6,7 +6,7 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
 
-trait CoinAuthRequests { self: AbstractController ⇒
+private[coin] trait CoinAuthRequests { self: AbstractController ⇒
 
   def actionBuilder: ActionBuilders
 

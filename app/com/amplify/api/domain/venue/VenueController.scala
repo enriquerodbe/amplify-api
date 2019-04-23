@@ -39,7 +39,7 @@ class VenueController @Inject()(
   def setCurrentPlaylist() = authenticatedVenue(parse.json[PlaylistRequest]) { request ⇒
     ContentIdentifier.fromString(request.body.identifier) match {
       case Success(identifier: PlaylistIdentifier) ⇒
-        queueService.setCurrentPlaylist(request.subject.venue, identifier).map(_ ⇒ NoContent)
+        queueService.setCurrentPlaylist(request.subject.venue.uid, identifier).map(_ ⇒ NoContent)
       case Success(otherIdentifier) ⇒
         Future.failed(InvalidProviderIdentifier(otherIdentifier.toString))
       case Failure(ex) ⇒
@@ -55,18 +55,18 @@ class VenueController @Inject()(
   }
 
   def retrieveQueue() = authenticatedVenue(parse.empty) { request ⇒
-    queueService.retrieveQueue(request.subject.venue).map(queueToQueueResponse)
+    queueService.retrieveQueue(request.subject.venue.uid).map(queueToQueueResponse)
   }
 
   def start() = authenticatedVenue(parse.empty) { request ⇒
-    queueService.start(request.subject.venue).map(_ ⇒ NoContent)
+    queueService.start(request.subject.venue.uid).map(_ ⇒ NoContent)
   }
 
   def skip() = authenticatedVenue(parse.empty) { request ⇒
-    queueService.skip(request.subject.venue).map(_ ⇒ NoContent)
+    queueService.skip(request.subject.venue.uid).map(_ ⇒ NoContent)
   }
 
   def finish() = authenticatedVenue(parse.empty) { request ⇒
-    queueService.finish(request.subject.venue).map(_ ⇒ NoContent)
+    queueService.finish(request.subject.venue.uid).map(_ ⇒ NoContent)
   }
 }

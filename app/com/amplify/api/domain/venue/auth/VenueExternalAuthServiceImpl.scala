@@ -7,7 +7,7 @@ import com.amplify.api.shared.services.external.spotify.SpotifyAuthProvider
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class VenueExternalAuthServiceImpl @Inject()(
+private class VenueExternalAuthServiceImpl @Inject()(
     spotifyAuthProvider: SpotifyAuthProvider)(
     implicit ec: ExecutionContext) extends VenueExternalAuthService {
 

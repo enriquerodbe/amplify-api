@@ -5,8 +5,6 @@ import scala.language.implicitConversions
 
 trait CommonData {
 
-  val aliceDbUserId = 1L
-  val aliceDbVenueId = 1L
   val aliceSpotifyId = "alice-spotify-id"
   val aliceVenueUid = "Fa84A3fl"
 
@@ -19,10 +17,8 @@ trait CommonData {
   val invalidAccessToken = Token[Access]("invalid-access-token")
   val invalidAuthCode = Token[AuthorizationCode]("invalid-auth-code")
 
-  val validDbCoinId = 1L
   val validCoinCodeStr = "valid_coin123456"
 
-  val bobDbUserId = 2L
   val bobSpotifyId = "bob-spotify-id"
 
   implicit def string2Name(str: String): Name = Name(str)

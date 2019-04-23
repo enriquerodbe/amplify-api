@@ -1,8 +1,8 @@
-package com.amplify.api.it.fixtures
+package com.amplify.api.domain.venue
 
 import com.amplify.api.domain.models.AuthProviderType.Spotify
-import com.amplify.api.domain.models.primitives.{Id, Name}
-import com.amplify.api.domain.venue.{DbVenue, VenuesTable}
+import com.amplify.api.domain.models.primitives.{Name, Uid}
+import com.amplify.api.it.fixtures.{BaseDbFixture, CommonData}
 
 trait DbVenueFixture extends BaseDbFixture with CommonData with VenuesTable {
 
@@ -10,7 +10,6 @@ trait DbVenueFixture extends BaseDbFixture with CommonData with VenuesTable {
 
   val aliceDbVenue =
     DbVenue(
-      aliceDbVenueId,
       "Alice's Bar",
       aliceVenueUid,
       Spotify → aliceSpotifyId,
@@ -21,8 +20,8 @@ trait DbVenueFixture extends BaseDbFixture with CommonData with VenuesTable {
   def findVenues(name: String): Seq[DbVenue] = {
     await(db.run(venuesTable.filter(_.name === Name(name)).result))
   }
-  def getVenue(id: Id): DbVenue = {
-    await(db.run(venuesTable.filter(_.id === id).result.head))
+  def getVenue(uid: Uid): DbVenue = {
+    await(db.run(venuesTable.filter(_.uid === uid).result.head))
   }
 
   insertVenue(aliceDbVenue)

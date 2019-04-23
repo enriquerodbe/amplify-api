@@ -5,7 +5,7 @@ import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import scala.concurrent.ExecutionContext
 
-class QueueEventDaoImpl @Inject()(
+private class QueueEventDaoImpl @Inject()(
     val dbConfigProvider: DatabaseConfigProvider)(
     implicit ec: ExecutionContext) extends QueueEventDao with QueueEventsTable {
 

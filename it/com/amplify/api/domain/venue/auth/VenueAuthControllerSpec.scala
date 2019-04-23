@@ -1,9 +1,8 @@
-package com.amplify.api.shared.controllers
+package com.amplify.api.domain.venue.auth
 
-import com.amplify.api.domain.venue.auth.VenueAuthController
-import com.amplify.api.shared.exceptions.{BadRequestException, UserAuthTokenNotFound}
-import com.amplify.api.it.fixtures.DbVenueFixture
+import com.amplify.api.domain.venue.DbVenueFixture
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
+import com.amplify.api.shared.exceptions.{BadRequestException, UserAuthTokenNotFound}
 import org.mockito.Mockito.verify
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.test.FakeRequest

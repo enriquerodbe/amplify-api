@@ -1,16 +1,16 @@
-package com.amplify.api.shared.controllers
+package com.amplify.api.domain.venue
 
 import akka.pattern.ask
+import com.amplify.api.domain.coin.DbCoinFixture
 import com.amplify.api.domain.models.Spotify.TrackUri
 import com.amplify.api.domain.models._
+import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.domain.queue.CommandProcessor.RetrieveState
-import com.amplify.api.domain.venue.VenueController
-import com.amplify.api.it.fixtures.{DbCoinFixture, DbVenueFixture}
 import com.amplify.api.it.{BaseIntegrationSpec, VenueRequests}
 import com.amplify.api.shared.configuration.EnvConfig
-import com.amplify.api.shared.exceptions.{InvalidCreateCoinsRequestedNumber, InvalidProviderIdentifier}
+import com.amplify.api.shared.exceptions.{InvalidCreateCoinsRequestedNumber, InvalidProviderIdentifier, UnexpectedResponse}
 import com.amplify.api.shared.services.external.spotify.Converters.{toModelPlaylist, toModelTrack}
-import org.mockito.Mockito.{atLeastOnce, verify, inOrder ⇒ order}
+import org.mockito.Mockito.{atLeastOnce, verify, when, inOrder ⇒ order}
 import org.scalatest.Inside
 import org.scalatest.Inspectors.forAll
 import org.scalatest.concurrent.Eventually
@@ -20,6 +20,7 @@ import play.api.libs.json.{JsArray, JsDefined}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 
 class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequests {
@@ -73,6 +74,39 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
         val requestNumber = envConfig.coinsCreateMax + 1
         intercept[InvalidCreateCoinsRequestedNumber] {
           await(controller.createCoins()(createCoinsRequest(requestNumber).withAliceSession))
+        }
+      }
+    }
+  }
+
+  class RetrievePlaylistsFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+      extends DbVenueFixture
+
+  "retrievePlaylists" should {
+    "respond OK" in new RetrievePlaylistsFixture {
+      val response = controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceSession)
+      status(response) mustEqual OK
+    }
+    "respond with playlists" in new RetrievePlaylistsFixture {
+      val response = controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceSession)
+
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      val jsonResponse = contentAsJson(response).head
+      (jsonResponse \ "name").as[String] mustEqual alicePlaylist.name.toString
+      (jsonResponse \ "identifier").as[String] mustEqual alicePlaylistUri.toString
+      val image = (jsonResponse \ "images").head
+      (image \ "url").as[String] mustEqual alicePlaylistImages.head.url
+      (image \ "height").as[Int] mustEqual alicePlaylistImages.head.height.get
+      (image \ "width").as[Int] mustEqual alicePlaylistImages.head.width.get
+    }
+
+    "fail" when {
+      "Spotify responds with unexpected response" in new RetrievePlaylistsFixture {
+        when(spotifyContentProvider.fetchPlaylists(aliceAccessToken))
+            .thenReturn(Future.failed(UnexpectedResponse("Testing!")))
+
+        intercept[UnexpectedResponse] {
+          await(controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceSession))
         }
       }
     }
@@ -247,7 +281,10 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
       "access token expires" in new StartFixture with Eventually {
         import profile.api._
         await(db.run {
-          venuesTable.filter(_.id === aliceDbVenue.id).map(_.accessToken).update(invalidAccessToken)
+          venuesTable
+              .filter(_.uid === Uid(aliceVenueUid))
+              .map(_.accessToken)
+              .update(invalidAccessToken)
         })
 
         await(controller.start()(FakeRequest().withBody(()).withAliceSession))

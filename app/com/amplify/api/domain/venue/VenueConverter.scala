@@ -3,7 +3,7 @@ package com.amplify.api.domain.venue
 import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.domain.models.{Venue, VenueData}
 
-object VenueConverter {
+private object VenueConverter {
 
   def dbVenueToVenue(dbVenue: DbVenue): Venue = {
     Venue(dbVenue.name, dbVenue.uid, dbVenue.identifier, dbVenue.refreshToken, dbVenue.accessToken)

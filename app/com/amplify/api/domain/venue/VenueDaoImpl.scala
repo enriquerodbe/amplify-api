@@ -8,7 +8,7 @@ import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import scala.concurrent.ExecutionContext
 
-class VenueDaoImpl @Inject()(
+private class VenueDaoImpl @Inject()(
     val dbConfigProvider: DatabaseConfigProvider,
     implicit val ec: ExecutionContext)
   extends VenueDao with VenuesTable {
@@ -40,10 +40,11 @@ class VenueDaoImpl @Inject()(
   }
 
   private def updateTokens(dbVenue: DbVenue): DBIO[DbVenue] = {
-    venuesTable.filter(_.id === dbVenue.id)
-      .map(r ⇒ r.refreshToken → r.accessToken)
-      .update(dbVenue.refreshToken → dbVenue.accessToken)
-      .map(_ ⇒ dbVenue)
+    venuesTable
+        .filter(_.uid === dbVenue.uid)
+        .map(r ⇒ r.refreshToken → r.accessToken)
+        .update(dbVenue.refreshToken → dbVenue.accessToken)
+        .map(_ ⇒ dbVenue)
   }
 
   private def create(dbVenue: DbVenue): DBIO[DbVenue] = insertVenuesQuery += dbVenue

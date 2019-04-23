@@ -5,7 +5,7 @@ import com.google.inject.ImplementedBy
 import slick.dbio.DBIO
 
 @ImplementedBy(classOf[QueueEventDaoImpl])
-trait QueueEventDao {
+private trait QueueEventDao {
 
   def create(event: QueueEvent): DBIO[Unit]
 

@@ -12,7 +12,7 @@ import com.amplify.api.utils.FutureUtils._
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CoinServiceImpl @Inject()(
+private class CoinServiceImpl @Inject()(
     db: DbioRunner,
     envConfig: EnvConfig,
     venueService: VenueService,
@@ -42,7 +42,7 @@ class CoinServiceImpl @Inject()(
     val venueUid = coin.code.venueUid
     for {
       venue ← venueService.retrieve(venueUid) ?! VenueNotFoundByUid(venueUid)
-      queue ← queueService.retrieveQueue(venue)
+      queue ← queueService.retrieveQueue(venueUid)
     }
     yield CoinStatus(coin, venue, queue.currentItem)
   }

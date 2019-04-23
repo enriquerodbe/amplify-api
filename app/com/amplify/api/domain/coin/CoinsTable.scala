@@ -15,15 +15,13 @@ trait CoinsTable extends BaseTable {
   // scalastyle:off public.methods.have.type
   // scalastyle:off method.name
   class Coins(tag: Tag) extends Table[DbCoin](tag, "coins") {
-    def id = column[Id]("id", O.PrimaryKey, O.AutoInc)
     def venueUid = column[Uid]("venue_uid")
     def code = column[Code]("code")
     def maxUsages = column[Int]("max_usages")
 
-    def * = (id, venueUid, code, maxUsages) <> (DbCoin.tupled, DbCoin.unapply)
+    def * = (venueUid, code, maxUsages) <> (DbCoin.tupled, DbCoin.unapply)
   }
 
   lazy val coinsTable = TableQuery[Coins]
-  lazy val insertCoinsQuery =
-    coinsTable.returning(coinsTable.map(_.id)).into((obj, id) ⇒ obj.copy(id = id))
+  lazy val insertCoinsQuery = coinsTable.returning(coinsTable)
 }

@@ -6,7 +6,7 @@ import com.amplify.api.shared.configuration.EnvConfig
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 
-private[coin] class CoinDaoImpl @Inject()(
+private class CoinDaoImpl @Inject()(
     val dbConfigProvider: DatabaseConfigProvider, envConfig: EnvConfig)
   extends CoinDao with CoinsTable {
 

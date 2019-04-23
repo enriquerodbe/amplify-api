@@ -3,7 +3,6 @@ package com.amplify.api.it.fixtures
 import com.amplify.api.domain.coin.CoinDeadboltHandler.COIN_PARAM
 import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
 import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
-import com.amplify.api.domain.venue.auth.AuthHeaders
 import com.amplify.api.shared.exceptions.UserAuthTokenNotFound
 import com.amplify.api.shared.services.external.models._
 import com.amplify.api.shared.services.external.spotify.Dtos._
@@ -22,7 +21,7 @@ trait SpotifyContext extends CommonData with MockitoSugar {
 
   implicit class FakeRequestWithCookie[T](fakeRequest: FakeRequest[T]) {
 
-    def cookie(venueUid: String): (String, String) = AuthHeaders.VENUE_UID → venueUid
+    def cookie(venueUid: String): (String, String) = "venue-uid" → venueUid
 
     def withSession(venueUid: String): FakeRequest[T] = fakeRequest.withSession(cookie(venueUid))
 

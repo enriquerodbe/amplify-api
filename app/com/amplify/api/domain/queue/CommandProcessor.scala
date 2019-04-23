@@ -13,7 +13,7 @@ import play.api.libs.concurrent.InjectedActorSupport
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class CommandProcessor @Inject()(
+private class CommandProcessor @Inject()(
     db: DbioRunner,
     playlistService: PlaylistService,
     queueEventDao: QueueEventDao,
@@ -59,16 +59,15 @@ class CommandProcessor @Inject()(
   }
 
   private def createEvent(command: Command): QueueEvent = command match {
-    case SetCurrentPlaylist(venue, playlist) ⇒ CurrentPlaylistSet(venue.uid, playlist)
+    case SetCurrentPlaylist(_, playlist) ⇒ CurrentPlaylistSet(venueUid, playlist)
 
-    case StartPlayback(venue) ⇒ PlaybackStarted(venue.uid)
+    case StartPlayback(_) ⇒ PlaybackStarted(venueUid)
 
-    case SkipCurrentTrack(venue) ⇒ CurrentTrackSkipped(venue.uid)
+    case SkipCurrentTrack(_) ⇒ CurrentTrackSkipped(venueUid)
 
-    case FinishCurrentTrack(venue) ⇒ TrackFinished(venue.uid)
+    case FinishCurrentTrack(_) ⇒ TrackFinished(venueUid)
 
-    case AddTrack(venue, coin, trackIdentifier) ⇒
-      UserTrackAdded(venue.uid, coin.code, trackIdentifier)
+    case AddTrack(_, coin, trackIdentifier) ⇒ UserTrackAdded(venueUid, coin.code, trackIdentifier)
   }
 
   private def newState(queue: Queue, event: QueueEvent): Future[Queue] = event match {

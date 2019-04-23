@@ -1,11 +1,9 @@
-package com.amplify.api.shared.controllers
+package com.amplify.api.domain.coin
 
-import akka.pattern.ask
-import com.amplify.api.domain.coin.CoinController
 import com.amplify.api.domain.models.Spotify.TrackUri
 import com.amplify.api.domain.models.{Playlist, Queue, Spotify}
-import com.amplify.api.domain.queue.CommandProcessor.RetrieveState
-import com.amplify.api.it.fixtures.{DbCoinFixture, DbVenueFixture}
+import com.amplify.api.domain.queue.QueueService
+import com.amplify.api.domain.venue.DbVenueFixture
 import com.amplify.api.it.{BaseIntegrationSpec, CoinRequests}
 import com.amplify.api.shared.services.external.spotify.Converters.{toModelPlaylist, toModelTrack}
 import play.api.db.slick.DatabaseConfigProvider
@@ -17,6 +15,7 @@ import play.mvc.Http
 class CoinControllerSpec extends BaseIntegrationSpec with CoinRequests {
 
   val controller = instanceOf[CoinController]
+  val queueService = instanceOf[QueueService]
   val commandProcessor = findCommandProcessor(aliceVenueUid)
 
   class CoinStatusFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
@@ -56,7 +55,7 @@ class CoinControllerSpec extends BaseIntegrationSpec with CoinRequests {
       val request = addTrackRequest(aliceVenueUid, trackId).withValidCoin
       await(controller.addTrack()(request))
 
-      val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
+      val queue = await(queueService.retrieveQueue(aliceVenueUid))
 
       val nextItem = queue.futureItems.head
       nextItem.isUserTrack mustBe true
