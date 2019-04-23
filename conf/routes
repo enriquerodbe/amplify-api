@@ -2,8 +2,5 @@
 GET    /assets/swagger.json    controllers.Assets.versioned(path="/public", file="swagger.json")
 
 -> /venues  venues.auth.Routes
--> /venues  venues.playlists.Routes
--> /venues  venues.queue.Routes
--> /venues  venues.coins.Routes
-
--> /coins  coins.Routes
+-> /venues  venues.Routes
+-> /coins   coins.Routes

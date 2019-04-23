@@ -9,6 +9,10 @@ trait QueueEventsTable extends BaseTable {
 
   import profile.api._
 
+  implicit val queueEventTypeType = {
+    MappedColumnType.base[QueueEventType, String](_.toString, QueueEventType.withName)
+  }
+
   // scalastyle:off public.methods.have.type
   // scalastyle:off method.name
   class QueueEvents(tag: Tag) extends Table[QueueEvent](tag, "queue_events") {

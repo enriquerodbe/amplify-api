@@ -10,7 +10,7 @@ case class Venue(
     refreshToken: Token[Refresh],
     accessToken: Token[Access]) {
 
-  def contentProviders: ContentProvider = ContentProvider.Spotify
+  val contentProviders: ContentProvider = ContentProvider.Spotify
 }
 
 case class VenueData(

@@ -12,4 +12,41 @@
 #    required: true
 #    type: string
 ###
-GET    /    com.amplify.api.domain.coin.CoinController.coinStatus()
+GET    /me    com.amplify.api.domain.coin.CoinController.coinStatus()
+
+###
+#  summary: Retrieve the current playlist of a venue
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
+#    204:
+#      description: no current playlist set
+#  parameters:
+#  - name: coin
+#    description: Coin code
+#    in: header
+#    required: true
+#    type: string
+###
+GET    /playlists/current    com.amplify.api.domain.coin.CoinController.retrieveCurrentPlaylist()
+
+###
+#  summary: Spend a coin to add a track to a venue's queue
+#  responses:
+#    204:
+#      description: success
+#  parameters:
+#  - name: coin
+#    description: Coin code
+#    in: header
+#    required: true
+#    type: string
+#  - name: track
+#    in: body
+#    required: true
+#    schema:
+#      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.QueueDtos.AddTrackRequest'
+###
+PUT    /me    com.amplify.api.domain.coin.CoinController.addTrack()

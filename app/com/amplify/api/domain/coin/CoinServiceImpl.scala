@@ -1,7 +1,8 @@
 package com.amplify.api.domain.coin
 
 import com.amplify.api.domain.coin.CoinConverter.dbCoinToCoin
-import com.amplify.api.domain.models.{Coin, CoinCode, CoinStatus, Venue}
+import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.models.{Coin, CoinCode, CoinStatus}
 import com.amplify.api.domain.queue.QueueService
 import com.amplify.api.domain.venue.VenueService
 import com.amplify.api.shared.configuration.EnvConfig
@@ -22,15 +23,15 @@ class CoinServiceImpl @Inject()(
   val maxCreatePerRequest = envConfig.coinsCreateMax
   implicit val defaultTimeout = envConfig.defaultAskTimeout
 
-  override def createCoins(venue: Venue, number: Int): Future[Seq[Coin]] = {
+  override def createCoins(venueUid: Uid, number: Int): Future[Seq[Coin]] = {
     if (number <= 0 || number > maxCreatePerRequest) {
       Future.failed(InvalidCreateCoinsRequestedNumber(maxCreatePerRequest, number))
     }
-    else create(venue, number)
+    else create(venueUid, number)
   }
 
-  private def create(venue: Venue, number: Int): Future[Seq[Coin]] = {
-    db.run(coinDao.create(venue.uid, number).map(_.map(dbCoinToCoin(_, Seq.empty))))
+  private def create(venueUid: Uid, number: Int): Future[Seq[Coin]] = {
+    db.run(coinDao.create(venueUid, number).map(_.map(dbCoinToCoin(_, Seq.empty))))
   }
 
   override def login(coinCode: CoinCode): Future[Option[Coin]] = {
