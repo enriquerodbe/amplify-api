@@ -83,11 +83,11 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
 
   "retrievePlaylists" should {
     "respond OK" in new RetrievePlaylistsFixture {
-      val response = controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceSession)
+      val response = controller.retrievePlaylists()(emptyRequest().withAliceSession)
       status(response) mustEqual OK
     }
     "respond with playlists" in new RetrievePlaylistsFixture {
-      val response = controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceSession)
+      val response = controller.retrievePlaylists()(emptyRequest().withAliceSession)
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response).head
@@ -105,9 +105,31 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
             .thenReturn(Future.failed(UnexpectedResponse("Testing!")))
 
         intercept[UnexpectedResponse] {
-          await(controller.retrievePlaylists()(FakeRequest().withBody(()).withAliceSession))
+          await(controller.retrievePlaylists()(emptyRequest().withAliceSession))
         }
       }
+    }
+  }
+
+  class RetrievePlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+      extends DbVenueFixture
+
+  "retrievePlaylist" should {
+    "respond OK" in new RetrievePlaylistFixture {
+      val response =
+        controller.retrievePlaylist(alicePlaylistUri.toString)(emptyRequest().withAliceSession)
+      status(response) mustEqual OK
+    }
+    "respond with some playlist" in new RetrievePlaylistFixture {
+      val response =
+        controller.retrievePlaylist(alicePlaylistUri.toString)(emptyRequest().withAliceSession)
+
+      contentType(response) must contain (Http.MimeTypes.JSON)
+      val jsonResponse = contentAsJson(response)
+      (jsonResponse \ "info" \ "name").as[String] mustEqual alicePlaylist.name
+      val playlistUri = Spotify.PlaylistUri(aliceSpotifyUser.id, alicePlaylist.id)
+      (jsonResponse \ "info" \ "identifier").as[String] mustEqual playlistUri.toString
+      (jsonResponse \ "tracks").as[JsArray].value mustNot be(empty)
     }
   }
 
@@ -213,7 +235,7 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
     "respond empty playlist" when {
       "no playlist was set" in new RetrieveCurrentPlaylistFixture {
         val response =
-          controller.retrieveCurrentPlaylist()(FakeRequest().withBody(()).withAliceSession)
+          controller.retrieveCurrentPlaylist()(emptyRequest().withAliceSession)
         status(response) mustEqual NO_CONTENT
       }
     }
@@ -223,8 +245,7 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
       val queue = Queue.empty.copy(currentPlaylist = Some(playlist))
       initQueue(aliceVenueUid, queue)
 
-      val response =
-        controller.retrieveCurrentPlaylist()(FakeRequest().withBody(()).withAliceSession)
+      val response = controller.retrieveCurrentPlaylist()(emptyRequest().withAliceSession)
 
       status(response) mustEqual OK
       contentType(response) must contain (Http.MimeTypes.JSON)
@@ -241,12 +262,12 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
 
   "retrieveQueue" should {
     "respond OK" in new RetrieveQueueFixture {
-      val response = controller.retrieveQueue()(FakeRequest().withBody(()).withAliceSession)
+      val response = controller.retrieveQueue()(emptyRequest().withAliceSession)
       status(response) mustBe OK
     }
 
     "respond with queue" in new RetrieveQueueFixture {
-      val response = controller.retrieveQueue()(FakeRequest().withBody(()).withAliceSession)
+      val response = controller.retrieveQueue()(emptyRequest().withAliceSession)
 
       contentType(response) must contain (Http.MimeTypes.JSON)
       val jsonResponse = contentAsJson(response)
@@ -265,11 +286,11 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
 
   "start" should {
     "respond No content" in new StartFixture {
-      val response = controller.start()(FakeRequest().withBody(()).withAliceSession)
+      val response = controller.start()(emptyRequest().withAliceSession)
       status(response) mustBe NO_CONTENT
     }
     "call content provider" in new StartFixture with Eventually {
-      await(controller.start()(FakeRequest().withBody(()).withAliceSession))
+      await(controller.start()(emptyRequest().withAliceSession))
 
       eventually(Timeout(3.seconds)) {
         verify(spotifyContentProvider, atLeastOnce())
@@ -286,7 +307,7 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
               .update(invalidAccessToken)
         })
 
-        await(controller.start()(FakeRequest().withBody(()).withAliceSession))
+        await(controller.start()(emptyRequest().withAliceSession))
 
         eventually(Timeout(3.seconds)) {
           val calls = order(spotifyContentProvider, spotifyAuthProvider, spotifyContentProvider)
@@ -304,11 +325,11 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
 
   "skip" should {
     "respond No content" in new SkipFixture {
-      val response = controller.skip()(FakeRequest().withBody(()).withAliceSession)
+      val response = controller.skip()(emptyRequest().withAliceSession)
       status(response) mustBe NO_CONTENT
     }
     "update queue current track" in new SkipFixture {
-      await(controller.skip()(FakeRequest().withBody(()).withAliceSession))
+      await(controller.skip()(emptyRequest().withAliceSession))
 
       val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 
@@ -324,11 +345,11 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
 
   "finish" should {
     "respond No content" in new FinishFixture {
-      val response = controller.finish()(FakeRequest().withBody(()).withAliceSession)
+      val response = controller.finish()(emptyRequest().withAliceSession)
       status(response) mustBe NO_CONTENT
     }
     "update queue current track" in new FinishFixture {
-      await(controller.finish()(FakeRequest().withBody(()).withAliceSession))
+      await(controller.finish()(emptyRequest().withAliceSession))
 
       val queue = await((commandProcessor ? RetrieveState).mapTo[Queue])
 

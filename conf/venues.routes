@@ -29,6 +29,16 @@ POST    /me/coins    com.amplify.api.domain.venue.VenueController.createCoins()
 GET    /me/playlists    com.amplify.api.domain.venue.VenueController.retrievePlaylists
 
 ###
+#  summary: Retrieve a playlist of the authenticated venue
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
+###
+GET    /me/playlists/:identifier    com.amplify.api.domain.venue.VenueController.retrievePlaylist(identifier: String)
+
+###
 #  summary: Set the current playlist of allowed tracks for the authenticated venue
 #  responses:
 #    204:

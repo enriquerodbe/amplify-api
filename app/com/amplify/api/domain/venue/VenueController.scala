@@ -36,10 +36,27 @@ class VenueController @Inject()(
     eventualPlaylists.map(_.map(playlistInfoToPlaylistInfoResponse))
   }
 
+  def retrievePlaylist(identifier: String) = authenticatedVenue(parse.empty) { request ⇒
+    withPlaylistIdentifier(identifier) { playlistIdentifier ⇒
+      val venueUid = request.subject.venue.uid
+      val eventualPlaylist = playlistService.retrievePlaylist(venueUid, playlistIdentifier)
+      eventualPlaylist.map(playlistToPlaylistResponse)
+    }
+  }
+
   def setCurrentPlaylist() = authenticatedVenue(parse.json[PlaylistRequest]) { request ⇒
-    ContentIdentifier.fromString(request.body.identifier) match {
-      case Success(identifier: PlaylistIdentifier) ⇒
-        queueService.setCurrentPlaylist(request.subject.venue.uid, identifier).map(_ ⇒ NoContent)
+    withPlaylistIdentifier(request.body.identifier) { playlistIdentifier ⇒
+      val venueUid = request.subject.venue.uid
+      queueService.setCurrentPlaylist(venueUid, playlistIdentifier).map(_ ⇒ NoContent)
+    }
+  }
+
+  private def withPlaylistIdentifier[T](
+      identifier: String)(
+      onSuccess: PlaylistIdentifier ⇒ Future[T]): Future[T] = {
+    ContentIdentifier.fromString(identifier) match {
+      case Success(playlistIdentifier: PlaylistIdentifier) ⇒
+        onSuccess(playlistIdentifier)
       case Success(otherIdentifier) ⇒
         Future.failed(InvalidProviderIdentifier(otherIdentifier.toString))
       case Failure(ex) ⇒

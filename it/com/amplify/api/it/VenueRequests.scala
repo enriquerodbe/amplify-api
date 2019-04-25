@@ -8,6 +8,8 @@ import play.api.test.FakeRequest
 
 trait VenueRequests {
 
+  def emptyRequest(): FakeRequest[Unit] = FakeRequest().withBody(())
+
   def venueRequest(code: Token[AuthorizationCode]): FakeRequest[VenueSignInRequest] = {
     FakeRequest().withBody(VenueSignInRequest(code.value))
   }
