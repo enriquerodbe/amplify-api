@@ -58,6 +58,6 @@ object QueueDtos extends DtosDefinition {
   }
   implicit val queueResponseWrites: Writes[QueueResponse] = Json.writes[QueueResponse]
 
-  case class AddTrackRequest(venueUid: String, identifier: String)
+  case class AddTrackRequest(identifier: String)
   implicit val addTrackRequestReads: Reads[AddTrackRequest] = Json.reads[AddTrackRequest]
 }

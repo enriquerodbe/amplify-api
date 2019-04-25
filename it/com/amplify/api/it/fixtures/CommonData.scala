@@ -17,7 +17,7 @@ trait CommonData {
   val invalidAccessToken = Token[Access]("invalid-access-token")
   val invalidAuthCode = Token[AuthorizationCode]("invalid-auth-code")
 
-  val validCoinCodeStr = "valid_coin123456"
+  val validCoinCodeStr = "CODE"
 
   val bobSpotifyId = "bob-spotify-id"
 

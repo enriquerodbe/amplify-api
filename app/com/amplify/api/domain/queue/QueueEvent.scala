@@ -1,14 +1,14 @@
 package com.amplify.api.domain.queue
 
-import com.amplify.api.domain.models.{CoinCode, ContentIdentifier, PlaylistIdentifier, TrackIdentifier}
 import com.amplify.api.domain.models.primitives.{Code, Uid}
+import com.amplify.api.domain.models.{ContentIdentifier, PlaylistIdentifier, TrackIdentifier}
 import com.amplify.api.domain.queue.QueueEventType.QueueEventType
 
 sealed trait QueueEvent {
 
   def venueUid: Uid
   def eventType: QueueEventType
-  def coinCode: Option[CoinCode]
+  def coinCode: Option[Code]
   def contentIdentifier: Option[ContentIdentifier]
 }
 
@@ -17,21 +17,21 @@ case class CurrentPlaylistSet(
     playlistIdentifier: PlaylistIdentifier) extends QueueEvent {
 
   override val eventType: QueueEventType = QueueEventType.CurrentPlaylistSet
-  override val coinCode: Option[CoinCode] = None
+  override val coinCode: Option[Code] = None
   override val contentIdentifier: Option[ContentIdentifier] = Some(playlistIdentifier)
 }
 
 case class PlaybackStarted(override val venueUid: Uid) extends QueueEvent {
 
   override val eventType: QueueEventType = QueueEventType.PlaybackStarted
-  override val coinCode: Option[CoinCode] = None
+  override val coinCode: Option[Code] = None
   override val contentIdentifier: Option[ContentIdentifier] = None
 }
 
 case class TrackFinished(override val venueUid: Uid) extends QueueEvent {
 
   override val eventType: QueueEventType = QueueEventType.TrackFinished
-  override val coinCode: Option[CoinCode] = None
+  override val coinCode: Option[Code] = None
   override val contentIdentifier: Option[ContentIdentifier] = None
 }
 
@@ -41,14 +41,14 @@ case class UserTrackAdded(
     trackIdentifier: TrackIdentifier) extends QueueEvent {
 
   override val eventType: QueueEventType = QueueEventType.UserTrackAdded
-  override val coinCode: Option[CoinCode] = Some(CoinCode(venueUid, code))
+  override val coinCode: Option[Code] = Some(code)
   override val contentIdentifier: Option[ContentIdentifier] = Some(trackIdentifier)
 }
 
 case class CurrentTrackSkipped(override val venueUid: Uid) extends QueueEvent {
 
   override def eventType: QueueEventType = QueueEventType.CurrentTrackSkipped
-  override def coinCode: Option[CoinCode] = None
+  override def coinCode: Option[Code] = None
   override def contentIdentifier: Option[ContentIdentifier] = None
 }
 
@@ -74,7 +74,7 @@ object QueueEvent {
     Some(
       dbQueueEvent.venueUid,
       dbQueueEvent.eventType,
-      dbQueueEvent.coinCode.map(_.code),
+      dbQueueEvent.coinCode,
       dbQueueEvent.contentIdentifier
     )
   }

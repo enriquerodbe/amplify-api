@@ -1,13 +1,13 @@
 package com.amplify.api.domain.coin
 
 import com.amplify.api.domain.coin.CoinConverter.dbCoinToCoin
-import com.amplify.api.domain.models.primitives.Uid
-import com.amplify.api.domain.models.{Coin, CoinCode, CoinStatus}
+import com.amplify.api.domain.models.primitives.{Code, Uid}
+import com.amplify.api.domain.models.{Coin, CoinStatus}
 import com.amplify.api.domain.queue.QueueService
 import com.amplify.api.domain.venue.VenueService
 import com.amplify.api.shared.configuration.EnvConfig
 import com.amplify.api.shared.daos.DbioRunner
-import com.amplify.api.shared.exceptions.{InvalidCreateCoinsRequestedNumber, VenueNotFoundByUid}
+import com.amplify.api.shared.exceptions.{CodeMatchesMultipleCoins, InvalidCreateCoinsRequestedNumber, VenueNotFoundByUid}
 import com.amplify.api.utils.FutureUtils._
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,12 +34,15 @@ private class CoinServiceImpl @Inject()(
     db.run(coinDao.create(venueUid, number).map(_.map(dbCoinToCoin(_, Seq.empty))))
   }
 
-  override def login(coinCode: CoinCode): Future[Option[Coin]] = {
-    db.run(coinDao.retrieve(coinCode).map(_.map(dbCoinToCoin(_, Seq.empty))))
+  override def login(code: Code): Future[Option[Coin]] = {
+    db.run(coinDao.retrieve(code)).flatMap {
+      case coins if coins.size > 1 ⇒ Future.failed(CodeMatchesMultipleCoins(code))
+      case coins ⇒ Future.successful(coins.headOption.map(dbCoinToCoin(_, Seq.empty)))
+    }
   }
 
   override def retrieveStatus(coin: Coin): Future[CoinStatus] = {
-    val venueUid = coin.code.venueUid
+    val venueUid = coin.venueUid
     for {
       venue ← venueService.retrieve(venueUid) ?! VenueNotFoundByUid(venueUid)
       queue ← queueService.retrieveQueue(venueUid)

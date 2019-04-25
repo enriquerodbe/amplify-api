@@ -1,7 +1,7 @@
 package com.amplify.api.domain.queue
 
-import com.amplify.api.domain.models.primitives.Uid
-import com.amplify.api.domain.models.{CoinCode, PlaylistIdentifier, TrackIdentifier}
+import com.amplify.api.domain.models.primitives.{Code, Uid}
+import com.amplify.api.domain.models.{PlaylistIdentifier, TrackIdentifier}
 
 sealed trait Command {
 
@@ -18,6 +18,6 @@ object Command {
 
   case class FinishCurrentTrack(venueUid: Uid) extends Command
 
-  case class AddTrack(venueUid: Uid, coinCode: CoinCode, trackIdentifier: TrackIdentifier)
+  case class AddTrack(venueUid: Uid, code: Code, trackIdentifier: TrackIdentifier)
     extends Command
 }

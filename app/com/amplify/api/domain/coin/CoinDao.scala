@@ -1,7 +1,6 @@
 package com.amplify.api.domain.coin
 
-import com.amplify.api.domain.models.CoinCode
-import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.models.primitives.{Code, Uid}
 import com.google.inject.ImplementedBy
 import slick.dbio.DBIO
 
@@ -10,5 +9,5 @@ private trait CoinDao {
 
   def create(venueUid: Uid, number: Int): DBIO[Seq[DbCoin]]
 
-  def retrieve(coinCode: CoinCode): DBIO[Option[DbCoin]]
+  def retrieve(code: Code): DBIO[Seq[DbCoin]]
 }

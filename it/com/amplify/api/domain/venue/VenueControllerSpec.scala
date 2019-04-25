@@ -48,8 +48,7 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
       jsonResponse.value.foreach { jsValue ⇒
         (jsValue \ "remaining").as[Int] mustBe 1
         val code = (jsValue \ "code").as[String]
-        code must have size 25
-        code must startWith (s"$aliceVenueUid:")
+        code must have size 4
       }
     }
     "create coins" in new CreateCoinsFixture {
@@ -59,8 +58,8 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
 
       createdCoins must have size validRequestNumber + 1
       forAll(createdCoins) { coin ⇒
-        coin.coinCode.toString must have size 25
-        coin.coinCode.toString must startWith (s"$aliceVenueUid:")
+        coin.code.toString must have size 4
+        coin.venueUid.toString must be (aliceVenueUid)
         coin.maxUsages mustBe envConfig.coinsDefaultMaxUsages
       }
     }

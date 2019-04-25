@@ -30,7 +30,7 @@ GET    /me    com.amplify.api.domain.coin.CoinController.coinStatus()
 #    required: true
 #    type: string
 ###
-GET    /playlists/current    com.amplify.api.domain.coin.CoinController.retrieveCurrentPlaylist()
+GET    /me/playlists/current    com.amplify.api.domain.coin.CoinController.retrieveCurrentPlaylist()
 
 ###
 #  summary: Spend a coin to add a track to a venue's queue

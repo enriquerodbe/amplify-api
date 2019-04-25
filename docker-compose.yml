@@ -9,7 +9,7 @@ services:
     depends_on:
       - app
   app:
-    image: registry.gitlab.com/amplifyuy/amplify-api:latest
+    image: amplify-api:test
     ports:
       - "9000:9000"
     environment:

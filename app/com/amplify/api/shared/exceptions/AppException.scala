@@ -36,6 +36,7 @@ object AppExceptionCode extends Enumeration {
     AuthenticationFailed,
     InvalidCoinCode,
     InvalidCreateCoinsRequestedNumber,
-    MissingCoin
+    MissingCoin,
+    CodeMatchesMultipleCoins
   = Value
 }

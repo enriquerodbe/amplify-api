@@ -1,16 +1,11 @@
 package com.amplify.api.domain.coin
 
-import com.amplify.api.domain.models.CoinCode
-import com.amplify.api.domain.models.primitives.{Code, Id, Uid}
+import com.amplify.api.domain.models.primitives.{Code, Uid}
 import com.amplify.api.shared.daos.BaseTable
 
 trait CoinsTable extends BaseTable {
 
   import profile.api._
-
-  implicit val coinCodeType = {
-    MappedColumnType.base[CoinCode, String](_.toString, CoinCode.fromString(_).get)
-  }
 
   // scalastyle:off public.methods.have.type
   // scalastyle:off method.name

@@ -8,7 +8,8 @@ CREATE TABLE "venues" (
   "auth_identifier" VARCHAR(255) NOT NULL,
   "refresh_token" VARCHAR(255) NOT NULL,
   "access_token" VARCHAR(255) NOT NULL,
-  UNIQUE ("auth_provider", "auth_identifier"));
+  UNIQUE ("auth_provider", "auth_identifier")
+);
 
 CREATE TABLE "queue_events" (
   "id" BIGSERIAL PRIMARY KEY,
@@ -26,7 +27,8 @@ CREATE TABLE "coins" (
   "venue_uid" CHAR(8) NOT NULL,
   "code" VARCHAR(255) UNIQUE,
   "max_usages" SMALLINT,
-  "created_at" TIMESTAMP NOT NULL DEFAULT NOW()
+  "created_at" TIMESTAMP NOT NULL DEFAULT NOW(),
+  UNIQUE ("venue_uid", "code")
 );
 
 

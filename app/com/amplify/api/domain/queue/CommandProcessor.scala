@@ -67,7 +67,7 @@ private class CommandProcessor @Inject()(
 
     case FinishCurrentTrack(_) ⇒ TrackFinished(venueUid)
 
-    case AddTrack(_, coin, trackIdentifier) ⇒ UserTrackAdded(venueUid, coin.code, trackIdentifier)
+    case AddTrack(_, code, trackIdentifier) ⇒ UserTrackAdded(venueUid, code, trackIdentifier)
   }
 
   private def newState(queue: Queue, event: QueueEvent): Future[Queue] = event match {

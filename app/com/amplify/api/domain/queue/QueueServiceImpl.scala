@@ -3,7 +3,7 @@ package com.amplify.api.domain.queue
 import akka.actor.ActorRef
 import akka.pattern.ask
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.models.primitives.{Code, Uid}
 import com.amplify.api.domain.queue.Command._
 import com.amplify.api.domain.queue.CommandRouter.{RetrieveQueue, RouteCommand}
 import com.amplify.api.shared.configuration.EnvConfig
@@ -47,8 +47,8 @@ private class QueueServiceImpl @Inject()(
 
   override def addTrack(
       venueUid: Uid,
-      coinCode: CoinCode,
+      code: Code,
       trackIdentifier: TrackIdentifier): Future[Unit] = {
-    (queueCommandRouter ? RouteCommand(AddTrack(venueUid, coinCode, trackIdentifier))).mapTo[Unit]
+    (queueCommandRouter ? RouteCommand(AddTrack(venueUid, code, trackIdentifier))).mapTo[Unit]
   }
 }

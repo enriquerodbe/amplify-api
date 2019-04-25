@@ -1,7 +1,7 @@
 package com.amplify.api.domain.queue
 
 import com.amplify.api.domain.models._
-import com.amplify.api.domain.models.primitives.Uid
+import com.amplify.api.domain.models.primitives.{Code, Uid}
 import com.google.inject.ImplementedBy
 import scala.concurrent.Future
 
@@ -20,5 +20,5 @@ trait QueueService {
 
   def finish(venueUid: Uid): Future[Unit]
 
-  def addTrack(venueUid: Uid, coinCode: CoinCode, trackIdentifier: TrackIdentifier): Future[Unit]
+  def addTrack(venueUid: Uid, code: Code, trackIdentifier: TrackIdentifier): Future[Unit]
 }

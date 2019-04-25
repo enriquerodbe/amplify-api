@@ -8,6 +8,6 @@ import play.api.test.FakeRequest
 trait CoinRequests {
 
   def addTrackRequest(venueUid: Uid, identifier: TrackIdentifier): FakeRequest[AddTrackRequest] = {
-    FakeRequest().withBody(AddTrackRequest(venueUid.value, identifier.toString))
+    FakeRequest().withBody(AddTrackRequest(identifier.toString))
   }
 }
