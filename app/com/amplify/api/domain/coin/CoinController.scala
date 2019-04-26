@@ -42,7 +42,7 @@ class CoinController @Inject()(
   }
 
   def retrieveCurrentPlaylist() = authenticatedCoin() { request ⇒
-    queueService.retrieveCurrentPlaylist(request.subject.coin.venueUid).map {
+    queueService.retrieveAllowedPlaylist(request.subject.coin.venueUid).map {
       case Some(playlist) ⇒ playlistToPlaylistResponse(playlist)
       case _ ⇒ NoContent
     }

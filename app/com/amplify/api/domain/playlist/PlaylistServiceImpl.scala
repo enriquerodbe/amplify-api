@@ -45,4 +45,11 @@ class PlaylistServiceImpl @Inject()(
       contentService.fetchPlaylistTracks(playlistIdentifier, _)
     }
   }
+
+  override def retrieveTrack(venueUid: Uid, identifier: TrackIdentifier): Future[Track] = {
+    val eventualVenue = venueService.retrieve(venueUid) ?! VenueNotFoundByUid(venueUid)
+    eventualVenue.flatMap { venue =>
+      venueAuthService.withRefreshToken(venue)(contentService.fetchTrack(identifier, _))
+    }
+  }
 }

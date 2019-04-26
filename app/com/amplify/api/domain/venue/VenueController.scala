@@ -2,18 +2,16 @@ package com.amplify.api.domain.venue
 
 import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.domain.coin.CoinService
-import com.amplify.api.domain.models.{ContentIdentifier, PlaylistIdentifier}
+import com.amplify.api.domain.models.{PlaylistIdentifier, TrackIdentifier}
 import com.amplify.api.domain.playlist.PlaylistService
 import com.amplify.api.domain.queue.QueueService
 import com.amplify.api.domain.venue.auth.VenueAuthRequests
 import com.amplify.api.shared.controllers.dtos.CoinDtos.{CreateCoinsRequest, coinToCoinResponse}
 import com.amplify.api.shared.controllers.dtos.PlaylistDtos.{PlaylistRequest, playlistInfoToPlaylistInfoResponse, playlistToPlaylistResponse}
-import com.amplify.api.shared.controllers.dtos.QueueDtos.queueToQueueResponse
-import com.amplify.api.shared.exceptions.InvalidProviderIdentifier
+import com.amplify.api.shared.controllers.dtos.QueueDtos.{AddTrackRequest, queueToQueueResponse}
 import javax.inject.Inject
 import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 // scalastyle:off public.methods.have.type
 class VenueController @Inject()(
@@ -37,37 +35,42 @@ class VenueController @Inject()(
   }
 
   def retrievePlaylist(identifier: String) = authenticatedVenue(parse.empty) { request ⇒
-    withPlaylistIdentifier(identifier) { playlistIdentifier ⇒
+    val triedIdentifier = PlaylistIdentifier.fromString(identifier)
+    Future.fromTry(triedIdentifier).flatMap { playlistIdentifier ⇒
       val venueUid = request.subject.venue.uid
       val eventualPlaylist = playlistService.retrievePlaylist(venueUid, playlistIdentifier)
       eventualPlaylist.map(playlistToPlaylistResponse)
     }
   }
 
-  def setCurrentPlaylist() = authenticatedVenue(parse.json[PlaylistRequest]) { request ⇒
-    withPlaylistIdentifier(request.body.identifier) { playlistIdentifier ⇒
+  def setAllowedPlaylist() = authenticatedVenue(parse.json[PlaylistRequest]) { request ⇒
+    val triedIdentifier = PlaylistIdentifier.fromString(request.body.identifier)
+    Future.fromTry(triedIdentifier).flatMap { playlistIdentifier ⇒
       val venueUid = request.subject.venue.uid
-      queueService.setCurrentPlaylist(venueUid, playlistIdentifier).map(_ ⇒ NoContent)
+      queueService.setAllowedPlaylist(venueUid, playlistIdentifier).map(_ ⇒ NoContent)
     }
   }
 
-  private def withPlaylistIdentifier[T](
-      identifier: String)(
-      onSuccess: PlaylistIdentifier ⇒ Future[T]): Future[T] = {
-    ContentIdentifier.fromString(identifier) match {
-      case Success(playlistIdentifier: PlaylistIdentifier) ⇒
-        onSuccess(playlistIdentifier)
-      case Success(otherIdentifier) ⇒
-        Future.failed(InvalidProviderIdentifier(otherIdentifier.toString))
-      case Failure(ex) ⇒
-        Future.failed(ex)
-    }
-  }
-
-  def retrieveCurrentPlaylist() = authenticatedVenue(parse.empty) { request ⇒
-    queueService.retrieveCurrentPlaylist(request.subject.venue.uid).map {
+  def retrieveAllowedPlaylist() = authenticatedVenue(parse.empty) { request ⇒
+    queueService.retrieveAllowedPlaylist(request.subject.venue.uid).map {
       case Some(playlist) ⇒ playlistToPlaylistResponse(playlist)
       case _ ⇒ NoContent
+    }
+  }
+
+  def addPlaylistTracks() = authenticatedVenue(parse.json[PlaylistRequest]) { request ⇒
+    val triedIdentifier = PlaylistIdentifier.fromString(request.body.identifier)
+    Future.fromTry(triedIdentifier).flatMap { playlistIdentifier ⇒
+      val venueUid = request.subject.venue.uid
+      queueService.addPlaylistTracks(venueUid, playlistIdentifier).map(_ ⇒ NoContent)
+    }
+  }
+
+  def addVenueTrack() = authenticatedVenue(parse.json[AddTrackRequest]) { request ⇒
+    val triedIdentifier = TrackIdentifier.fromString(request.body.identifier)
+    Future.fromTry(triedIdentifier).flatMap { trackIdentifier ⇒
+      val venueUid = request.subject.venue.uid
+      queueService.addVenueTrack(venueUid, trackIdentifier).map(_ ⇒ NoContent)
     }
   }
 

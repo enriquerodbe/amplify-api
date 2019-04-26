@@ -35,7 +35,25 @@ object ContentIdentifier {
 }
 
 sealed trait PlaylistIdentifier extends ContentIdentifier
+object PlaylistIdentifier {
+
+  def fromString(str: String): Try[PlaylistIdentifier] = {
+    ContentIdentifier.fromString(str).flatMap {
+      case playlistIdentifier: PlaylistIdentifier ⇒ Success(playlistIdentifier)
+      case _ ⇒ Failure(InvalidProviderIdentifier(str))
+    }
+  }
+}
 sealed trait TrackIdentifier extends ContentIdentifier
+object TrackIdentifier {
+
+  def fromString(str: String): Try[TrackIdentifier] = {
+    ContentIdentifier.fromString(str).flatMap {
+      case trackIdentifier: TrackIdentifier ⇒ Success(trackIdentifier)
+      case _ ⇒ Failure(InvalidProviderIdentifier(str))
+    }
+  }
+}
 
 object Spotify {
 

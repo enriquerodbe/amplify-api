@@ -9,6 +9,7 @@ import com.amplify.api.domain.queue.CommandProcessor._
 import com.amplify.api.shared.daos.DbioRunner
 import com.google.inject.assistedinject.Assisted
 import javax.inject.Inject
+import play.api.Logger
 import play.api.libs.concurrent.InjectedActorSupport
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -20,6 +21,7 @@ private class CommandProcessor @Inject()(
     @Assisted venueUid: Uid)(
     implicit ec: ExecutionContext) extends Actor with Stash with InjectedActorSupport {
 
+  private lazy val logger = Logger(classOf[CommandProcessor])
   private lazy val eventStream = context.system.eventStream
 
   private var queue = Queue.empty
@@ -30,7 +32,9 @@ private class CommandProcessor @Inject()(
       val event = createEvent(command)
       val result = db.run(queueEventDao.create(event)).flatMap(_ ⇒ newState(queue, event))
       result.onComplete {
-        case Failure(_) ⇒ self ! FinishedProcessing(queue)
+        case Failure(ex) ⇒
+          logger.error(s"Processing command $command and event $event", ex)
+          self ! FinishedProcessing(queue)
         case Success(newQueue) ⇒
           self ! FinishedProcessing(newQueue)
           eventStream.publish(QueueUpdated(event, newQueue))
@@ -59,7 +63,7 @@ private class CommandProcessor @Inject()(
   }
 
   private def createEvent(command: Command): QueueEvent = command match {
-    case SetCurrentPlaylist(_, playlist) ⇒ CurrentPlaylistSet(venueUid, playlist)
+    case SetAllowedPlaylist(_, playlist) ⇒ AllowedPlaylistSet(venueUid, playlist)
 
     case StartPlayback(_) ⇒ PlaybackStarted(venueUid)
 
@@ -67,21 +71,32 @@ private class CommandProcessor @Inject()(
 
     case FinishCurrentTrack(_) ⇒ TrackFinished(venueUid)
 
+    case AddPlaylistTracks(_, playlistIdentifier) ⇒
+      PlaylistTracksAdded(venueUid, playlistIdentifier)
+
+    case AddVenueTrack(_, trackIdentifier) ⇒ VenueTrackAdded(venueUid, trackIdentifier)
+
     case AddTrack(_, code, trackIdentifier) ⇒ UserTrackAdded(venueUid, code, trackIdentifier)
   }
 
   private def newState(queue: Queue, event: QueueEvent): Future[Queue] = event match {
-    case CurrentPlaylistSet(uid, playlistIdentifier) ⇒
-      playlistService.retrievePlaylist(uid, playlistIdentifier).map(queue.setCurrentPlaylist)
+    case AllowedPlaylistSet(uid, playlistIdentifier) ⇒
+      playlistService.retrievePlaylist(uid, playlistIdentifier).map(queue.setAllowedPlaylist)
 
     case _: PlaybackStarted ⇒ Future.successful(queue)
 
+    case _: CurrentTrackSkipped ⇒ Future.successful(queue.skipCurrentTrack())
+
     case _: TrackFinished ⇒ Future.successful(queue.finishCurrentTrack())
+
+    case PlaylistTracksAdded(uid, playlistIdentifier) ⇒
+      playlistService.retrievePlaylist(uid, playlistIdentifier).map(queue.addPlaylistTracks)
+
+    case VenueTrackAdded(uid, trackIdentifier) ⇒
+      playlistService.retrieveTrack(uid, trackIdentifier).map(queue.addVenueTrack)
 
     case UserTrackAdded(_, _, trackIdentifier) ⇒
       Future.successful(queue.addUserTrack(trackIdentifier))
-
-    case _: CurrentTrackSkipped ⇒ Future.successful(queue.skipCurrentTrack())
   }
 
   override def preStart(): Unit = {

@@ -21,5 +21,7 @@ trait PlaylistExternalContentService {
       playlistIdentifier: PlaylistIdentifier,
       accessToken: Token[Access]): Future[Seq[Track]]
 
+  def fetchTrack(trackIdentifier: TrackIdentifier, accessToken: Token[Access]): Future[Track]
+
   def startPlayback(tracks: Seq[TrackIdentifier], accessToken: Token[Access]): Future[Unit]
 }

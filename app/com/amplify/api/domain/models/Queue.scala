@@ -1,7 +1,7 @@
 package com.amplify.api.domain.models
 
 case class Queue(
-    currentPlaylist: Option[Playlist],
+    allowedPlaylist: Option[Playlist],
     pastItems: List[QueueItem],
     currentItem: Option[QueueItem],
     futureItems: List[QueueItem]) {
@@ -12,7 +12,7 @@ case class Queue(
     copy(futureItems = futureItems.takeWhile(_.itemType == QueueItemType.User))
   }
 
-  private def addVenueTrack(track: Track): Queue = {
+  def addVenueTrack(track: Track): Queue = {
     val newItem = QueueItem(track, QueueItemType.Venue)
 
     currentItem match {
@@ -21,12 +21,7 @@ case class Queue(
     }
   }
 
-  def setCurrentPlaylist(playlist: Playlist): Queue = {
-    playlist
-        .tracks
-        .foldLeft(removeVenueTracks())(_.addVenueTrack(_))
-        .copy(currentPlaylist = Some(playlist))
-  }
+  def setAllowedPlaylist(playlist: Playlist): Queue = copy(allowedPlaylist = Some(playlist))
 
   def finishCurrentTrack(): Queue = {
     copy(
@@ -34,6 +29,10 @@ case class Queue(
       currentItem = futureItems.headOption,
       futureItems = futureItems.drop(1)
     )
+  }
+
+  def addPlaylistTracks(playlist: Playlist): Queue = {
+    playlist.tracks.foldLeft(removeVenueTracks())(_.addVenueTrack(_))
   }
 
   def addUserTrack(identifier: TrackIdentifier): Queue = {
@@ -49,7 +48,7 @@ case class Queue(
   }
 
   private def findTrack(identifier: TrackIdentifier): Option[Track] = {
-    currentPlaylist match {
+    allowedPlaylist match {
       case Some(playlist) ⇒ playlist.findTrack(identifier)
       case _ ⇒ None
     }
@@ -61,5 +60,5 @@ case class Queue(
 object Queue {
 
   val empty: Queue =
-    Queue(currentPlaylist = None, pastItems = Nil, currentItem = None, futureItems = Nil)
+    Queue(allowedPlaylist = None, pastItems = Nil, currentItem = None, futureItems = Nil)
 }

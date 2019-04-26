@@ -8,9 +8,9 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[QueueServiceImpl])
 trait QueueService {
 
-  def retrieveCurrentPlaylist(venueUid: Uid): Future[Option[Playlist]]
+  def retrieveAllowedPlaylist(venueUid: Uid): Future[Option[Playlist]]
 
-  def setCurrentPlaylist(venueUid: Uid, playlistIdentifier: PlaylistIdentifier): Future[Unit]
+  def setAllowedPlaylist(venueUid: Uid, playlistIdentifier: PlaylistIdentifier): Future[Unit]
 
   def retrieveQueue(venueUid: Uid): Future[Queue]
 
@@ -19,6 +19,10 @@ trait QueueService {
   def skip(venueUid: Uid): Future[Unit]
 
   def finish(venueUid: Uid): Future[Unit]
+
+  def addPlaylistTracks(venueUid: Uid, playlistIdentifier: PlaylistIdentifier): Future[Unit]
+
+  def addVenueTrack(venueUid: Uid, trackIdentifier: TrackIdentifier): Future[Unit]
 
   def addTrack(venueUid: Uid, code: Code, trackIdentifier: TrackIdentifier): Future[Unit]
 }

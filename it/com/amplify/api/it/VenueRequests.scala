@@ -1,8 +1,10 @@
 package com.amplify.api.it
 
+import com.amplify.api.domain.models.TrackIdentifier
 import com.amplify.api.domain.models.primitives.{AuthorizationCode, Token}
 import com.amplify.api.shared.controllers.dtos.CoinDtos.CreateCoinsRequest
 import com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistRequest
+import com.amplify.api.shared.controllers.dtos.QueueDtos.AddTrackRequest
 import com.amplify.api.shared.controllers.dtos.VenueDtos.VenueSignInRequest
 import play.api.test.FakeRequest
 
@@ -20,5 +22,9 @@ trait VenueRequests {
 
   def playlistRequest(identifier: String): FakeRequest[PlaylistRequest] = {
     FakeRequest().withBody(PlaylistRequest(identifier))
+  }
+
+  def addTrackRequest(identifier: TrackIdentifier): FakeRequest[AddTrackRequest] = {
+    FakeRequest().withBody(AddTrackRequest(identifier.toString))
   }
 }

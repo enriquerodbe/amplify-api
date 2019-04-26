@@ -41,6 +41,15 @@ class PlaylistExternalContentServiceImpl @Inject()(
     }
   }
 
+  override def fetchTrack(
+      trackIdentifier: TrackIdentifier,
+      accessToken: Token[Access]): Future[Track] = {
+    trackIdentifier match {
+      case spotifyUri: Spotify.TrackUri ⇒
+        spotifyContentProvider.fetchTrack(spotifyUri, accessToken).map(toModelTrack)
+    }
+  }
+
   override def startPlayback(
       tracks: Seq[TrackIdentifier],
       accessToken: Token[Access]): Future[Unit] = {

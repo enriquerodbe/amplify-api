@@ -12,7 +12,7 @@ sealed trait QueueEvent {
   def contentIdentifier: Option[ContentIdentifier]
 }
 
-case class CurrentPlaylistSet(
+case class AllowedPlaylistSet(
     override val venueUid: Uid,
     playlistIdentifier: PlaylistIdentifier) extends QueueEvent {
 
@@ -33,6 +33,24 @@ case class TrackFinished(override val venueUid: Uid) extends QueueEvent {
   override val eventType: QueueEventType = QueueEventType.TrackFinished
   override val coinCode: Option[Code] = None
   override val contentIdentifier: Option[ContentIdentifier] = None
+}
+
+case class PlaylistTracksAdded(
+    override val venueUid: Uid,
+    playlistIdentifier: PlaylistIdentifier) extends QueueEvent {
+
+  override def eventType: QueueEventType = QueueEventType.PlaylistTracksAdded
+  override def coinCode: Option[Code] = None
+  override def contentIdentifier: Option[ContentIdentifier] = Some(playlistIdentifier)
+}
+
+case class VenueTrackAdded(
+    override val venueUid: Uid,
+    trackIdentifier: TrackIdentifier) extends QueueEvent {
+
+  override val eventType: QueueEventType = QueueEventType.VenueTrackAdded
+  override val coinCode: Option[Code] = None
+  override val contentIdentifier: Option[ContentIdentifier] = Some(trackIdentifier)
 }
 
 case class UserTrackAdded(
@@ -60,7 +78,7 @@ object QueueEvent {
       code: Option[Code],
       contentIdentifier: Option[ContentIdentifier]): QueueEvent = eventType match {
     case QueueEventType.CurrentPlaylistSet ⇒
-      CurrentPlaylistSet(venueUid, contentIdentifier.get.asInstanceOf[PlaylistIdentifier])
+      AllowedPlaylistSet(venueUid, contentIdentifier.get.asInstanceOf[PlaylistIdentifier])
     case QueueEventType.PlaybackStarted ⇒ PlaybackStarted(venueUid)
     case QueueEventType.TrackFinished ⇒ TrackFinished(venueUid)
     case QueueEventType.UserTrackAdded ⇒
@@ -86,7 +104,9 @@ object QueueEventType extends Enumeration {
   val
   CurrentPlaylistSet,
   PlaybackStarted,
+  CurrentTrackSkipped,
   TrackFinished,
-  UserTrackAdded,
-  CurrentTrackSkipped = Value
+  PlaylistTracksAdded,
+  VenueTrackAdded,
+  UserTrackAdded = Value
 }

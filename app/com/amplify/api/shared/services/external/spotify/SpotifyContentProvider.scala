@@ -1,6 +1,6 @@
 package com.amplify.api.shared.services.external.spotify
 
-import com.amplify.api.domain.models.Spotify.PlaylistUri
+import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
 import com.amplify.api.domain.models.TrackIdentifier
 import com.amplify.api.domain.models.primitives.{Access, Token}
 import com.amplify.api.shared.configuration.EnvConfig
@@ -35,6 +35,15 @@ class SpotifyContentProvider @Inject()(
     client
       .paginatedFetch[TrackItem](path, accessToken, query)
       .handleNotFound(uri)
+  }
+
+  def fetchTrack(uri: TrackUri, accessToken: Token[Access]): Future[TrackItem] = {
+    client
+      .apiRequest(s"/tracks/${uri.id}")
+      .withBearerToken(accessToken)
+      .get()
+      .handleNotFound(uri)
+      .parseJson[TrackItem]
   }
 
   def startPlayback(tracks: Seq[TrackIdentifier], accessToken: Token[Access]): Future[Unit] = {

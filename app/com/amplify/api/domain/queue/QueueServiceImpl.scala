@@ -18,14 +18,14 @@ private class QueueServiceImpl @Inject()(
 
   implicit val askTimeout = envConfig.defaultAskTimeout
 
-  override def retrieveCurrentPlaylist(venueUid: Uid): Future[Option[Playlist]] = {
-    (queueCommandRouter ? RetrieveQueue(venueUid)).mapTo[Queue].map(_.currentPlaylist)
+  override def retrieveAllowedPlaylist(venueUid: Uid): Future[Option[Playlist]] = {
+    (queueCommandRouter ? RetrieveQueue(venueUid)).mapTo[Queue].map(_.allowedPlaylist)
   }
 
-  override def setCurrentPlaylist(
+  override def setAllowedPlaylist(
       venueUid: Uid,
       playlistIdentifier: PlaylistIdentifier): Future[Unit] = {
-    val command = SetCurrentPlaylist(venueUid, playlistIdentifier)
+    val command = SetAllowedPlaylist(venueUid, playlistIdentifier)
     (queueCommandRouter ? RouteCommand(command)).mapTo[Unit]
   }
 
@@ -43,6 +43,16 @@ private class QueueServiceImpl @Inject()(
 
   override def finish(venueUid: Uid): Future[Unit] = {
     (queueCommandRouter ? RouteCommand(FinishCurrentTrack(venueUid))).mapTo[Unit]
+  }
+
+  override def addPlaylistTracks(
+      venueUid: Uid,
+      playlistIdentifier: PlaylistIdentifier): Future[Unit] = {
+    (queueCommandRouter ? RouteCommand(AddPlaylistTracks(venueUid, playlistIdentifier))).mapTo[Unit]
+  }
+
+  override def addVenueTrack(venueUid: Uid, trackIdentifier: TrackIdentifier): Future[Unit] = {
+    (queueCommandRouter ? RouteCommand(AddVenueTrack(venueUid, trackIdentifier))).mapTo[Unit]
   }
 
   override def addTrack(

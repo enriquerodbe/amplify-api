@@ -49,7 +49,7 @@ object QueueDtos extends DtosDefinition {
   }
   def queueToQueueResponse(queue: Queue): QueueResponse = {
     QueueResponse(
-      queue.currentPlaylist.map(_.info.identifier.toString),
+      queue.allowedPlaylist.map(_.info.identifier.toString),
       queue.currentItem.map { item =>
         val currentTrackIndex = queue.allItems.indexOf(item)
         itemToCurrentTrackResponse(item, currentTrackIndex)

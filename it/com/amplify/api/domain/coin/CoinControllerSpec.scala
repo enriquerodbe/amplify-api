@@ -40,19 +40,19 @@ class CoinControllerSpec extends BaseIntegrationSpec with CoinRequests {
   class AddTrackFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
       extends DbVenueFixture with DbCoinFixture {
     val playlist = Playlist(toModelPlaylist(alicePlaylist), Seq(toModelTrack(bedOfNailsTrack)))
-    val newQueue = Queue.empty.copy(currentPlaylist = Some(playlist))
+    val newQueue = Queue.empty.copy(allowedPlaylist = Some(playlist))
     initQueue(aliceVenueUid, newQueue)
   }
 
   "addTrack" should {
     "respond No content" in new AddTrackFixture {
-      val request = addTrackRequest(aliceVenueUid, TrackUri(bedOfNailsTrack.track.id)).withValidCoin
+      val request = addTrackRequest(TrackUri(bedOfNailsTrack.track.id)).withValidCoin
       val response = controller.addTrack()(request)
       status(response) mustBe NO_CONTENT
     }
     "update queue next track" in new AddTrackFixture {
       val trackId = TrackUri(bedOfNailsTrack.track.id)
-      val request = addTrackRequest(aliceVenueUid, trackId).withValidCoin
+      val request = addTrackRequest(trackId).withValidCoin
       await(controller.addTrack()(request))
 
       val queue = await(queueService.retrieveQueue(aliceVenueUid))
@@ -77,7 +77,7 @@ class CoinControllerSpec extends BaseIntegrationSpec with CoinRequests {
 
     "respond with some playlist" in new RetrieveCurrentPlaylistFixture {
       val playlist = Playlist(toModelPlaylist(alicePlaylist), Seq.empty)
-      val queue = Queue.empty.copy(currentPlaylist = Some(playlist))
+      val queue = Queue.empty.copy(allowedPlaylist = Some(playlist))
       initQueue(aliceVenueUid, queue)
 
       val response =

@@ -39,7 +39,7 @@ GET    /me/playlists    com.amplify.api.domain.venue.VenueController.retrievePla
 GET    /me/playlists/:identifier    com.amplify.api.domain.venue.VenueController.retrievePlaylist(identifier: String)
 
 ###
-#  summary: Set the current playlist of allowed tracks for the authenticated venue
+#  summary: Set the playlist of allowed tracks for the authenticated venue
 #  responses:
 #    204:
 #      description: success
@@ -50,19 +50,47 @@ GET    /me/playlists/:identifier    com.amplify.api.domain.venue.VenueController
 #    schema:
 #      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistRequest'
 ###
-PUT    /me/playlists/current    com.amplify.api.domain.venue.VenueController.setCurrentPlaylist
+PUT    /me/playlists/allowed    com.amplify.api.domain.venue.VenueController.setAllowedPlaylist
 
 ###
-#  summary: Retrieve the current playlist of the authenticated venue
+#  summary: Retrieve the allowed playlist of the authenticated venue
 #  responses:
 #    200:
 #      description: success
 #      schema:
 #        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
 #    204:
-#      description: no current playlist set
+#      description: no allowed playlist set
 ###
-GET    /me/playlists/current    com.amplify.api.domain.venue.VenueController.retrieveCurrentPlaylist
+GET    /me/playlists/allowed    com.amplify.api.domain.venue.VenueController.retrieveAllowedPlaylist
+
+###
+#  summary: Add all the tracks from a playlist to the authenticated venue's queue
+#  responses:
+#    204:
+#      description: success
+#  parameters:
+#  - name: playlist
+#    in: body
+#    required: true
+#    schema:
+#      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistRequest'
+###
+PUT    /me/queue    com.amplify.api.domain.venue.VenueController.addPlaylistTracks
+
+###
+#  summary: Add a track to the authenticated venue's queue
+#  responses:
+#    204:
+#      description: success
+#  parameters:
+#  - name: track
+#    in: body
+#    required: true
+#    schema:
+#      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.QueueDtos.AddTrackRequest'
+###
+POST    /me/queue    com.amplify.api.domain.venue.VenueController.addVenueTrack
 
 ###
 #  summary: Retrieve the queue of the authenticated venue

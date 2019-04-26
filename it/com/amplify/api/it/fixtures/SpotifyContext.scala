@@ -75,5 +75,8 @@ trait SpotifyContext extends CommonData with MockitoSugar {
     when(spotifyContentProvider
       .startPlayback(Seq(TrackUri(bedOfNailsTrack.track.id)), aliceAccessToken))
       .thenReturn(Future.successful(()))
+    when(spotifyContentProvider
+      .fetchTrack(TrackUri(bedOfNailsTrack.track.id), aliceAccessToken))
+      .thenReturn(Future.successful(bedOfNailsTrack))
   }
 }

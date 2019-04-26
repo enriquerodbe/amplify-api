@@ -48,15 +48,14 @@ fork in IntegrationTest := true
 javaOptions in IntegrationTest += "-Dconfig.file=it/conf/application.test.conf"
 
 // Scoverage
-coverageMinimum := 73
+coverageMinimum := 74
 coverageFailOnMinimum := true
 lazy val coverageExcludedPackagesSeq = Seq(
   "<empty>",
   "Reverse.*",
   "router",
   "coins",
-  "venues\\..*",
-  "com.amplify.api.domain.queue.serialization")
+  "venues\\..*")
 coverageExcludedPackages := coverageExcludedPackagesSeq.mkString(";")
 
 // Scalastyle

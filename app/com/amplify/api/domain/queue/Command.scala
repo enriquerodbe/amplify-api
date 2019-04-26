@@ -10,13 +10,18 @@ sealed trait Command {
 
 object Command {
 
-  case class SetCurrentPlaylist(venueUid: Uid, playlist: PlaylistIdentifier) extends Command
+  case class SetAllowedPlaylist(venueUid: Uid, playlist: PlaylistIdentifier) extends Command
 
   case class StartPlayback(venueUid: Uid) extends Command
 
   case class SkipCurrentTrack(venueUid: Uid) extends Command
 
   case class FinishCurrentTrack(venueUid: Uid) extends Command
+
+  case class AddPlaylistTracks(venueUid: Uid, playlistIdentifier: PlaylistIdentifier)
+      extends Command
+
+  case class AddVenueTrack(venueUid: Uid, trackIdentifier: TrackIdentifier) extends Command
 
   case class AddTrack(venueUid: Uid, code: Code, trackIdentifier: TrackIdentifier)
     extends Command
