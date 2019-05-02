@@ -31,9 +31,18 @@ CREATE TABLE "coins" (
   UNIQUE ("venue_uid", "code")
 );
 
+CREATE TABLE "coin_usages" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "coin_id" BIGINT NOT NULL,
+  "usage_number" INT NOT NULL,
+  "timestamp" TIMESTAMP NOT NULL DEFAULT NOW(),
+  UNIQUE ("coin_id", "usage_number")
+);
+
 
 # --- !Downs
 
 DROP TABLE "venues";
 DROP TABLE "queue_events";
 DROP TABLE "coins";
+DROP TABLE "coin_usages";

@@ -10,12 +10,6 @@ case class InvalidProviderIdentifier(identifier: String)
     s"Invalid content provider identifier: $identifier")
     with ValidationException
 
-case class InvalidCoinCode(coinCode: String)
-  extends BadRequestException(
-      AppExceptionCode.InvalidCoinCode,
-      s"Invalid coin code: $coinCode")
-    with ValidationException
-
 case class InvalidCreateCoinsRequestedNumber(max: Int, number: Int)
   extends BadRequestException(
     AppExceptionCode.InvalidCreateCoinsRequestedNumber,

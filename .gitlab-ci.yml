@@ -4,7 +4,7 @@ stages:
 
 test:
   stage: test
-  image: enriquerodbe/sbt-play:1.1.2_2.6.13
+  image: mozilla/sbt:8u181_1.2.7
   cache:
     paths:
       - "sbt-cache/sbtboot"

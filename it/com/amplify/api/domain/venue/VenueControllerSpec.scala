@@ -54,7 +54,7 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
 
       val createdCoins = findCoins(aliceVenueUid)
 
-      createdCoins must have size validRequestNumber + 1
+      createdCoins must have size validRequestNumber + 2
       forAll(createdCoins) { coin ⇒
         coin.code.toString must have size 4
         coin.venueUid.toString must be (aliceVenueUid)

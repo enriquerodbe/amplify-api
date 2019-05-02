@@ -34,9 +34,10 @@ object AppExceptionCode extends Enumeration {
     InvalidProviderIdentifier,
     VenueNotFound,
     AuthenticationFailed,
-    InvalidCoinCode,
+    CoinNotFound,
     InvalidCreateCoinsRequestedNumber,
     MissingCoin,
-    CodeMatchesMultipleCoins
+    CodeMatchesMultipleCoins,
+    CoinMaxUsages
   = Value
 }

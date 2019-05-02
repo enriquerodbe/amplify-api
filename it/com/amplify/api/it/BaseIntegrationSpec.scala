@@ -56,14 +56,14 @@ trait BaseIntegrationSpec
     reset(spotifyAuthProvider)
   }
 
-  protected def findCommandProcessor(venueUid: Uid) = {
+  private def findCommandProcessor(venueUid: Uid) = {
     val path = s"/user/queue-command-router/queue-command-processor-$venueUid"
     app.actorSystem.actorSelection(path)
   }
 
   protected def initQueue(venueUid: Uid, queue: Queue) = {
     await(instanceOf[CoinController]
-      .retrieveCurrentPlaylist()(FakeRequest().withAliceSession.withValidCoin))
+      .retrieveAllowedPlaylist()(FakeRequest().withAliceSession.withUnusedCoin))
     val processor = findCommandProcessor(venueUid)
     await((processor ? SetState(queue)).mapTo[Unit])
   }

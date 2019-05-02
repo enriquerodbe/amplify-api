@@ -10,7 +10,9 @@ object QueueDtos extends DtosDefinition {
       name: String,
       priority: String,
       identifier: String,
-      album: AlbumResponse)
+      album: AlbumResponse) extends SuccessfulResponse {
+    override def toJson: JsValue = Json.toJson(this)
+  }
   def itemToQueueTrackResponse(item: QueueItem): QueueTrackResponse = {
     QueueTrackResponse(
       item.track.name.value,

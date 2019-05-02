@@ -34,7 +34,8 @@ trait SpotifyContext extends CommonData with MockitoSugar {
 
     def withCoin(coin: String): FakeRequest[T] = fakeRequest.withHeaders(coinHeader(coin))
 
-    def withValidCoin: FakeRequest[T] = withCoin(validCoinCodeStr)
+    def withUnusedCoin: FakeRequest[T] = withCoin(unusedCoinCode)
+    def withUsedCoin: FakeRequest[T] = withCoin(usedCoinCode)
   }
 
   val aliceUserData = UserData(AuthSpotify → aliceSpotifyId, "Alice")

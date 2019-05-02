@@ -1,28 +1,12 @@
 ###
-#  summary: Retrieve the coin status
-#  responses:
-#    200:
-#      description: success
-#      schema:
-#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.CoinDtos.CoinStatusResponse'
-#  parameters:
-#  - name: coin
-#    description: Coin code
-#    in: header
-#    required: true
-#    type: string
-###
-GET    /me    com.amplify.api.domain.coin.CoinController.coinStatus()
-
-###
-#  summary: Retrieve the current playlist of a venue
+#  summary: Retrieve the allowed playlist of the venue
 #  responses:
 #    200:
 #      description: success
 #      schema:
 #        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
 #    204:
-#      description: no current playlist set
+#      description: no allowed playlist set
 #  parameters:
 #  - name: coin
 #    description: Coin code
@@ -30,7 +14,7 @@ GET    /me    com.amplify.api.domain.coin.CoinController.coinStatus()
 #    required: true
 #    type: string
 ###
-GET    /me/playlists/current    com.amplify.api.domain.coin.CoinController.retrieveCurrentPlaylist()
+GET    /me/playlists/allowed    com.amplify.api.domain.coin.CoinController.retrieveAllowedPlaylist()
 
 ###
 #  summary: Spend a coin to add a track to a venue's queue

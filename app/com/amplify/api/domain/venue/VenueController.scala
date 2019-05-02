@@ -6,7 +6,7 @@ import com.amplify.api.domain.models.{PlaylistIdentifier, TrackIdentifier}
 import com.amplify.api.domain.playlist.PlaylistService
 import com.amplify.api.domain.queue.QueueService
 import com.amplify.api.domain.venue.auth.VenueAuthRequests
-import com.amplify.api.shared.controllers.dtos.CoinDtos.{CreateCoinsRequest, coinToCoinResponse}
+import com.amplify.api.shared.controllers.dtos.CoinDtos.{CreateCoinsRequest, coinToCreateCoinResponse}
 import com.amplify.api.shared.controllers.dtos.PlaylistDtos.{PlaylistRequest, playlistInfoToPlaylistInfoResponse, playlistToPlaylistResponse}
 import com.amplify.api.shared.controllers.dtos.QueueDtos.{AddTrackRequest, queueToQueueResponse}
 import javax.inject.Inject
@@ -26,7 +26,7 @@ class VenueController @Inject()(
   def createCoins() = authenticatedVenue(parse.json[CreateCoinsRequest]) { request ⇒
     coinService
         .createCoins(request.subject.venue.uid, request.body.number)
-        .map(_.map(coinToCoinResponse))
+        .map(_.map(coinToCreateCoinResponse))
   }
 
   def retrievePlaylists() = authenticatedVenue(parse.empty) { request ⇒

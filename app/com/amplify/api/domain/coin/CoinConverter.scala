@@ -4,7 +4,5 @@ import com.amplify.api.domain.models.Coin
 
 private object CoinConverter {
 
-  def dbCoinToCoin(dbCoin: DbCoin, usages: Seq[DbCoinUsage]): Coin = {
-    Coin(dbCoin.venueUid, dbCoin.code, dbCoin.maxUsages - usages.size)
-  }
+  def dbCoinToCoin(dbCoin: DbCoin): Coin = Coin(dbCoin.venueUid, dbCoin.code, dbCoin.maxUsages)
 }
