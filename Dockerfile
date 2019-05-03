@@ -5,7 +5,6 @@ COPY project/ /dist/project/
 WORKDIR /dist
 RUN sbt update
 COPY . /dist
-WORKDIR /dist
 RUN sbt -Damplify.api.version=$version dist &&\
  unzip target/universal/amplify-api-$version.zip -d /app
 

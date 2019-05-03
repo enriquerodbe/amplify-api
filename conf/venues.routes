@@ -6,7 +6,7 @@
 #      schema:
 #        type: array
 #        items:
-#          $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.CoinDtos.CoinResponse'
+#          $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.CoinDtos.CreateCoinResponse'
 #  parameters:
 #  - name: number
 #    in: body
@@ -14,7 +14,7 @@
 #    schema:
 #      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.CoinDtos.CreateCoinsRequest'
 ###
-POST    /me/coins    com.amplify.api.domain.venue.VenueController.createCoins()
+POST    /coins    com.amplify.api.domain.venue.VenueController.createCoins()
 
 ###
 #  summary: Retrieve the playlists of the authenticated venue
@@ -26,7 +26,7 @@ POST    /me/coins    com.amplify.api.domain.venue.VenueController.createCoins()
 #        items:
 #          $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
 ###
-GET    /me/playlists    com.amplify.api.domain.venue.VenueController.retrievePlaylists
+GET    /playlists    com.amplify.api.domain.venue.VenueController.retrievePlaylists
 
 ###
 #  summary: Retrieve a playlist of the authenticated venue
@@ -36,7 +36,7 @@ GET    /me/playlists    com.amplify.api.domain.venue.VenueController.retrievePla
 #      schema:
 #        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistResponse'
 ###
-GET    /me/playlists/:identifier    com.amplify.api.domain.venue.VenueController.retrievePlaylist(identifier: String)
+GET    /playlists/:identifier    com.amplify.api.domain.venue.VenueController.retrievePlaylist(identifier: String)
 
 ###
 #  summary: Set the playlist of allowed tracks for the authenticated venue
@@ -50,7 +50,7 @@ GET    /me/playlists/:identifier    com.amplify.api.domain.venue.VenueController
 #    schema:
 #      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistRequest'
 ###
-PUT    /me/playlists/allowed    com.amplify.api.domain.venue.VenueController.setAllowedPlaylist
+PUT    /queue/playlists/allowed    com.amplify.api.domain.venue.VenueController.setAllowedPlaylist
 
 ###
 #  summary: Retrieve the allowed playlist of the authenticated venue
@@ -62,7 +62,7 @@ PUT    /me/playlists/allowed    com.amplify.api.domain.venue.VenueController.set
 #    204:
 #      description: no allowed playlist set
 ###
-GET    /me/playlists/allowed    com.amplify.api.domain.venue.VenueController.retrieveAllowedPlaylist
+GET    /queue/playlists/allowed    com.amplify.api.domain.venue.VenueController.retrieveAllowedPlaylist
 
 ###
 #  summary: Add all the tracks from a playlist to the authenticated venue's queue
@@ -76,7 +76,7 @@ GET    /me/playlists/allowed    com.amplify.api.domain.venue.VenueController.ret
 #    schema:
 #      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.PlaylistDtos.PlaylistRequest'
 ###
-PUT    /me/queue    com.amplify.api.domain.venue.VenueController.addPlaylistTracks
+PUT    /queue/tracks    com.amplify.api.domain.venue.VenueController.addPlaylistTracks
 
 ###
 #  summary: Add a track to the authenticated venue's queue
@@ -90,7 +90,7 @@ PUT    /me/queue    com.amplify.api.domain.venue.VenueController.addPlaylistTrac
 #    schema:
 #      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.QueueDtos.AddTrackRequest'
 ###
-POST    /me/queue    com.amplify.api.domain.venue.VenueController.addVenueTrack
+POST    /queue/tracks    com.amplify.api.domain.venue.VenueController.addVenueTrack
 
 ###
 #  summary: Retrieve the queue of the authenticated venue
@@ -100,7 +100,7 @@ POST    /me/queue    com.amplify.api.domain.venue.VenueController.addVenueTrack
 #      schema:
 #        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.QueueDtos.QueueResponse'
 ###
-GET    /me/queue    com.amplify.api.domain.venue.VenueController.retrieveQueue
+GET    /queue    com.amplify.api.domain.venue.VenueController.retrieveQueue
 
 ###
 #  summary: Start playing the queue of the authenticated venue
@@ -108,7 +108,7 @@ GET    /me/queue    com.amplify.api.domain.venue.VenueController.retrieveQueue
 #    204:
 #      description: success
 ###
-PUT    /me/queue/start    com.amplify.api.domain.venue.VenueController.start
+PUT    /queue/start    com.amplify.api.domain.venue.VenueController.start
 
 ###
 #  summary: Skip playing the current track of the authenticated venue
@@ -116,7 +116,7 @@ PUT    /me/queue/start    com.amplify.api.domain.venue.VenueController.start
 #    204:
 #      description: success
 ###
-PUT    /me/queue/skip    com.amplify.api.domain.venue.VenueController.skip
+PUT    /queue/skip    com.amplify.api.domain.venue.VenueController.skip
 
 ###
 #  summary: Finish playing the current track of the authenticated venue
@@ -124,7 +124,7 @@ PUT    /me/queue/skip    com.amplify.api.domain.venue.VenueController.skip
 #    204:
 #      description: success
 ###
-PUT    /me/queue/finish    com.amplify.api.domain.venue.VenueController.finish
+PUT    /queue/finish    com.amplify.api.domain.venue.VenueController.finish
 
 ### NoDocs ###
 GET /ws com.amplify.api.domain.venue.WebSocketController.connect

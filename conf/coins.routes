@@ -14,7 +14,39 @@
 #    required: true
 #    type: string
 ###
-GET    /me/playlists/allowed    com.amplify.api.domain.coin.CoinController.retrieveAllowedPlaylist()
+GET    /queue/playlists/allowed    com.amplify.api.domain.coin.CoinController.retrieveAllowedPlaylist()
+
+###
+#  summary: Retrieve the remaining usages of this coin
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.CoinDtos.CoinRemainingUsagesResponse'
+#  parameters:
+#  - name: coin
+#    description: Coin code
+#    in: header
+#    required: true
+#    type: string
+###
+GET    /usages/remaining    com.amplify.api.domain.coin.CoinController.retrieveRemainingUsages()
+
+###
+#  summary: Retrieve the track that is currently playing on the venue
+#  responses:
+#    200:
+#      description: success
+#      schema:
+#        $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.QueueDtos.QueueTrackResponse'
+#  parameters:
+#  - name: coin
+#    description: Coin code
+#    in: header
+#    required: true
+#    type: string
+###
+GET    /queue/current    com.amplify.api.domain.coin.CoinController.retrieveCurrentTrack()
 
 ###
 #  summary: Spend a coin to add a track to a venue's queue
@@ -33,4 +65,4 @@ GET    /me/playlists/allowed    com.amplify.api.domain.coin.CoinController.retri
 #    schema:
 #      $ref: '#/definitions/com.amplify.api.shared.controllers.dtos.QueueDtos.AddTrackRequest'
 ###
-PUT    /me    com.amplify.api.domain.coin.CoinController.addTrack()
+PUT    /queue    com.amplify.api.domain.coin.CoinController.addTrack()
