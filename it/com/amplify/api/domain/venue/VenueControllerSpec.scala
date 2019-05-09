@@ -131,16 +131,16 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
     }
   }
 
-  class SetCurrentPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
+  class SetAllowedPlaylistFixture(implicit val dbConfigProvider: DatabaseConfigProvider)
       extends DbVenueFixture
 
   "setAllowedPlaylist" should {
-    "respond No content" in new SetCurrentPlaylistFixture {
+    "respond No content" in new SetAllowedPlaylistFixture {
       val response = controller.setAllowedPlaylist()(
         playlistRequest(alicePlaylistUri.toString).withAliceSession)
       status(response) mustEqual NO_CONTENT
     }
-    "update queue current playlist" in new SetCurrentPlaylistFixture {
+    "update queue current playlist" in new SetAllowedPlaylistFixture {
       await(controller.setAllowedPlaylist()(
         playlistRequest(alicePlaylistUri.toString).withAliceSession))
 
@@ -188,13 +188,13 @@ class VenueControllerSpec extends BaseIntegrationSpec with Inside with VenueRequ
     }
 
     "fail" when {
-      "invalid identifier" in new SetCurrentPlaylistFixture {
+      "invalid identifier" in new SetAllowedPlaylistFixture {
         intercept[InvalidProviderIdentifier] {
           await(controller.setAllowedPlaylist()(
             playlistRequest("wrong_identifier").withAliceSession))
         }
       }
-      "invalid content provider" in new SetCurrentPlaylistFixture {
+      "invalid content provider" in new SetAllowedPlaylistFixture {
         intercept[InvalidProviderIdentifier] {
           await(controller.setAllowedPlaylist()(
             playlistRequest("wrong_provider:wrong_identifier").withAliceSession))

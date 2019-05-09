@@ -26,7 +26,7 @@ class SpotifyBaseClient @Inject()(
   val totalField = "total"
   val nextField = "next"
   val paginationOffsetHeader = "offset"
-  val MAX_WAIT_RESPONSE = 20.seconds
+  val MAX_WAIT_RESPONSE = 10.seconds
 
   private def createRequest(baseUrl: String, path: String): WSRequest = {
     ws.url(s"$baseUrl$path").withRequestTimeout(MAX_WAIT_RESPONSE)

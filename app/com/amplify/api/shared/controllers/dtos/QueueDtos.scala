@@ -43,7 +43,7 @@ object QueueDtos extends DtosDefinition {
   }
 
   case class QueueResponse(
-      currentPlaylist: Option[String],
+      allowedPlaylist: Option[String],
       currentTrack: Option[CurrentTrackResponse],
       tracks: Seq[QueueTrackResponse]) extends SuccessfulResponse {
 
@@ -51,12 +51,12 @@ object QueueDtos extends DtosDefinition {
   }
   def queueToQueueResponse(queue: Queue): QueueResponse = {
     QueueResponse(
-      queue.allowedPlaylist.map(_.info.identifier.toString),
-      queue.currentItem.map { item =>
+      allowedPlaylist = queue.allowedPlaylist.map(_.info.identifier.toString),
+      currentTrack = queue.currentItem.map { item =>
         val currentTrackIndex = queue.allItems.indexOf(item)
         itemToCurrentTrackResponse(item, currentTrackIndex)
       },
-      queue.allItems.map(itemToQueueTrackResponse))
+      tracks = queue.allItems.map(itemToQueueTrackResponse))
   }
   implicit val queueResponseWrites: Writes[QueueResponse] = Json.writes[QueueResponse]
 

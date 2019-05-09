@@ -1,6 +1,6 @@
 package com.amplify.api.domain.queue
 
-import akka.actor.{Actor, Stash}
+import akka.actor.{Actor, PoisonPill, Stash}
 import com.amplify.api.domain.models.Queue
 import com.amplify.api.domain.models.primitives.Uid
 import com.amplify.api.domain.playlist.PlaylistService
@@ -100,15 +100,21 @@ private class CommandProcessor @Inject()(
   }
 
   override def preStart(): Unit = {
-    db.run(queueEventDao.retrieve(venueUid)).map { events ⇒
-      val initial = Future.successful(queue)
-      val computation = events.foldLeft(initial)((state, event) ⇒ state.flatMap(newState(_, event)))
-      computation.onComplete {
-        case Success(result) ⇒ self ! FinishedProcessing(result)
-        case Failure(_) ⇒ self ! FinishedProcessing(queue)
-      }
+    initialize().onComplete {
+      case Success(result) ⇒ self ! FinishedProcessing(result)
+      case Failure(ex) ⇒
+        logger.error(s"Initialization failed for venue $venueUid", ex)
+        self ! PoisonPill
     }
     context.become(processing)
+  }
+
+  private def initialize() = {
+    val allVenueEvents = db.run(queueEventDao.retrieve(venueUid))
+    allVenueEvents.flatMap { events ⇒
+      val initialState = Future.successful(queue)
+      events.foldLeft(initialState)((state, event) ⇒ state.flatMap(newState(_, event)))
+    }
   }
 }
 
@@ -118,13 +124,13 @@ object CommandProcessor {
     def apply(venueUid: Uid): Actor
   }
 
+  private case class FinishedProcessing(queue: Queue)
+
   sealed trait CommandProcessorProtocol
 
   case class HandleCommand(command: Command) extends CommandProcessorProtocol
 
   case object RetrieveState extends CommandProcessorProtocol
-
-  private case class FinishedProcessing(queue: Queue) extends CommandProcessorProtocol
 
   // For testing only
   case class SetState(queue: Queue) extends CommandProcessorProtocol

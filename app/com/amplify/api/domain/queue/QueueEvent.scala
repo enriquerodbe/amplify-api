@@ -16,7 +16,7 @@ case class AllowedPlaylistSet(
     override val venueUid: Uid,
     playlistIdentifier: PlaylistIdentifier) extends QueueEvent {
 
-  override val eventType: QueueEventType = QueueEventType.CurrentPlaylistSet
+  override val eventType: QueueEventType = QueueEventType.AllowedPlaylistSet
   override val coinCode: Option[Code] = None
   override val contentIdentifier: Option[ContentIdentifier] = Some(playlistIdentifier)
 }
@@ -77,13 +77,17 @@ object QueueEvent {
       eventType: QueueEventType,
       code: Option[Code],
       contentIdentifier: Option[ContentIdentifier]): QueueEvent = eventType match {
-    case QueueEventType.CurrentPlaylistSet ⇒
+    case QueueEventType.AllowedPlaylistSet ⇒
       AllowedPlaylistSet(venueUid, contentIdentifier.get.asInstanceOf[PlaylistIdentifier])
     case QueueEventType.PlaybackStarted ⇒ PlaybackStarted(venueUid)
+    case QueueEventType.CurrentTrackSkipped ⇒ CurrentTrackSkipped(venueUid)
     case QueueEventType.TrackFinished ⇒ TrackFinished(venueUid)
+    case QueueEventType.PlaylistTracksAdded ⇒
+      PlaylistTracksAdded(venueUid, contentIdentifier.get.asInstanceOf[PlaylistIdentifier])
+    case QueueEventType.VenueTrackAdded ⇒
+      VenueTrackAdded(venueUid, contentIdentifier.get.asInstanceOf[TrackIdentifier])
     case QueueEventType.UserTrackAdded ⇒
       UserTrackAdded(venueUid, code.get, contentIdentifier.get.asInstanceOf[TrackIdentifier])
-    case QueueEventType.CurrentTrackSkipped ⇒ CurrentTrackSkipped(venueUid)
   }
 
   def toTuple(
@@ -102,7 +106,7 @@ object QueueEventType extends Enumeration {
   type QueueEventType = Value
 
   val
-  CurrentPlaylistSet,
+  AllowedPlaylistSet,
   PlaybackStarted,
   CurrentTrackSkipped,
   TrackFinished,
