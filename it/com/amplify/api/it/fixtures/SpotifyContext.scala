@@ -1,6 +1,6 @@
 package com.amplify.api.it.fixtures
 
-import com.amplify.api.domain.coin.CoinDeadboltHandler.COIN_PARAM
+import com.amplify.api.domain.coin.CoinAuthenticatedBuilder.COIN_PARAM
 import com.amplify.api.domain.models.AuthProviderType.{Spotify ⇒ AuthSpotify}
 import com.amplify.api.domain.models.Spotify.{PlaylistUri, TrackUri}
 import com.amplify.api.shared.exceptions.UserAuthTokenNotFound

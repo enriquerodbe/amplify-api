@@ -2,7 +2,6 @@ package com.amplify.api.domain.coin
 
 import com.amplify.api.domain.models.primitives.Id
 import com.amplify.api.shared.daos.BaseTable
-import java.time.Instant
 
 trait CoinUsagesTable extends BaseTable {
 
@@ -14,7 +13,6 @@ trait CoinUsagesTable extends BaseTable {
     def id = column[Id]("id", O.PrimaryKey, O.AutoInc)
     def coinId = column[Id]("coin_id")
     def usageNumber = column[Int]("usage_number")
-    def timestamp = column[Instant]("timestamp")
 
     def * = (coinId, usageNumber) <> (CoinUsage.tupled, CoinUsage.unapply)
   }

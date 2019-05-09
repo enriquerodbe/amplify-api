@@ -14,8 +14,7 @@ class HttpSpec extends BaseHttpSpec {
       response.contentType mustBe JSON
     }
     "respond unauthorized" in {
-      val response = await(wsUrl("/venues")
-        .post(Json.obj("code" → invalidAuthCode.value)))
+      val response = await(wsUrl("/venues").post(Json.obj("code" → invalidAuthCode.value)))
       response.status mustBe UNAUTHORIZED
       response.contentType mustBe JSON
     }
@@ -24,13 +23,6 @@ class HttpSpec extends BaseHttpSpec {
         .withHttpHeaders(AUTHORIZATION → s"Bearer $aliceAccessToken")
         .post(Json.obj("wrong" → "test")))
       response.status mustBe BAD_REQUEST
-      response.contentType mustBe JSON
-    }
-    "respond forbidden" in {
-      val response = await {
-        wsUrl("/venues/me").withHttpHeaders(AUTHORIZATION → s"Bearer $aliceAccessToken").get()
-      }
-      response.status mustBe FORBIDDEN
       response.contentType mustBe JSON
     }
     "respond not found" in {

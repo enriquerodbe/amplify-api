@@ -8,7 +8,6 @@ lazy val dependencies = Seq(
   ws,
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
   "org.postgresql" % "postgresql" % "42.2.5",
-  "be.objectify" %% "deadbolt-scala" % "2.6.1",
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "it,test",
   "org.mockito" % "mockito-core" % "2.23.0" % "it,test")
 
@@ -48,7 +47,7 @@ fork in IntegrationTest := true
 javaOptions in IntegrationTest += "-Dconfig.file=it/conf/application.test.conf"
 
 // Scoverage
-coverageMinimum := 74
+coverageMinimum := 75
 coverageFailOnMinimum := true
 lazy val coverageExcludedPackagesSeq = Seq(
   "com.amplify.api.domain.models.*",

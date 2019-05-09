@@ -10,9 +10,6 @@ class DbioRunner @Inject()(
 
   import profile.api._
 
-  def runTransactionally[R, S <: NoStream, E <: Effect](
-      action: DBIOAction[R, S, E]): Future[R] = run(action.transactionally)
-
   def run[R, S <: NoStream, E <: Effect](
       action: DBIOAction[R, S, E]): Future[R] = db.run(action)
 }

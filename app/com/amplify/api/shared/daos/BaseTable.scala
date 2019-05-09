@@ -1,10 +1,8 @@
 package com.amplify.api.shared.daos
 
-import com.amplify.api.domain.models.{AuthProviderType, ContentIdentifier}
 import com.amplify.api.domain.models.AuthProviderType.AuthProviderType
 import com.amplify.api.domain.models.primitives._
-import java.sql.Timestamp
-import java.time.Instant
+import com.amplify.api.domain.models.{AuthProviderType, ContentIdentifier}
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
@@ -12,8 +10,6 @@ import slick.jdbc.JdbcProfile
 trait BaseTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
-
-  implicit val instantType = MappedColumnType.base[Instant, Timestamp](Timestamp.from, _.toInstant)
 
   implicit val idType = MappedColumnType.base[Id, Long](_.value, Id.apply)
 

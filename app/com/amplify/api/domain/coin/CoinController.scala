@@ -1,6 +1,5 @@
 package com.amplify.api.domain.coin
 
-import be.objectify.deadbolt.scala.ActionBuilders
 import com.amplify.api.domain.models.TrackIdentifier
 import com.amplify.api.domain.queue.QueueService
 import com.amplify.api.shared.controllers.dtos.CoinDtos.CoinRemainingUsagesResponse
@@ -15,23 +14,23 @@ class CoinController @Inject()(
     cc: ControllerComponents,
     coinService: CoinService,
     queueService: QueueService,
-    val actionBuilder: ActionBuilders)(
+    coinAuthAction: CoinActionBuilder)(
     implicit ec: ExecutionContext)
-  extends AbstractController(cc) with CoinAuthRequests {
+  extends AbstractController(cc) {
 
-  def retrieveAllowedPlaylist() = authenticatedCoin() { request ⇒
-    queueService.retrieveAllowedPlaylist(request.subject.coin.venueUid).map {
+  def retrieveAllowedPlaylist() = coinAuthAction.async { request ⇒
+    queueService.retrieveAllowedPlaylist(request.coin.venueUid).map {
       case Some(playlist) ⇒ playlistToPlaylistResponse(playlist)
       case None ⇒ NoContent
     }
   }
 
-  def retrieveRemainingUsages() = authenticatedCoin() { request ⇒
-    coinService.retrieveRemainingUsages(request.subject.coin).map(CoinRemainingUsagesResponse.apply)
+  def retrieveRemainingUsages() = coinAuthAction.async { request ⇒
+    coinService.retrieveRemainingUsages(request.coin).map(CoinRemainingUsagesResponse.apply)
   }
 
-  def retrieveCurrentTrack() = authenticatedCoin() { request ⇒
-    val eventualQueue = queueService.retrieveQueue(request.subject.coin.venueUid)
+  def retrieveCurrentTrack() = coinAuthAction.async { request ⇒
+    val eventualQueue = queueService.retrieveQueue(request.coin.venueUid)
     eventualQueue.map { queue ⇒
       queue.currentItem match {
         case Some(queueItem) ⇒ itemToQueueTrackResponse(queueItem)
@@ -40,10 +39,10 @@ class CoinController @Inject()(
     }
   }
 
-  def addTrack() = authenticatedCoin(parse.json[AddTrackRequest]) { request ⇒
+  def addTrack() = coinAuthAction.async(parse.json[AddTrackRequest]) { request ⇒
     val triedIdentifier = TrackIdentifier.fromString(request.body.identifier)
     Future.fromTry(triedIdentifier).flatMap { trackIdentifier ⇒
-      coinService.addTrack(request.subject.coin, trackIdentifier).map(_ ⇒ NoContent)
+      coinService.addTrack(request.coin, trackIdentifier).map(_ ⇒ NoContent)
     }
   }
 }

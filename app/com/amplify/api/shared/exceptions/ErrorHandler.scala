@@ -18,6 +18,7 @@ class ErrorHandler @Inject()(
   extends HttpErrorHandler with Results {
 
   private val logger = Logger(classOf[ErrorHandler])
+  private val InternalServerErrorMessage = "Internal server error"
 
   override def onClientError(
       request: RequestHeader,
@@ -33,11 +34,10 @@ class ErrorHandler @Inject()(
       case ex: BadRequestException ⇒
         Future.successful(ClientErrorResponse(ex.code, ex.message))
       case ex ⇒
-        val message = "Internal server error"
-        logger.error(message, exception)
+        logger.error(InternalServerErrorMessage, exception)
         val response = ex match {
-          case ex: InternalException ⇒ ServerErrorResponse(ex.code, message)
-          case _ ⇒ ServerErrorResponse(message = message)
+          case ex: InternalException ⇒ ServerErrorResponse(ex.code, InternalServerErrorMessage)
+          case _ ⇒ ServerErrorResponse(message = InternalServerErrorMessage)
         }
         Future.successful(response)
     }

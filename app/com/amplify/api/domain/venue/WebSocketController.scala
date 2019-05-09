@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.Materializer
 import com.amplify.api.domain.models.Venue
 import com.amplify.api.domain.models.primitives.Uid
-import com.amplify.api.domain.venue.auth.{AuthHeaders, VenueAuthService}
+import com.amplify.api.domain.venue.auth.{VenueAuthService, VenueAuthenticatedBuilder}
 import javax.inject.Inject
 import play.api.libs.streams.ActorFlow
 import play.api.mvc.{AbstractController, ControllerComponents, WebSocket}
@@ -18,7 +18,7 @@ class WebSocketController @Inject()(
     materializer: Materializer) extends AbstractController(cc) {
 
   def connect: WebSocket = WebSocket.acceptOrResult[String, String] { request =>
-    request.session.get(AuthHeaders.VENUE_UID) match {
+    request.session.get(VenueAuthenticatedBuilder.VENUE_UID) match {
       case Some(venueUid) ⇒
         venueAuthService.login(Uid(venueUid)).map {
           case Some(venue) ⇒ Right(notifierFlow(venue))
